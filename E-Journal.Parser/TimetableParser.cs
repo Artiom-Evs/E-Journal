@@ -48,7 +48,7 @@ namespace E_Journal.Parser
 
         private static ParseResult ParseNodeGroup(HtmlNode[] nodeGroup)
         {
-            string? name = null;
+            string name = string.Empty;
             string? dateRange = null;
             DateTime[]? days = null;
             string[][]? grid = null;
