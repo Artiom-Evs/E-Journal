@@ -118,11 +118,12 @@ namespace E_Journal.Parser
         }
         private static string[][] ConvertToGridStrs(HtmlNode[][] gridNodes)
         {
-            return gridNodes.Select(row => row.Select(cell => cell.InnerText.Trim()).ToArray()).ToArray();
+            return gridNodes.Select(row => row.Select(cell => CleanUpCell(cell.InnerHtml)).ToArray()).ToArray();
         }
-        public static string[][] CleanUpExscess(string[][] grid)
+        
+        public static string CleanUpCell(string cell)
         {
-            return grid.Select(row => row.Select(cell => cell.Replace("&nbsp;", "")).ToArray()).ToArray();
+            return cell.Replace("&nbsp;", "").Replace("<p>", "").Replace("<br> ", "\n").Replace("</p>", "").Trim();
         }
     }
 }
