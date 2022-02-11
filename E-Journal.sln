@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E-Journal.Console", "E-Journal.Console\E-Journal.Console.csproj", "{16252A6D-1982-404A-BD67-675B2AAEA0F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E-Journal.Console", "E-Journal.Console\E-Journal.Console.csproj", "{16252A6D-1982-404A-BD67-675B2AAEA0F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E-Journal.Shared", "E-Journal.Shared\E-Journal.Shared.csproj", "{8A4C2532-3947-45CF-9EC3-E77F636C754F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E-Journal.Shared", "E-Journal.Shared\E-Journal.Shared.csproj", "{8A4C2532-3947-45CF-9EC3-E77F636C754F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E-Journal.Parser", "E-Journal.Parser\E-Journal.Parser.csproj", "{31A65530-E0A8-4745-BE4C-387A268C140A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E-Journal.Parser", "E-Journal.Parser\E-Journal.Parser.csproj", "{31A65530-E0A8-4745-BE4C-387A268C140A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E_Journal.Builder", "E_Journal.Builder\E_Journal.Builder.csproj", "{FBAB2D19-BFB0-40E5-BE1A-1EC6CFA45A74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{31A65530-E0A8-4745-BE4C-387A268C140A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31A65530-E0A8-4745-BE4C-387A268C140A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31A65530-E0A8-4745-BE4C-387A268C140A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBAB2D19-BFB0-40E5-BE1A-1EC6CFA45A74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBAB2D19-BFB0-40E5-BE1A-1EC6CFA45A74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBAB2D19-BFB0-40E5-BE1A-1EC6CFA45A74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBAB2D19-BFB0-40E5-BE1A-1EC6CFA45A74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
