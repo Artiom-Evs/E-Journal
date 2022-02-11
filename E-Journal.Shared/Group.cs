@@ -16,5 +16,10 @@ namespace E_Journal.Shared
         public string Name { get; set; }
         public ICollection<Student> Students { get; set; }
         public ICollection<Discipline> Disciplines { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

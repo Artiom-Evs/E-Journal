@@ -11,5 +11,9 @@
         public string Name { get; set; }
         public Group Group { get; set; }
 
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

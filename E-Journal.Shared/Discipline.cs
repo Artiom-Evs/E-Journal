@@ -15,7 +15,11 @@ namespace E_Journal.Shared
         public int Id { get; set; }
         public string Name { get; set; }
         public ICollection<Teacher> Teachers { get; set; }
-        public ICollection<TrainingSession> TrainingSessions { get; set; }  
+        public ICollection<TrainingSession> TrainingSessions { get; set; }
 
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }
