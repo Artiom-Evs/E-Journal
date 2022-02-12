@@ -100,8 +100,9 @@ namespace E_Journal.Parser
 
             var gridNodes = ConvertToGridNodes(tableRows.Skip(2));
             var gridStrs = ConvertToGridStrs(gridNodes);
-            
-            return (days, gridStrs);
+            var invertedGrid = InverseGrid(gridStrs);
+
+            return (days, invertedGrid);
         }
         private static DateTime[] ParseDaysRow(HtmlNode daysRow)
         {
@@ -132,7 +133,24 @@ namespace E_Journal.Parser
         {
             return cell.Replace("&nbsp;", "").Replace("<p>", "").Replace("<br> ", "\n").Replace("</p>", "").Trim();
         }
-        
+        private static string[][] InverseGrid(string[][] grid)
+        {
+            string[][] newGrid = new string[grid[0].Length / 2][];
+
+            for (int col = 0; col < grid[0].Length; col += 2)
+            {
+                newGrid[col / 2] = new string[grid.Length * 2];
+
+                for (int row = 0; row < grid.Length; row++)
+                {
+                    newGrid[col / 2][row * 2] = grid[row][col];
+                    newGrid[col / 2][row * 2 + 1] = grid[row][col + 1];
+                }
+            }
+
+            return newGrid;
+        }
+
         private static IEnumerable<HtmlNode> ContentNodeChildSelector(IEnumerable<HtmlNode> nodes) => nodes
             .Where(n => n.Name == "table" || ((n.Name == tags.NameHeader || n.Name == tags.DateRangeHeader) && n.InnerText.Contains(" - ")));
 
