@@ -11,10 +11,15 @@ namespace E_Journal.Parser
 {
     public static class TimetableParser
     {
+        private static (string NameHeader, string DateRangeHeader) tags;
+        
         public static ParseResult[] ParseTimetable(string pageText)
         {
             var document = ConvertToHtmlNode(pageText);
             var contentNode = CutContentNode(document);
+
+            tags = (DefineNameTag(contentNode), DefineDataRangeTag(contentNode));
+
             var nodeGroups = DivideToNodeGroups(contentNode).ToList();
 
             return nodeGroups.Select(group => ParseNodeGroup(group)).ToArray();
@@ -34,16 +39,18 @@ namespace E_Journal.Parser
         {
             List<HtmlNode> blockGroup = new();
 
-            foreach (HtmlNode node in contentNode.ChildNodes.Where(n => n.Name == "h2" || n.Name == "h3" || n.Name == "table"))
+            var s = ContentNodeChildSelector(contentNode.ChildNodes);  foreach (HtmlNode node in s)
             {
-                if (blockGroup.Any() && node.Name == "h2")
+                if (blockGroup.Any() && (node.InnerText.Contains("Группа - ") || node.InnerText.Contains("Преподаватель - ")))
                 {
                     yield return blockGroup.ToArray();
                     blockGroup = new();
                 }
-
+                
                 blockGroup.Add(node);
             }
+
+            yield return blockGroup.ToArray();
         }
 
         private static ParseResult ParseNodeGroup(HtmlNode[] nodeGroup)
@@ -93,7 +100,7 @@ namespace E_Journal.Parser
 
             var gridNodes = ConvertToGridNodes(tableRows.Skip(2));
             var gridStrs = ConvertToGridStrs(gridNodes);
-
+            
             return (days, gridStrs);
         }
         private static DateTime[] ParseDaysRow(HtmlNode daysRow)
@@ -120,10 +127,35 @@ namespace E_Journal.Parser
         {
             return gridNodes.Select(row => row.Select(cell => CleanUpCell(cell.InnerHtml)).ToArray()).ToArray();
         }
-        
+
         public static string CleanUpCell(string cell)
         {
             return cell.Replace("&nbsp;", "").Replace("<p>", "").Replace("<br> ", "\n").Replace("</p>", "").Trim();
+        }
+        
+        private static IEnumerable<HtmlNode> ContentNodeChildSelector(IEnumerable<HtmlNode> nodes) => nodes
+            .Where(n => n.Name == "table" || ((n.Name == tags.NameHeader || n.Name == tags.DateRangeHeader) && n.InnerText.Contains(" - ")));
+
+        private static string DefineNameTag(HtmlNode contentNode) =>
+            contentNode
+            .ChildNodes
+            .FirstOrDefault(n => n.InnerText.Contains("Группа - ") || n.InnerText.Contains("Преподаватель - "))
+            ?.Name ?? throw new InvalidOperationException("Не удалось определить тег названия группы/преподавателя.");
+        private static string DefineDataRangeTag(HtmlNode contentNode)
+        {
+            foreach (var node in contentNode.ChildNodes)
+            {
+                string[] dates = node.InnerText.Split(" - ");
+
+                if (dates.Length != 2) continue;
+
+                if (DateTime.TryParse(dates[0], out _) && DateTime.TryParse(dates[1], out _))
+                {
+                    return node.Name;
+                }
+            }
+
+            throw new InvalidOperationException("Не удалось определить тег диапазона дат.");
         }
     }
 }
