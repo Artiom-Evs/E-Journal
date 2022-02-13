@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E-Journal.Shared", "E-Journ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E-Journal.Parser", "E-Journal.Parser\E-Journal.Parser.csproj", "{31A65530-E0A8-4745-BE4C-387A268C140A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E_Journal.Builder", "E_Journal.Builder\E_Journal.Builder.csproj", "{FBAB2D19-BFB0-40E5-BE1A-1EC6CFA45A74}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E-Journal.Builder", "E-Journal.Builder\E-Journal.Builder.csproj", "{FBAB2D19-BFB0-40E5-BE1A-1EC6CFA45A74}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E-Journal.Parser.Tests", "E-Journal.Parser.Tests\E-Journal.Parser.Tests.csproj", "{469039D9-D7A0-419E-9368-25CC4FC73C9C}"
 EndProject
