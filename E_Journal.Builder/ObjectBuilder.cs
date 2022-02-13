@@ -12,12 +12,8 @@ namespace E_Journal.Builder
 
         public static (TrainingSession[]?, Discipline[]?, Teacher[]?, Group[]?) BuildAllGroups(ParseResult[] results)
         {
-            objectTree = new();
-            objectTree.Sessions = new();
-            objectTree.Disciplines = new();
-            objectTree.Teachers = new();
-            objectTree.Groups = new();
-
+            objectTree = new(new(), new(), new(), new());
+            
             foreach (var result in results)
             {
                 BuildGroup(result);
@@ -29,48 +25,41 @@ namespace E_Journal.Builder
             return (objects.Sessions?.ToArray(), objects.Disciplines?.ToArray(), objects.Teachers?.ToArray(), objects.Groups?.ToArray());
         }
 
-        public static Group BuildGroup(ParseResult result)
+        public static void BuildGroup(ParseResult result)
         {
             Group group = new() { Name = result.Name };
             objectTree.Groups.Add(group);
-
-            string cell;
-            string room;
-            DateTime date;
-
+            
             if (result.Days is null || result.Timetable is null)
             {
-                return group;
+                return;
             }
 
-            for (int row = 0; row < result.Timetable?.Length; row++)
+            foreach (var day in result.Days.Zip(result.Timetable))
             {
-                for (int col = 0; col < result.Timetable?[row].Length;)
+                foreach (var session in BuildDay(day.First, day.Second))
                 {
-                    if (result.Timetable[row][col] == "") break;
-
-                    date = result.Days[col / 2];
-                    cell = result.Timetable[row][col++];
-                    room = result.Timetable[row][col++];
-
-
-                    var sessions = ParseCell(cell, room, date);
-
-                    foreach (var session in sessions)
-                    {
-                        session.Group = group;
-                        group.Disciplines.Add(session.Discipline);
-                    }
+                    session.Group = group;
+                    group.Disciplines.Add<Discipline>(session.Discipline);
                 }
             }
-
-            group.Disciplines = group.Disciplines.Distinct().ToList();
-            return group;
         }
 
-        private static TrainingSession[] ParseCell(string cell, string room, DateTime date)
+        private static IEnumerable<TrainingSession> BuildDay(DateTime date, string[] day_sessions)
         {
-            List<TrainingSession> sessions = new();
+            for (int i = 0; i < day_sessions.Length; i += 2)
+            {
+                if (day_sessions[i] == "") continue;
+                
+                foreach (var session in BuildCell(day_sessions[i], day_sessions[i + 1], date, i / 2 + 1))
+                {
+                    yield return session;
+                }
+            }
+        }
+
+        private static IEnumerable<TrainingSession> BuildCell(string cell, string room, DateTime date, int number)
+        {
             var distRows = cell.Replace("1.", "").Replace("2.", "").Replace("3.", "").Split('\n');
             var roomRows = room.Replace("1.", "").Replace("2.", "").Replace("3.", "").Split('\n');
 
@@ -87,13 +76,18 @@ namespace E_Journal.Builder
                     Date = date,
                     Discipline = discipline,
                     Teacher = teacher,
-                    Room = (row / 3 < roomRows.Length) ? roomRows[row / 3] : roomRows[0]
+                    Room = (row / 3 < roomRows.Length) ? roomRows[row / 3] : roomRows[0],
+                    Number = (byte)number
                 };
 
-                sessions.Add(session);
-            }
+                if (distRows.Length > 3)
+                {
+                    session.Subgroup = char.Parse((row / 3 + 1).ToString());
+                }
 
-            return sessions.ToArray();
+                discipline.TrainingSessions.Add(session);
+                yield return session;
+            }
         }
 
         private static Discipline AddDiscipline(string discipline_name)
@@ -122,7 +116,6 @@ namespace E_Journal.Builder
 
             return teacher;
         }
-
         private static void Add<T>(this ICollection<T> list, T item)
         {
             if (!list.Contains(item))
