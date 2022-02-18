@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\E-Journal.Builder\E-Journal.Builder.csproj" />
+    <ProjectReference Include="..\E-Journal.Parser\E-Journal.Parser.csproj" />
     <ProjectReference Include="..\E-Journal.Shared\E-Journal.Shared.csproj" />
   </ItemGroup>
 
