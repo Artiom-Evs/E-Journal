@@ -12,7 +12,7 @@ namespace E_Journal.Parser
     public static class TimetableParser
     {
         private static (string NameHeader, string DateRangeHeader) tags;
-        
+
         public static ParseResult[] ParseTimetable(string pageText)
         {
             var document = ConvertToHtmlNode(pageText);
@@ -39,14 +39,14 @@ namespace E_Journal.Parser
         {
             List<HtmlNode> blockGroup = new();
 
-            var s = ContentNodeChildSelector(contentNode.ChildNodes);  foreach (HtmlNode node in s)
+            foreach (HtmlNode node in ContentNodeChildSelector(contentNode.ChildNodes))
             {
                 if (blockGroup.Any() && (node.InnerText.Contains("Группа - ") || node.InnerText.Contains("Преподаватель - ")))
                 {
                     yield return blockGroup.ToArray();
                     blockGroup = new();
                 }
-                
+
                 blockGroup.Add(node);
             }
 
@@ -59,25 +59,28 @@ namespace E_Journal.Parser
             string? dateRange = null;
             DateTime[]? days = null;
             string[][]? grid = null;
-            
+            int hashCode = 0;
+
             try
             {
                 name = nodeGroup[0].InnerText.Trim().Replace("Группа - ", "").Replace("Преподаватель - ", "");
-                dateRange = nodeGroup.FirstOrDefault(n => n.Name == "h3")?.InnerText.Trim();
-                
+                dateRange = nodeGroup[1].InnerText.Trim();
+
                 if (nodeGroup.Length == 3)
                 {
                     (days, grid) = ParseTable(nodeGroup[2]);
+                    hashCode = nodeGroup[2].InnerText.GetHashCode();
                 }
             }
             catch (Exception ex)
             {
                 return new ParseResult()
                 {
-                    Name = name, 
-                    DateRange = dateRange, 
-                    Days = days, 
-                    Timetable = grid, 
+                    Name = name,
+                    DateRange = dateRange,
+                    Days = days,
+                    Timetable = grid,
+                    HashCode = hashCode,
                     Exception = ex
                 };
             }
@@ -87,7 +90,8 @@ namespace E_Journal.Parser
                 Name = name,
                 DateRange = dateRange,
                 Days = days,
-                Timetable = grid
+                Timetable = grid,
+                HashCode = hashCode
             };
         }
         private static (DateTime[], string[][]?) ParseTable(HtmlNode table)
@@ -107,11 +111,10 @@ namespace E_Journal.Parser
         private static DateTime[] ParseDaysRow(HtmlNode daysRow)
         {
             List<DateTime> days = new();
-            DateTime buffer;
 
             foreach (HtmlNode node in daysRow.Elements("td").Skip(1))
             {
-                if (DateTime.TryParse(node.InnerText, out buffer))
+                if (DateTime.TryParse(node.InnerText, out DateTime buffer))
                 {
                     days.Add(buffer);
                 }
