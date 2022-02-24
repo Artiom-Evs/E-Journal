@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using HtmlAgilityPack;
-
+using System.Globalization;
 
 namespace E_Journal.Parser
 {
@@ -114,7 +114,7 @@ namespace E_Journal.Parser
 
             foreach (HtmlNode node in daysRow.Elements("td").Skip(1))
             {
-                if (DateTime.TryParse(node.InnerText, out DateTime buffer))
+                if (DateTime.TryParse(node.InnerText, new CultureInfo("ru-Ru"), DateTimeStyles.None, out DateTime buffer))
                 {
                     days.Add(buffer);
                 }
@@ -132,7 +132,7 @@ namespace E_Journal.Parser
             return gridNodes.Select(row => row.Select(cell => CleanUpCell(cell.InnerHtml)).ToArray()).ToArray();
         }
 
-        public static string CleanUpCell(string cell)
+        private static string CleanUpCell(string cell)
         {
             return cell.Replace("&nbsp;", "").Replace("<p>", "").Replace("<br> ", "\n").Replace("</p>", "").Trim();
         }
@@ -170,7 +170,10 @@ namespace E_Journal.Parser
 
                 if (dates.Length != 2) continue;
 
-                if (DateTime.TryParse(dates[0], out _) && DateTime.TryParse(dates[1], out _))
+                bool isStartDateValid = DateTime.TryParse(dates[0], new CultureInfo("ru-RU"), DateTimeStyles.None, out _);
+                bool isEndDateValid = DateTime.TryParse(dates[1], new CultureInfo("ru-RU"), DateTimeStyles.None, out _);
+
+                if (isStartDateValid && isEndDateValid)
                 {
                     return node.Name;
                 }
