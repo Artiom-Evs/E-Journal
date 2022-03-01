@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 
+using E_Journal.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+
 namespace E_Journal.Server
 {
     public class Startup
@@ -15,6 +18,12 @@ namespace E_Journal.Server
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+
+            services.AddDbContext<JournalDbContext>(options =>
+            {
+                string connectionString = Configuration["ConnectionString"];
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostEnvironment env)

@@ -1,25 +1,33 @@
 version: '3.4'
 
+# name: 'e_journal'
+
 services:
   e-journal.server:
     image: ${DOCKER_REGISTRY-}ejournalserver
+    container_name: e-journal.server
     build:
       context: .
       dockerfile: E-Journal.Server/Dockerfile
     expose:
       - 443
       - 80
+    environment:
+      ConnectionString: "server=mysql;port=3306;database=JournalDB;user=root;password=12345"
+    restart: always
     depends_on:
       - e-journal.mysql
 
   e-journal.mysql:
     image: mysql
+    hostname: mysql
+    container_name: e-journal.mysql
     command: --innodb_use_native_aio=0
     expose:
       - 3306
     environment:
       MYSQL_ROOT_PASSWORD: "12345"
-    hostname: mysql
-    container_name: e-journal.mysql
-
+    restart: always
+    
+    
 
