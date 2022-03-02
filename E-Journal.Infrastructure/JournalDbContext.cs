@@ -16,7 +16,6 @@ namespace E_Journal.Infrastructure
         public JournalDbContext(DbContextOptions options)
             : base(options)
         {
-            Database.EnsureDeleted();
             Database.EnsureCreated();
         }
     }

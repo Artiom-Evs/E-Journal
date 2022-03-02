@@ -18,6 +18,18 @@ services:
     depends_on:
       - e-journal.mysql
 
+  e-journal.update_service:
+    image: ${DOCKER_REGISTRY-}ejournalupdateservice
+    container_name: e-journal.update_service
+    build:
+      context: .
+      dockerfile: E-Journal.UpdateService/Dockerfile
+    environment:
+      ConnectionString: "server=mysql;port=3306;database=JournalDB;user=root;password=12345"
+    restart: always
+    depends_on:
+      - e-journal.mysql
+
   e-journal.mysql:
     image: mysql
     hostname: mysql
@@ -27,6 +39,7 @@ services:
       - 3306
     environment:
       MYSQL_ROOT_PASSWORD: "12345"
+      MYSQL_DATABASE: JournalDB
     restart: always
     
     
