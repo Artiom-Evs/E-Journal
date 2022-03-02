@@ -93,5 +93,10 @@ namespace E_Journal.Infrastructure
             await context.Database.EnsureCreatedAsync();
             await context.SaveChangesAsync();
         }
+
+        public void Dispose()
+        {
+            context.Dispose();
+        }
     }
 }

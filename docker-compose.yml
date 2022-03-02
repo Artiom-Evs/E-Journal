@@ -26,6 +26,7 @@ services:
       dockerfile: E-Journal.UpdateService/Dockerfile
     environment:
       ConnectionString: "server=mysql;port=3306;database=JournalDB;user=root;password=12345"
+      GroupsTimetableAddress: "http://mgke.minsk.edu.by/ru/main.aspx?guid=3791"
     restart: always
     depends_on:
       - e-journal.mysql

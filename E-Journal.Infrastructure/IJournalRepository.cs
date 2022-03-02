@@ -3,7 +3,7 @@ using E_Journal.Shared;
 
 namespace E_Journal.Infrastructure
 {
-    public interface IJournalRepository
+    public interface IJournalRepository : IDisposable
     {
         IQueryable<Group> Groups { get; }
         IQueryable<Student> Students { get; }

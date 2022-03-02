@@ -12,6 +12,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         {
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         });
+        services.AddHostedService<UpdateService>();
     })
     .Build();
 
