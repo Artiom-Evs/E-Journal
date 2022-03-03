@@ -1,5 +1,6 @@
 ﻿using E_Journal.Shared;
 using E_Journal.Parser;
+using System.Globalization;
 
 namespace E_Journal.Infrastructure
 {
@@ -25,14 +26,19 @@ namespace E_Journal.Infrastructure
             Timetable timetable = new() { Group = group };
             group.Timetables.Add(timetable);
 
-            if (result.DateRange is null || result.Days is null || result.Timetable is null)
+            if (result.DateRange is null)
             {
                 return group;
             }
 
-            DateTime[] dates = result.DateRange.Split(" - ").Select(d => DateTime.Parse(d)).ToArray();
-            timetable.StartDate = dates[0];
-            timetable.EndDate = dates[1];
+            string[] dates = result.DateRange.Split(" - ").ToArray();
+            timetable.StartDate = DateTime.Parse(dates[0], new CultureInfo("ru-Ru"), DateTimeStyles.None);
+            timetable.EndDate = DateTime.Parse(dates[1], new CultureInfo("ru-Ru"), DateTimeStyles.None);
+
+            if (result.Days is null || result.Timetable is null)
+            {
+                return group;
+            }
 
             foreach (var (First, Second) in result.Days.Zip(result.Timetable))
             {
