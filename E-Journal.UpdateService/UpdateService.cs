@@ -63,7 +63,7 @@ namespace E_Journal.UpdateService
                     {
                         Group group = await builder.BuildGroup(schedule);
                         context.Groups.Update(group);
-                        await context.SaveChangesAsync();
+                        context.SaveChanges();
                     }
 
                     _logger.LogInformation($"Update ended at: {DateTimeOffset.Now}\n");
