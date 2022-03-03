@@ -104,7 +104,7 @@ namespace E_Journal.Infrastructure
             if (group == null)
             {
                 group = new() { Name = group_name };
-                await repository.Add<Group>(group);
+                await repository.AddAsync<Group>(group);
             }
 
             return group;
@@ -116,7 +116,7 @@ namespace E_Journal.Infrastructure
             if (discipline == null)
             {
                 discipline = new() { Name = discipline_name };
-                await repository.Add<Discipline>(discipline);
+                await repository.AddAsync<Discipline>(discipline);
             }
 
             return discipline;
@@ -128,7 +128,7 @@ namespace E_Journal.Infrastructure
             if (teacher == null)
             {
                 teacher = new() { Name = teacher_name };
-                await repository.Add<Teacher>(teacher);
+                await repository.AddAsync<Teacher>(teacher);
             }
 
             return teacher;

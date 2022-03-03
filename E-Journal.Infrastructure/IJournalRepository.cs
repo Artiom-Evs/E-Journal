@@ -12,18 +12,31 @@ namespace E_Journal.Infrastructure
         IQueryable<TrainingSession> TrainingSessions { get; }
         IQueryable<Timetable> Timetables { get; }
 
-        ValueTask Add<T>(T item) where T : class;
-        ValueTask Update<T>(T item) where T : class;
-        ValueTask Delete<T>(int id) where T : class;
-        ValueTask<T?> Get<T>(int id) where T : class;
+        void Add<T>(T item) where T : class;
+        void Update<T>(T item) where T : class;
+        void Delete<T>(int id) where T : class;
+        T? Get<T>(int id) where T : class;
 
-        Task<Group> GetGroup(int id);
-        Task<Student> GetStudent(int id);
-        Task<Teacher> GetTeacher(int id);
-        Task<Discipline> GetDiscipline(int id);
-        Task<TrainingSession> GetTrainingSession(int id);
-        Task<StudentStatus> GetStudentStatus(int id);
-        Task<Timetable> GetTimetable(int id);
+        ValueTask AddAsync<T>(T item) where T : class;
+        ValueTask UpdateAsync<T>(T item) where T : class;
+        ValueTask DeleteAsync<T>(int id) where T : class;
+        ValueTask<T?> GetAsync<T>(int id) where T : class;
+
+        Group GetGroup(int id);
+        Student GetStudent(int id);
+        Teacher GetTeacher(int id);
+        Discipline GetDiscipline(int id);
+        TrainingSession GetTrainingSession(int id);
+        StudentStatus GetStudentStatus(int id);
+        Timetable GetTimetable(int id);
+
+        Task<Group> GetGroupAsync(int id);
+        Task<Student> GetStudentAsync(int id);
+        Task<Teacher> GetTeacherAsync(int id);
+        Task<Discipline> GetDisciplineAsync(int id);
+        Task<TrainingSession> GetTrainingSessionAsync(int id);
+        Task<StudentStatus> GetStudentStatusAsync(int id);
+        Task<Timetable> GetTimetableAsync(int id);
         Task ClearDatabase();
     }
 }
