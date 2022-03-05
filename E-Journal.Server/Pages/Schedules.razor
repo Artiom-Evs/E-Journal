@@ -1,0 +1,44 @@
+﻿@page "/schedules"
+@inject IJournalRepository repository
+
+<PageTitle>E-Journal - Расписание групп</PageTitle>
+
+<h1>Расписание групп</h1>
+<br />
+
+@if (schedules == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    foreach (var schedule in schedules)
+    {
+        <GroupScheduleViewConponent Timetable = "@schedule" />
+        <br />
+    }
+}
+
+@code {
+    private Timetable[]? schedules;
+
+    protected override void OnInitialized()
+    {
+        schedules = GetLastSchedules();
+        StateHasChanged();
+    }
+
+    private Timetable[] GetLastSchedules()
+    {
+        int[] scheduleIds = repository.Groups.Select(g => g.Timetables.OrderBy(t => t.StartDate).Last().Id).ToArray();
+        Timetable[] schedules = new Timetable[scheduleIds.Length];
+
+
+        for (int i = 0; i < scheduleIds.Length; i++)
+        {
+            schedules[i] = repository.GetTimetable(scheduleIds[i]);
+        }
+
+        return schedules;
+    }
+}

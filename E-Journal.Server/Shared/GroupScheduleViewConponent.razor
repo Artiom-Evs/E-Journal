@@ -1,0 +1,124 @@
+﻿@inject IJournalRepository journalRepository
+
+@if (Timetable is null)
+{
+    <p><em>Ошибка данных</em></p>
+}
+else 
+{
+    <h2>Группа - @Timetable.Group.Name</h2>
+    <h3>@GetGroupDateRange()</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                @foreach (var date in dates)
+                {
+                    <th colspan="2">@DateToString(date)</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < maxSessionsCount; i++)
+            {
+                <tr>
+                    @for (int j = 0; j < dates.Length; j++)
+                    {
+                        sessions = Timetable?.TrainingSessions.Where(s => s.Number == (i + 1) && s.Date == dates[j]).ToArray();
+
+                        if (sessions?.Length == 0)
+                        {
+                            <td></td>
+                            <td></td>
+                        }
+                        else if (sessions?.Length == 1)
+                        {
+                            <td>@journalRepository.Disciplines.First(d => d.Id == sessions[0].DisciplineId).Name</td>
+                            <td>@sessions[0].Room</td>
+                        }
+                        else
+                        {
+                            <td>
+                                @foreach (var s in sessions)
+                                {
+                                    @($"{s.Subgroup}. {journalRepository.Disciplines.First(d => d.Id == s.DisciplineId).Name}")<br />
+                                    @(journalRepository.Teachers.First(t => t.Id == s.TeacherId).Name)<br />
+                                }
+                            </td>
+                            <td>
+                                @foreach (var s in sessions)
+                                {
+                                    @($"{s.Subgroup}. {s.Room}")<br />
+                                }
+                            </td>
+                        }
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private DateTime[]? dates;
+    private int maxSessionsCount;
+    private TrainingSession[]? sessions;
+
+    [Parameter]
+    public Timetable? Timetable { get; set; }
+
+    protected override void OnParametersSet() {
+        base.OnParametersSet();
+        dates = GetTimetableDays();
+        maxSessionsCount = GetMaxSessionsCount();
+    }
+    private string GetGroupDateRange() {
+        if (Timetable?.StartDate == default || Timetable?.EndDate == default)
+        {
+            return "Не определён";
+        }
+
+        return ($"{Timetable?.StartDate.ToShortDateString()} - {Timetable?.EndDate.ToShortDateString()}");
+    }
+    private DateTime[] GetTimetableDays() {
+        int daysCount = (Timetable?.EndDate - Timetable?.StartDate).Value.Days;
+        DateTime[] days = new DateTime[daysCount];
+
+        days[0] = Timetable.StartDate;
+
+        for (int i = 1; i < daysCount; i++)
+        {
+            days[i] = days[i - 1].AddDays(1);
+        }
+
+        return days;
+    }
+    private string DateToString(DateTime date){
+        string str = date.ToString("dddd");
+        return str[0].ToString().ToUpper() + str[1..] + ", " + date.ToShortDateString();
+    }
+    private string GetSessionNamesForSubgroups(TrainingSession[] sessions){
+        string str = "";
+
+        foreach (var s in sessions)
+        {
+            str += s.Subgroup + ". " + journalRepository.Disciplines.First(d => d.Id == s.DisciplineId).Name + " ";
+        }
+
+        return str;
+    }
+    private string GetSessionRoomsForSubgroups(TrainingSession[] sessions){
+        string str = "";
+
+        foreach (var s in sessions)
+        {
+            str += s.Subgroup + ". " + s.Room + " ";
+        }
+
+        return str;
+    }
+
+    private byte GetMaxSessionsCount()
+    {
+        return Timetable?.TrainingSessions.Select(s => s.Number).DefaultIfEmpty().Max() ?? 0;
+    }
+}

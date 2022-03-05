@@ -24,6 +24,7 @@ namespace E_Journal.Server
                 string connectionString = Configuration["ConnectionString"];
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             });
+            services.AddScoped<IJournalRepository, JournalRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IHostEnvironment env)
