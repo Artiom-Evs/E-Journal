@@ -1,138 +1,119 @@
 ﻿using E_Journal.Shared;
 using E_Journal.Parser;
 using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 
 namespace E_Journal.Infrastructure
 {
     public class TimetableBuilder
     {
-        private readonly IJournalRepository repository;
+        private readonly JournalDbContext dbContext;
 
-        public TimetableBuilder(IJournalRepository repository)
+        public TimetableBuilder(JournalDbContext dbContext)
         {
-            this.repository = repository;
+            this.dbContext = dbContext;
         }
 
-        public async IAsyncEnumerable<Group> BuildAllGroups(ParseResult[] results)
+        public Group BuildWeekSchedules(ParseResult result)
         {
-            foreach (var result in results)
-            {
-                yield return await BuildGroup(result);
-            }
-        }
-        public async ValueTask<Group> BuildGroup(ParseResult result)
-        {
-            Group group = await GetOrCreateGroup(result.Name);
-            Timetable timetable = new() { Group = group };
-            group.Timetables.Add(timetable);
+            Group group = GetOrCreateGroup(result.Name);
 
-            if (result.DateRange is null)
+            if (result.Days is null || result.TextSchedules is null)
             {
                 return group;
             }
 
-            string[] dates = result.DateRange.Split(" - ").ToArray();
-            timetable.StartDate = DateTime.Parse(dates[0], new CultureInfo("ru-Ru"), DateTimeStyles.None);
-            timetable.EndDate = DateTime.Parse(dates[1], new CultureInfo("ru-Ru"), DateTimeStyles.None);
-
-            if (result.Days is null || result.Timetable is null)
+            foreach (var (date, textSchedule) in result.Days.Zip(result.TextSchedules))
             {
-                return group;
-            }
-
-            foreach (var (First, Second) in result.Days.Zip(result.Timetable))
-            {
-                await foreach (var session in BuildDay(First, Second))
-                {
-                    session.Group = group;
-                    Add<Discipline>(group.Disciplines, session.Discipline);
-                    Add<Group>(session.Discipline.Groups, group);
-                    timetable.TrainingSessions.Add(session);
-                }
+                group.Schedules.Add(BuildSchedule(date, textSchedule, group));
             }
 
             return group;
         }
-        private async IAsyncEnumerable<TrainingSession> BuildDay(DateTime date, string[] day_sessions)
+        private Schedule BuildSchedule(DateTime date, string[] textSchedule, Group group)
         {
-            for (int i = 0; i < day_sessions.Length; i += 2)
-            {
-                if (day_sessions[i] == "") continue;
+            Schedule schedule = new(group, date);
 
-                await foreach (var session in BuildCell(day_sessions[i], day_sessions[i + 1], date, i / 2 + 1))
+            for (int i = 0; i < textSchedule.Length; i += 2)
+            {
+                if (textSchedule[i] == "") continue;
+
+                foreach (var lesson in BuildLessons(textSchedule[i], textSchedule[i + 1], date, i / 2 + 1, schedule))
                 {
-                    yield return session;
+                    schedule.Lessons.Add(lesson);
                 }
             }
-        }
-        private async IAsyncEnumerable<TrainingSession> BuildCell(string cell, string room, DateTime date, int number)
-        {
-            var distRows = cell.Replace("1.", "").Replace("2.", "").Replace("3.", "").Split('\n');
-            var roomRows = room.Replace("1.", "").Replace("2.", "").Replace("3.", "").Split('\n');
 
-            for (int row = 0; row < distRows.Length; row += 3)
+            return schedule;
+        }
+        private IEnumerable<Lesson> BuildLessons(string lessonCell, string roomCell, DateTime date, int lessonNumber, Schedule schedule)
+        {
+            var lessonRows = lessonCell.Replace("1.", "").Replace("2.", "").Replace("3.", "").Split("\r\n");
+            var roomRows = roomCell.Replace("1.", "").Replace("2.", "").Replace("3.", "").Split("\r\n");
+
+            for (int row = 0; row < lessonRows.Length / 3; row++)
             {
-                var discipline = await GetOrCreateDiscipline(distRows[row]);
-                var teacher = await GetOrCreateTeacher(distRows[row + 2]);
+                var discipline = GetOrCreateDiscipline(lessonRows[(row * 3)]);
+                var teacher = GetOrCreateTeacher(lessonRows[(row * 3) + 2]);
 
                 Add<Teacher>(discipline.Teachers, teacher);
                 Add<Discipline>(teacher.Disciplines, discipline);
+                Add<Discipline>(schedule.Group.Disciplines, discipline);
+                Add<Group>(discipline.Groups, schedule.Group);
 
-                TrainingSession session = new()
-                {
-                    Date = date,
-                    Discipline = discipline,
-                    Teacher = teacher,
-                    Room = (row / 3 < roomRows.Length) ? roomRows[row / 3] : roomRows[0],
-                    Number = (byte)number
-                };
+                // последним аргументом в конструкторе вычисляется индекс для получения номера кабинета
+                Lesson lesson = new(schedule, discipline, teacher, (row < roomRows.Length) ? roomRows[row] : roomRows[0]);
+                lesson.Number = lessonNumber;
 
-                if (distRows.Length > 3)
+                if (lessonRows.Length > 3)
                 {
-                    session.Subgroup = char.Parse((row / 3 + 1).ToString());
+                    lesson.Subgroup = char.Parse((row + 1).ToString());
                 }
 
-                discipline.TrainingSessions.Add(session);
-                yield return session;
+                yield return lesson;
             }
         }
 
-        private async ValueTask<Group> GetOrCreateGroup(string group_name)
+        private Group GetOrCreateGroup(string group_name)
         {
-            Group? group = repository.Groups.FirstOrDefault(g => g.Name == group_name);
+            var group = dbContext.Groups.FirstOrDefault(g => g.Name == group_name);
 
             if (group == null)
             {
-                group = new() { Name = group_name };
-                await repository.AddAsync<Group>(group);
+                group = new Group(group_name);
+                dbContext.Groups.Add(group);
+                dbContext.SaveChanges();
             }
 
             return group;
         }
-        private async ValueTask<Discipline> GetOrCreateDiscipline(string discipline_name)
+        private Discipline GetOrCreateDiscipline(string discipline_name)
         {
-            Discipline? discipline = repository.Disciplines.FirstOrDefault(d => d.Name == discipline_name);
+            var discipline = dbContext.Disciplines.FirstOrDefault(d => d.Name == discipline_name);
 
             if (discipline == null)
             {
-                discipline = new() { Name = discipline_name };
-                await repository.AddAsync<Discipline>(discipline);
+                discipline = new Discipline(discipline_name);
+                dbContext.Disciplines.Add(discipline);
+                dbContext.SaveChanges();
             }
 
             return discipline;
         }
-        private async ValueTask<Teacher> GetOrCreateTeacher(string teacher_name)
+        private Teacher GetOrCreateTeacher(string teacher_name)
         {
-            Teacher? teacher = repository.Teachers.FirstOrDefault(t => t.Name == teacher_name);
+            var teacher = dbContext.Teachers.FirstOrDefault(t => t.Name == teacher_name);
 
             if (teacher == null)
             {
-                teacher = new() { Name = teacher_name };
-                await repository.AddAsync<Teacher>(teacher);
+                teacher = new Teacher(teacher_name);
+                dbContext.Teachers.Add(teacher);
+                dbContext.SaveChanges();
             }
 
             return teacher;
         }
+
         private static void Add<T>(ICollection<T> list, T item)
         {
             if (!list.Contains(item))
