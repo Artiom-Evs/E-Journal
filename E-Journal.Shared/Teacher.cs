@@ -5,9 +5,9 @@ namespace E_Journal.Shared
 {
     public class Teacher
     {
-        public Teacher()
+        public Teacher(string name)
         {
-            Name = "";
+            Name = name;
             Disciplines = new List<Discipline>();
         }
 

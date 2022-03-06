@@ -2,9 +2,11 @@
 {
     public class Student
     {
-        public Student()
+        public Student() { }
+        public Student(string name, Group group)
         {
-            Name = "";
+            Name = name;
+            Group = group;
         }
 
         public int Id { get; set; }
