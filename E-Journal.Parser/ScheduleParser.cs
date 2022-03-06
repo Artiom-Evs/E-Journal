@@ -9,11 +9,11 @@ using System.Globalization;
 
 namespace E_Journal.Parser
 {
-    public static class TimetableParser
+    public static class ScheduleParser
     {
         private static (string NameHeader, string DateRangeHeader) tags;
 
-        public static ParseResult[] ParseTimetable(string pageText)
+        public static ParseResult[] ParseSchedules(string pageText)
         {
             var document = ConvertToHtmlNode(pageText);
             var contentNode = CutContentNode(document);
@@ -79,7 +79,7 @@ namespace E_Journal.Parser
                     Name = name,
                     DateRange = dateRange,
                     Days = days,
-                    Timetable = grid,
+                    TextSchedules = grid,
                     HashCode = hashCode,
                     Exception = ex
                 };
@@ -90,7 +90,7 @@ namespace E_Journal.Parser
                 Name = name,
                 DateRange = dateRange,
                 Days = days,
-                Timetable = grid,
+                TextSchedules = grid,
                 HashCode = hashCode
             };
         }
@@ -134,7 +134,7 @@ namespace E_Journal.Parser
 
         private static string CleanUpCell(string cell)
         {
-            return cell.Replace("&nbsp;", "").Replace("<p>", "").Replace("<br> ", "\n").Replace("</p>", "").Trim();
+            return cell.Replace("&nbsp;", "").Replace("<p>", "").Replace("<br> ", "\r\n").Replace("</p>", "").Trim();
         }
         private static string[][] InverseGrid(string[][] grid)
         {
