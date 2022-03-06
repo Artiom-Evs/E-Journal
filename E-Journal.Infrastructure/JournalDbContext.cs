@@ -9,14 +9,10 @@ namespace E_Journal.Infrastructure
         public DbSet<Student> Students { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Discipline> Disciplines { get; set; }
-        public DbSet<TrainingSession> TrainingSessions { get; set; }
-        public DbSet<StudentStatus> StudentStatuses { get; set; }
-        public DbSet<Timetable> Timetables { get; set; }
+        public DbSet<Lesson> Lessons { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
 
         public JournalDbContext(DbContextOptions options)
-            : base(options)
-        {
-            Database.EnsureCreated();
-        }
+            : base(options) { }
     }
 }

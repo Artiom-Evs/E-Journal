@@ -16,9 +16,8 @@ namespace E_Journal.Infrastructure
         public IQueryable<Student> Students => context.Students;
         public IQueryable<Teacher> Teachers => context.Teachers;
         public IQueryable<Discipline> Disciplines => context.Disciplines;
-        public IQueryable<TrainingSession> TrainingSessions => context.TrainingSessions;
-        public IQueryable<StudentStatus> StudentStatuses => context.StudentStatuses;
-        public IQueryable<Timetable> Timetables => context.Timetables;
+        public IQueryable<Lesson> Lessons => context.Lessons;
+        public IQueryable<Schedule> Schedules => context.Schedules;
 
         public void Add<T>(T item) where T : class
         {
@@ -89,28 +88,24 @@ namespace E_Journal.Infrastructure
             context.Disciplines
             .Include(d => d.Groups)
             .Include(d => d.Teachers)
-            .Include(d => d.TrainingSessions)
             .First(s => s.Id == id);
-        public TrainingSession GetTrainingSession(int id) =>
-            context.TrainingSessions
-            .Include(s => s.Discipline)
-            .Include(s => s.Teacher)
-            .Include(s => s.StudentStatuses)
+        public Lesson GetLesson(int id) =>
+            context.Lessons
+            .Include(l => l.Schedule)
+            .Include(l => l.Discipline)
+            .Include(l => l.Teacher)
+            .First(l => l.Id == id);
+        public Schedule GetSchedule(int id) =>
+            context.Schedules
+            .Include(s => s.Group)
+            .Include(s => s.Lessons)
             .First(s => s.Id == id);
-        public StudentStatus GetStudentStatus(int id) =>
-            context.StudentStatuses
-            .Include(ss => ss.Student)
-            .First(ss => ss.Id == id);
-        public Timetable GetTimetable(int id) =>
-            context.Timetables
-            .Include(t => t.Group)
-            .Include(t => t.TrainingSessions)
-            .First(t => t.Id == id);
 
         public Task<Group> GetGroupAsync(int id) =>
             context.Groups
             .Include(g => g.Disciplines)
             .Include(g => g.Students)
+            .Include(g => g.Schedules)
             .FirstAsync(g => g.Id == id);
         public Task<Student> GetStudentAsync(int id) =>
             context.Students
@@ -124,25 +119,20 @@ namespace E_Journal.Infrastructure
             context.Disciplines
             .Include(d => d.Groups)
             .Include(d => d.Teachers)
-            .Include(d => d.TrainingSessions)
             .FirstAsync(s => s.Id == id);
-        public Task<TrainingSession> GetTrainingSessionAsync(int id) =>
-            context.TrainingSessions
-            .Include(s => s.Discipline)
-            .Include(s => s.Teacher)
-            .Include(s => s.StudentStatuses)
+        public Task<Lesson> GetLessonAsync(int id) =>
+            context.Lessons
+            .Include(l => l.Schedule)
+            .Include(l => l.Discipline)
+            .Include(l => l.Teacher)
+            .FirstAsync(l => l.Id == id);
+        public Task<Schedule> GetScheduleAsync(int id) =>
+            context.Schedules
+            .Include(s => s.Group)
+            .Include(s => s.Lessons)
             .FirstAsync(s => s.Id == id);
-        public Task<StudentStatus> GetStudentStatusAsync(int id) =>
-            context.StudentStatuses
-            .Include(ss => ss.Student)
-            .FirstAsync(ss => ss.Id == id);
-        public Task<Timetable> GetTimetableAsync(int id) =>
-            context.Timetables
-            .Include(t => t.Group)
-            .Include(t => t.TrainingSessions)
-            .FirstAsync(t => t.Id == id);
 
-        public async Task ClearDatabase()
+        public async Task ClearDatabaseAsync()
         {
             await context.Database.EnsureDeletedAsync();
             await context.Database.EnsureCreatedAsync();

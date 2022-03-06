@@ -9,8 +9,8 @@ namespace E_Journal.Infrastructure
         IQueryable<Student> Students { get; }
         IQueryable<Teacher> Teachers { get; }
         IQueryable<Discipline> Disciplines { get; }
-        IQueryable<TrainingSession> TrainingSessions { get; }
-        IQueryable<Timetable> Timetables { get; }
+        IQueryable<Lesson> Lessons { get; }
+        IQueryable<Schedule> Schedules { get; }
 
         void Add<T>(T item) where T : class;
         void Update<T>(T item) where T : class;
@@ -26,17 +26,16 @@ namespace E_Journal.Infrastructure
         Student GetStudent(int id);
         Teacher GetTeacher(int id);
         Discipline GetDiscipline(int id);
-        TrainingSession GetTrainingSession(int id);
-        StudentStatus GetStudentStatus(int id);
-        Timetable GetTimetable(int id);
+        Lesson GetLesson(int id);
+        Schedule GetSchedule(int id);
 
         Task<Group> GetGroupAsync(int id);
         Task<Student> GetStudentAsync(int id);
         Task<Teacher> GetTeacherAsync(int id);
         Task<Discipline> GetDisciplineAsync(int id);
-        Task<TrainingSession> GetTrainingSessionAsync(int id);
-        Task<StudentStatus> GetStudentStatusAsync(int id);
-        Task<Timetable> GetTimetableAsync(int id);
-        Task ClearDatabase();
+        Task<Lesson> GetLessonAsync(int id);
+        Task<Schedule> GetScheduleAsync(int id);
+
+        Task ClearDatabaseAsync();
     }
 }
