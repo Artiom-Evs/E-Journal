@@ -1,13 +1,15 @@
 ﻿@inject IJournalRepository journalRepository
 
-@if (Timetable is null)
+<h2>Группа - @Group.Name</h2>
+<h3>@GetWeekScheduleDateRange()</h3>
+    
+
+@if (!Group.Schedules.Any())
 {
-    <p><em>Ошибка данных</em></p>
+    <p><em>Расписание отсутствует</em></p>
 }
 else 
 {
-    <h2>Группа - @Timetable.Group.Name</h2>
-    <h3>@GetGroupDateRange()</h3>
     <table class="table">
         <thead>
             <tr>
@@ -18,36 +20,54 @@ else
             </tr>
         </thead>
         <tbody>
-            @for (int i = 0; i < maxSessionsCount; i++)
+            <!--
+                цикл смещающийся по строкам таблицы
+                итератор i определяет номер занятия
+            -->
+            @for (int i = 1; i <= maxLessonsCount; i++)
             {
                 <tr>
+                    <!--
+                        цикл смещающийся по дням недели - столбцам таблицы
+                    -->
                     @for (int j = 0; j < dates.Length; j++)
                     {
-                        sessions = Timetable?.TrainingSessions.Where(s => s.Number == (i + 1) && s.Date == dates[j]).ToArray();
+                        schedule = Group.Schedules.FirstOrDefault(s => s.Date == dates[j]);
 
-                        if (sessions?.Length == 0)
+                        if (schedule == null) continue;
+
+                        lessons = schedule.Lessons.Where(l => l.Number == i).ToArray();
+
+                        if (lessons.Length == 0)
                         {
                             <td></td>
                             <td></td>
                         }
-                        else if (sessions?.Length == 1)
+                        else if (lessons.Length == 1)
                         {
-                            <td>@journalRepository.Disciplines.First(d => d.Id == sessions[0].DisciplineId).Name</td>
-                            <td>@sessions[0].Room</td>
+                            <td>
+                                @journalRepository.Disciplines.First(d => d.Id == lessons[0].DisciplineId).Name
+                                <br />
+                                @journalRepository.Teachers.First(t => t.Id == lessons[0].TeacherId).Name
+                            </td>
+                            <td>@lessons[0].Room</td>
                         }
                         else
                         {
                             <td>
-                                @foreach (var s in sessions)
+                                @foreach (var l in lessons)
                                 {
-                                    @($"{s.Subgroup}. {journalRepository.Disciplines.First(d => d.Id == s.DisciplineId).Name}")<br />
-                                    @(journalRepository.Teachers.First(t => t.Id == s.TeacherId).Name)<br />
+                                    @($"{l.Subgroup}. {journalRepository.Disciplines.First(d => d.Id == l.DisciplineId).Name}")
+                                    <br />
+                                    @journalRepository.Teachers.First(t => t.Id == l.TeacherId).Name
+                                    <br />
                                 }
                             </td>
                             <td>
-                                @foreach (var s in sessions)
+                                @foreach (var l in lessons)
                                 {
-                                    @($"{s.Subgroup}. {s.Room}")<br />
+                                    @($"{l.Subgroup}. {l.Room}")
+                                    <br />
                                 }
                             </td>
                         }
@@ -59,66 +79,48 @@ else
 }
 
 @code {
+    private Schedule? schedule;
+    private Lesson[] lessons;
     private DateTime[]? dates;
-    private int maxSessionsCount;
-    private TrainingSession[]? sessions;
+    private int maxLessonsCount;
 
     [Parameter]
-    public Timetable? Timetable { get; set; }
+    public Group Group { get; set; }
 
     protected override void OnParametersSet() {
-        base.OnParametersSet();
-        dates = GetTimetableDays();
-        maxSessionsCount = GetMaxSessionsCount();
-    }
-    private string GetGroupDateRange() {
-        if (Timetable?.StartDate == default || Timetable?.EndDate == default)
+        dates = GetWeekDates();
+        
+        if (Group.Schedules.Any())
         {
-            return "Не определён";
+            maxLessonsCount = GetMaxLessonsCount();
         }
-
-        return ($"{Timetable?.StartDate.ToShortDateString()} - {Timetable?.EndDate.ToShortDateString()}");
     }
-    private DateTime[] GetTimetableDays() {
-        int daysCount = (Timetable?.EndDate - Timetable?.StartDate).Value.Days;
-        DateTime[] days = new DateTime[daysCount];
 
-        days[0] = Timetable.StartDate;
-
-        for (int i = 1; i < daysCount; i++)
-        {
-            days[i] = days[i - 1].AddDays(1);
-        }
-
-        return days;
-    }
     private string DateToString(DateTime date){
         string str = date.ToString("dddd");
         return str[0].ToString().ToUpper() + str[1..] + ", " + date.ToShortDateString();
     }
-    private string GetSessionNamesForSubgroups(TrainingSession[] sessions){
-        string str = "";
 
-        foreach (var s in sessions)
-        {
-            str += s.Subgroup + ". " + journalRepository.Disciplines.First(d => d.Id == s.DisciplineId).Name + " ";
-        }
-
-        return str;
-    }
-    private string GetSessionRoomsForSubgroups(TrainingSession[] sessions){
-        string str = "";
-
-        foreach (var s in sessions)
-        {
-            str += s.Subgroup + ". " + s.Room + " ";
-        }
-
-        return str;
+    private string GetWeekScheduleDateRange() {
+        return dates.First().ToString("dd.MM.yyyy") + " - " + dates.Last().ToString("dd.MM.yyyy");
     }
 
-    private byte GetMaxSessionsCount()
-    {
-        return Timetable?.TrainingSessions.Select(s => s.Number).DefaultIfEmpty().Max() ?? 0;
+    private DateTime[] GetWeekDates() {
+        DateTime minDate = Group.Schedules.FirstOrDefault()?.Date ?? DateTime.Now;
+        DateTime weekStartDate = minDate.AddDays((int)minDate.DayOfWeek * -1 + 1);
+        DateTime[] weekDates = new DateTime[6];
+
+        weekDates[0] = weekStartDate;
+
+        for (int i = 1; i < weekDates.Length; i++)
+        {
+            weekDates[i] = weekDates[i - 1].AddDays(1);
+        }
+
+        return weekDates;
+    }
+
+    private int GetMaxLessonsCount() {
+        return Group?.Schedules.DefaultIfEmpty().Select(s => s?.Lessons.DefaultIfEmpty().Max(l => l?.Number))?.Max() ?? 0;
     }
 }

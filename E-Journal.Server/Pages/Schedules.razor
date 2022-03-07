@@ -6,39 +6,50 @@
 <h1>Расписание групп</h1>
 <br />
 
-@if (schedules == null)
+@if (groupsWithWeekSchedules == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    foreach (var schedule in schedules)
+    foreach (var group in groupsWithWeekSchedules)
     {
-        <GroupScheduleViewConponent Timetable = "@schedule" />
+        <GroupScheduleViewConponent Group = "@group" />
         <br />
     }
 }
 
 @code {
-    private Timetable[]? schedules;
+    private Group[] groupsWithWeekSchedules;
 
     protected override void OnInitialized()
     {
-        schedules = GetLastSchedules();
+        groupsWithWeekSchedules = GetGroupsWithWeekSchedules();
         StateHasChanged();
     }
 
-    private Timetable[] GetLastSchedules()
+    private void SetScheduleLessons(Schedule schedule)
     {
-        int[] scheduleIds = repository.Groups.Select(g => g.Timetables.OrderBy(t => t.StartDate).Last().Id).ToArray();
-        Timetable[] schedules = new Timetable[scheduleIds.Length];
+        schedule.Lessons = repository.Lessons.Where(l => l.ScheduleId == schedule.Id).ToList();
+    }
 
+    private Group[] GetGroupsWithWeekSchedules()
+    {
+        DateTime currentWeekStartDate = DateTime.Now.Date.AddDays((int)DateTime.Now.DayOfWeek * -1 + 1);
 
-        for (int i = 0; i < scheduleIds.Length; i++)
+        var groups = repository.Groups;
+        var groupsSchedules = groups.Select(g => g.Schedules.OrderBy(s => s.Date).Reverse().Take(6).Reverse());
+        var groupsWeekSchedules = groupsSchedules.Select(gs => gs.Where(s => s.Date >= currentWeekStartDate).ToArray()).ToArray();
+        var selectedGroups = groups.ToArray();
+
+        foreach (var g in selectedGroups)
         {
-            schedules[i] = repository.GetTimetable(scheduleIds[i]);
+            g.Schedules = groupsWeekSchedules?
+                .FirstOrDefault(ws => ws.FirstOrDefault()?.GroupId == g.Id)?.ToList() ?? new List<Schedule>();
         }
 
-        return schedules;
+        selectedGroups.ToList().ForEach(g => g.Schedules.ToList().ForEach(s => SetScheduleLessons(s)));
+
+        return selectedGroups;
     }
 }
