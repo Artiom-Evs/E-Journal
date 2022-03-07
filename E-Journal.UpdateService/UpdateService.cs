@@ -2,7 +2,6 @@ using E_Journal.Shared;
 using E_Journal.Parser;
 using E_Journal.Infrastructure;
 
-
 namespace E_Journal.UpdateService
 {
     public class UpdateService : BackgroundService
@@ -18,10 +17,12 @@ namespace E_Journal.UpdateService
         {
             _logger = logger;
             this.context = context;
+            context.ChangeTracker.AutoDetectChangesEnabled = false;
+
             this.client = new HttpClient();
             schedulesAddress = configuration["GroupsTimetableAddress"];
             schedulesHashCodes = new Dictionary<string, int>();
-            builder = new TimetableBuilder(new JournalRepository(context));
+            builder = new TimetableBuilder(context);
         }
 
         private int CheckHashCode(string groupName)
@@ -35,7 +36,6 @@ namespace E_Journal.UpdateService
                 return -1;
             }
         }
-
         private IEnumerable<ParseResult> GetOutdatedSchedules(ParseResult[] results)
         {
             foreach (var result in results)
@@ -48,32 +48,57 @@ namespace E_Journal.UpdateService
             }
         }
 
+        private bool UpdateSchedules(Group group)
+        {
+            bool hasChanges = false;
+
+            foreach (var newSchedule in group.Schedules)
+            {
+                bool isExists = context.Schedules
+                    .Where(s => s.GroupId == group.Id && s.Date == newSchedule.Date)
+                    .Any();
+
+                if (!isExists)
+                {
+                    context.Schedules.Add(newSchedule);
+                    hasChanges = true;
+                }
+            }
+
+            return hasChanges;
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            context.Database.EnsureCreated();
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation($"Start updating at: {DateTimeOffset.Now}\n");
 
                 try
                 {
-                    string pageText = await client.GetStringAsync(schedulesAddress);
-                    ParseResult[] results = TimetableParser.ParseTimetable(pageText);
-                    
-                    foreach (var schedule in GetOutdatedSchedules(results))
+                    string pageText = await client.GetStringAsync(schedulesAddress, stoppingToken);
+                    ParseResult[] results = ScheduleParser.ParseSchedules(pageText);
+
+                    foreach (var textSchedule in GetOutdatedSchedules(results))
                     {
-                        Group group = await builder.BuildGroup(schedule);
-                        context.Groups.Update(group);
-                        context.SaveChanges();
+                        Group group = builder.BuildWeekSchedules(textSchedule);
+
+                        if (UpdateSchedules(group))
+                        {
+                            context.SaveChanges();
+                        }
                     }
 
                     _logger.LogInformation($"Update ended at: {DateTimeOffset.Now}\n");
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Exception occured while updating timetable.", ex);
+                    _logger.LogError("Exception occured while updating schedules.", ex);
                 }
-                
-                await Task.Delay(10000, stoppingToken);
+
+                await Task.Delay(30000, stoppingToken);
             }
         }
 

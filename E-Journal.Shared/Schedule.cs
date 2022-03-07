@@ -10,6 +10,7 @@ namespace E_Journal.Shared
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
+        public int GroupId { get; set; }
         public Group Group { get; set; }
         public ICollection<Lesson> Lessons { get; set; }
 
