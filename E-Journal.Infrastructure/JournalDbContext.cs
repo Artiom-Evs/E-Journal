@@ -13,6 +13,9 @@ namespace E_Journal.Infrastructure
         public DbSet<Schedule> Schedules { get; set; }
 
         public JournalDbContext(DbContextOptions options)
-            : base(options) { }
+            : base(options)
+        {
+            Database.EnsureCreated();
+        }
     }
 }

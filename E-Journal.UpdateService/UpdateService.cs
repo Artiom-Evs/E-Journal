@@ -80,6 +80,7 @@ namespace E_Journal.UpdateService
                 {
                     string pageText = await client.GetStringAsync(schedulesAddress, stoppingToken);
                     ParseResult[] results = ScheduleParser.ParseSchedules(pageText);
+                    List<string> changedGroups = new();
 
                     foreach (var textSchedule in GetOutdatedSchedules(results))
                     {
@@ -88,10 +89,12 @@ namespace E_Journal.UpdateService
                         if (UpdateSchedules(group))
                         {
                             context.SaveChanges();
+                            changedGroups.Add(group.Name);
                         }
                     }
 
-                    _logger.LogInformation($"Update ended at: {DateTimeOffset.Now}\n");
+                    _logger.LogInformation($"Update ended at: {DateTimeOffset.Now}\r\n" +
+                        $"\tUpdated groups: {(changedGroups.Any() ? string.Join(", ", changedGroups) : "none")}");
                 }
                 catch (Exception ex)
                 {
