@@ -10,7 +10,13 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         services.AddDbContext<JournalDbContext>(options =>
         {
-            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+            options.UseMySql(
+                connectionString,
+                ServerVersion.AutoDetect(connectionString),
+                mySqlOptionsAction: options =>
+                {
+                    options.EnableRetryOnFailure();
+                });
         });
         services.AddHostedService<UpdateService>();
     })

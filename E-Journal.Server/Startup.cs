@@ -22,7 +22,13 @@ namespace E_Journal.Server
             services.AddDbContext<JournalDbContext>(options =>
             {
                 string connectionString = Configuration["ConnectionString"];
-                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+                options.UseMySql(
+                    connectionString,
+                    ServerVersion.AutoDetect(connectionString),
+                    mySqlOptionsAction: options =>
+                    {
+                        options.EnableRetryOnFailure();
+                    });
             });
             services.AddScoped<IJournalRepository, JournalRepository>();
         }
