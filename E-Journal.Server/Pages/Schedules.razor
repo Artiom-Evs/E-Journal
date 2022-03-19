@@ -33,23 +33,33 @@ else
         schedule.Lessons = repository.Lessons.Where(l => l.ScheduleId == schedule.Id).ToList();
     }
 
+    private DateTime GetStartWeekDay(DateTime date)
+    {
+        return date.Date.AddDays((int)DateTime.Now.DayOfWeek * -1 + 1);
+    }
+
+    private void SetWeekSchedules(Group group)
+    {
+        DateTime currentWeekStartDate = GetStartWeekDay(DateTime.Now);
+
+        var hasActual = repository.Schedules.FirstOrDefault(s => s.GroupId == group.Id && s.Date >= currentWeekStartDate)?.Id > 0;
+
+        if (hasActual)
+        {
+            var actualSchedules = repository.Schedules
+                .Where(s => s.GroupId == group.Id)
+                .Where(s => s.Date >= currentWeekStartDate)
+                .OrderBy(s => s.Date);
+            var lastWeekStartDate = GetStartWeekDay(actualSchedules.Last().Date);
+            group.Schedules = actualSchedules.Where(s => s.Date >= lastWeekStartDate).DefaultIfEmpty().ToList();
+            group.Schedules.ToList().ForEach(s => SetScheduleLessons(s));
+        }
+    }
+
     private Group[] GetGroupsWithWeekSchedules()
     {
-        DateTime currentWeekStartDate = DateTime.Now.Date.AddDays((int)DateTime.Now.DayOfWeek * -1 + 1);
-
-        var groups = repository.Groups;
-        var groupsSchedules = groups.Select(g => g.Schedules.OrderBy(s => s.Date).Reverse().Take(6).Reverse());
-        var groupsWeekSchedules = groupsSchedules.Select(gs => gs.Where(s => s.Date >= currentWeekStartDate).ToArray()).ToArray();
-        var selectedGroups = groups.ToArray();
-
-        foreach (var g in selectedGroups)
-        {
-            g.Schedules = groupsWeekSchedules?
-                .FirstOrDefault(ws => ws.FirstOrDefault()?.GroupId == g.Id)?.ToList() ?? new List<Schedule>();
-        }
-
-        selectedGroups.ToList().ForEach(g => g.Schedules.ToList().ForEach(s => SetScheduleLessons(s)));
-
-        return selectedGroups;
+        var groups = repository.Groups.ToList();
+        groups.ForEach(g => SetWeekSchedules(g));
+        return groups.ToArray();
     }
 }

@@ -32,7 +32,7 @@ services:
       - e-journal.mysql
 
   e-journal.mysql:
-    image: mysql
+    image: mariadb
     hostname: mysql
     container_name: e-journal.mysql
     command: --innodb_use_native_aio=0
