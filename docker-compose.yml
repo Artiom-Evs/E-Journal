@@ -9,9 +9,8 @@ services:
     build:
       context: .
       dockerfile: E-Journal.Server/Dockerfile
-    expose:
-      - 443
-      - 80
+    ports:
+      - 80:80
     environment:
       ConnectionString: "server=mysql;port=3306;database=JournalDB;user=root;password=12345"
     restart: always

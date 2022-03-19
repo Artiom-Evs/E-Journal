@@ -38,10 +38,10 @@ namespace E_Journal.Server
             if (!env.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
-                app.UseHsts();
+                //app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseStaticFiles();
 
