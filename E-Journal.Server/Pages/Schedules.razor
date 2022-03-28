@@ -35,7 +35,7 @@ else
 
     private DateTime GetStartWeekDay(DateTime date)
     {
-        return date.Date.AddDays((int)DateTime.Now.DayOfWeek * -1 + 1);
+        return date.Date.AddDays((int)date.DayOfWeek * -1 + 1);
     }
 
     private void SetWeekSchedules(Group group)

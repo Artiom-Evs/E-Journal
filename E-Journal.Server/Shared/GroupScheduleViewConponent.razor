@@ -89,7 +89,7 @@ else
 
     protected override void OnParametersSet() {
         dates = GetWeekDates();
-        
+
         if (Group.Schedules.Any())
         {
             maxLessonsCount = GetMaxLessonsCount();
@@ -97,8 +97,8 @@ else
     }
 
     private string DateToString(DateTime date){
-        string str = date.ToString("dddd");
-        return str[0].ToString().ToUpper() + str[1..] + ", " + date.ToShortDateString();
+        string str = date.ToString("dddd", new System.Globalization.CultureInfo("ru-RU"));
+        return str[0].ToString().ToUpper() + str[1..] + ", " + date.ToString("dd.MM.yyyy");
     }
 
     private string GetWeekScheduleDateRange() {
