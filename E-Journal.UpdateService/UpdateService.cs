@@ -7,59 +7,70 @@ namespace E_Journal.UpdateService
     public class UpdateService : BackgroundService
     {
         private readonly ILogger<UpdateService> _logger;
+        private readonly IConfiguration _configuration;
         private readonly JournalDbContext context;
         private readonly HttpClient client;
-        private readonly string schedulesAddress;
-        private readonly Dictionary<string, int> schedulesHashCodes;
+        private readonly Dictionary<string, int> parseResultHashCodes;
         private readonly TimetableBuilder builder;
 
-        public UpdateService(ILogger<UpdateService> logger, JournalDbContext context, IConfiguration configuration)
+        public UpdateService(ILogger<UpdateService> logger, IConfiguration configuration, JournalDbContext context)
         {
             _logger = logger;
+            _configuration = configuration;
             this.context = context;
             context.ChangeTracker.AutoDetectChangesEnabled = false;
 
             this.client = new HttpClient();
-            schedulesAddress = configuration["GroupsTimetableAddress"];
-            schedulesHashCodes = new Dictionary<string, int>();
             builder = new TimetableBuilder(context);
+            parseResultHashCodes = new Dictionary<string, int>();
         }
 
-        private int CheckHashCode(string groupName)
-        {
-            if (schedulesHashCodes.ContainsKey(groupName))
-            {
-                return schedulesHashCodes[groupName];
-            }
-            else
-            {
-                return -1;
-            }
-        }
-        private IEnumerable<ParseResult> GetOutdatedSchedules(ParseResult[] results)
+        private IEnumerable<ParseResult> GetNewParseResults(ParseResult[] results)
         {
             foreach (var result in results)
             {
-                if (CheckHashCode(result.Name) != result.HashCode)
+                if ((parseResultHashCodes.ContainsKey(result.Name) ? parseResultHashCodes[result.Name] : -1) != result.HashCode)
                 {
                     yield return result;
-                    schedulesHashCodes[result.Name] = result.HashCode;
+                    parseResultHashCodes[result.Name] = result.HashCode;
                 }
             }
         }
+        private int[] CheckGroupUpdates(ParseResult[] results)
+        {
+            List<int> changedGroups = new();
 
-        private bool UpdateSchedules(Group group)
+            foreach (var newResult in GetNewParseResults(results))
+            {
+                Group group = builder.BuildWeekSchedules(newResult);
+                bool hasUpdates = UpdateGroup(group);
+
+                if (hasUpdates)
+                {
+                    context.SaveChanges();
+                    changedGroups.Add(group.Id);
+                }
+            }
+
+            return changedGroups.ToArray();
+        }
+        private bool UpdateGroup(Group group)
         {
             bool hasChanges = false;
 
             foreach (var newSchedule in group.Schedules)
             {
-                bool isExists = context.Schedules
-                    .Where(s => s.GroupId == group.Id && s.Date == newSchedule.Date)
-                    .Any();
+                var existSchedule = context.Schedules
+                    .FirstOrDefault(s => s.GroupId == newSchedule.GroupId && s.Date == newSchedule.Date);
 
-                if (!isExists)
+                if (existSchedule == null)
                 {
+                    context.Schedules.Add(newSchedule);
+                    hasChanges = true;
+                }
+                else if (!existSchedule.Equals(newSchedule))
+                {
+                    context.Schedules.Remove(existSchedule);
                     context.Schedules.Add(newSchedule);
                     hasChanges = true;
                 }
@@ -74,27 +85,16 @@ namespace E_Journal.UpdateService
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation($"Start updating at: {DateTimeOffset.Now}\n");
-
                 try
                 {
-                    string pageText = await client.GetStringAsync(schedulesAddress, stoppingToken);
-                    ParseResult[] results = ScheduleParser.ParseSchedules(pageText);
-                    List<string> changedGroups = new();
+                    _logger.LogInformation($"Update started on: {DateTimeOffset.Now}\n");
 
-                    foreach (var textSchedule in GetOutdatedSchedules(results))
-                    {
-                        Group group = builder.BuildWeekSchedules(textSchedule);
+                    ParseResult[] results = ScheduleParser.ParseSchedules(await client.GetStringAsync(_configuration["GroupsTimetableAddress"], stoppingToken));
 
-                        if (UpdateSchedules(group))
-                        {
-                            context.SaveChanges();
-                            changedGroups.Add(group.Name);
-                        }
-                    }
+                    int[] changedGroups = CheckGroupUpdates(results);
 
-                    _logger.LogInformation($"Update ended at: {DateTimeOffset.Now}\r\n" +
-                        $"\tUpdated groups: {(changedGroups.Any() ? string.Join(", ", changedGroups) : "none")}");
+                    _logger.LogInformation($"Update ended on: {DateTime.Now.ToString()}\r\n" +
+                        $"\tUpdated groups: {(changedGroups.Any() ? string.Join(", ", changedGroups.Select(id => context.Groups.First(g => g.Id == id).Name)) : "none")}");
                 }
                 catch (Exception ex)
                 {
