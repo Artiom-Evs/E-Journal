@@ -27,5 +27,22 @@ namespace E_Journal.Shared
             Teacher = teacher;
             Room = room;
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Lesson lesson)
+            {
+                return this.DisciplineId == lesson.DisciplineId
+                    && this.TeacherId == lesson.TeacherId
+                    && this.Room == lesson.Room;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return $"{this.DisciplineId}{this.TeacherId}{this.Room}".GetHashCode();
+        }
     }
 }
