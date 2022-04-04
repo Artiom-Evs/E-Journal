@@ -1,0 +1,18 @@
+﻿@page
+@model E_Journal.WebUI.Pages.SchedulesModel
+@{
+    ViewData["Title"] = "Расписания групп";
+}
+<h1>@ViewData["Title"]</h1>
+
+@if (Model.Groups != null)
+{
+    @foreach (var group in Model.Groups)
+    {
+        <h2>@group.Name</h2>
+    }
+}
+else
+{
+    <p><em>Расписания отсутствуют.</em></p>
+}
