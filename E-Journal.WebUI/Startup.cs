@@ -1,4 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+
+using E_Journal.Infrastructure;
+using E_Journal.Shared;
 
 namespace E_Journal.WebUI
 {
@@ -16,6 +20,19 @@ namespace E_Journal.WebUI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+
+            services.AddDbContext<JournalDbContext>(options =>
+            {
+                string connectionString = Configuration["ConnectionString"];
+                options.UseMySql(
+                    connectionString,
+                    ServerVersion.AutoDetect(connectionString),
+                    mySqlOptionsAction: options =>
+                    {
+                        options.EnableRetryOnFailure();
+                    });
+            });
+            services.AddScoped<IJournalRepository, JournalRepository>();
         }
         public void Configure(IApplicationBuilder app)
         {
