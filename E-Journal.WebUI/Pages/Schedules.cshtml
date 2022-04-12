@@ -14,7 +14,7 @@ else
 {
     @foreach (var dataModel in Model.GroupDataModels)
     {
-        <p>@dataModel.GroupId</p>
+        @await Component.InvokeAsync("GroupSchedule", dataModel)
         <br />
     }
 }
