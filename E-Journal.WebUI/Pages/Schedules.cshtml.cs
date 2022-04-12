@@ -2,28 +2,37 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using E_Journal.Infrastructure;
 using E_Journal.Shared;
+using E_Journal.WebUI.Models;
 
 namespace E_Journal.WebUI.Pages
 {
     public class SchedulesModel : PageModel
     {
+        private const int STUDY_DAYS_COUNT = 6;
         private readonly ILogger<SchedulesModel> _logger;
-        private readonly IJournalRepository _repository;
+        public readonly IJournalRepository _repository;
 
-        public List<Group> Groups { get; }
+        public List<GroupScheduleDataModel> GroupDataModels { get; }
 
         public SchedulesModel(ILogger<SchedulesModel> logger, IJournalRepository repository)
         {
             _logger = logger;
             _repository = repository;
-            Groups = new List<Group>();
+            GroupDataModels = new List<GroupScheduleDataModel>();
         }
 
         public void OnGet()
         {
             try
             {
-                Groups.AddRange(GetGroupsWithWeekSchedules());
+                foreach (var group in _repository.Groups)
+                {
+                    GroupDataModels.Add(new GroupScheduleDataModel()
+                    {
+                        GroupId = group.Id,
+                        ActualScheduleIds = GetActualScheduleIds(group)
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -31,39 +40,34 @@ namespace E_Journal.WebUI.Pages
             }
         }
 
-        private void SetScheduleLessons(Schedule schedule)
+        private int[] GetActualScheduleIds(Group group)
         {
-            schedule.Lessons = _repository.Lessons.Where(l => l.ScheduleId == schedule.Id).ToList();
+            var lastDate = _repository.Schedules
+                .Where(s => s.GroupId == group.Id)
+                .DefaultIfEmpty()
+                ?.OrderBy(s => s.Date)
+                ?.Last()
+                ?.Date ?? default;
+
+            var lastWeekStartDate = GetStartWeekDay(lastDate);
+
+            if (lastWeekStartDate < GetStartWeekDay(DateTime.Now.Date))
+            {
+                return Array.Empty<int>();
+            }
+
+            var actualScheduleIds = _repository.Schedules
+                .Where(s => s.GroupId == group.Id)
+                .Where(s => s.Date >= lastWeekStartDate)
+                .Select(s => s.Id)
+                .ToArray();
+
+            return actualScheduleIds;
         }
 
         private DateTime GetStartWeekDay(DateTime date)
         {
             return date.Date.AddDays((int)date.DayOfWeek * -1 + 1);
-        }
-
-        private void SetWeekSchedules(Group group)
-        {
-            DateTime currentWeekStartDate = GetStartWeekDay(DateTime.Now);
-
-            var hasActual = _repository.Schedules.FirstOrDefault(s => s.GroupId == group.Id && s.Date >= currentWeekStartDate)?.Id > 0;
-
-            if (hasActual)
-            {
-                var actualSchedules = _repository.Schedules
-                    .Where(s => s.GroupId == group.Id)
-                    .Where(s => s.Date >= currentWeekStartDate)
-                    .OrderBy(s => s.Date);
-                var lastWeekStartDate = GetStartWeekDay(actualSchedules.Last().Date);
-                group.Schedules = actualSchedules.Where(s => s.Date >= lastWeekStartDate).DefaultIfEmpty().ToList();
-                group.Schedules.ToList().ForEach(s => SetScheduleLessons(s));
-            }
-        }
-
-        private Group[] GetGroupsWithWeekSchedules()
-        {
-            var groups = _repository.Groups.ToList();
-            groups.ForEach(g => SetWeekSchedules(g));
-            return groups.ToArray();
         }
     }
 }
