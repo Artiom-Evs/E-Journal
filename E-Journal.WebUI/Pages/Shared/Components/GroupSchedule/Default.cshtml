@@ -1,0 +1,99 @@
+﻿@model GroupScheduleViewModel
+
+<h2>Группа - @Model.GroupName</h2>
+<h3>@GetDatesRange()</h3>
+
+@if(!Model.Lessons.Any())
+{
+    <p><em>Расписание отсутствуют.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                @foreach (var date in Model.Dates)
+                {
+                    <th colspan="2">@DateToString(date)</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for (int lessonNumber = 1; lessonNumber <= Model.MaxLessonsCount; lessonNumber++)
+            {
+                <tr>
+                    @foreach (var dayLessons in Model.Lessons)
+                    {
+                        if (dayLessons.Any())
+                        {
+                            cellLessons = dayLessons.Where(l => l.Number == lessonNumber).ToArray();
+                        }
+                        else
+                        {
+                            cellLessons = Array.Empty<LessonViewModel>();
+                        }
+
+                        @if (cellLessons.Length == 0)
+                        {
+                            <td>-</td>
+                            <td>-</td>
+                        }
+                        else if (cellLessons.Length == 1)
+                        {
+                            <td>
+                                    <p>
+                                        @cellLessons[0].DisciplineName<br/>
+                                        @cellLessons[0].TeacherName
+                                    </p>
+                                </td>
+                            <td><p>@cellLessons[0].Room</p></td>
+                        }
+                        else
+                        {
+                            <td>
+                                @foreach (var cellLesson in cellLessons)
+                                {
+                                    <p>
+                                        @(cellLesson.Subgroup). @(cellLesson.DisciplineName)<br />
+                                        @cellLesson.TeacherName
+                                    </p>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var cellLesson in cellLessons)
+                                {
+                                    <p>@cellLesson.Room</p>
+                                }
+                            </td>
+                        }
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@functions {
+    private LessonViewModel[] cellLessons = Array.Empty<LessonViewModel>();
+
+    private LessonViewModel[] GetLessonsByNumber(int number)
+    {
+        List<LessonViewModel> lessons = new();
+
+        foreach (var dayLessons in Model.Lessons.Where(l => l.Any()))
+        {
+            lessons.AddRange(dayLessons.Where(l => l.Number == number));
+        }
+
+        return lessons.ToArray();
+    }
+
+    private string DateToString(DateTime date){
+        string str = date.ToString("dddd", new System.Globalization.CultureInfo("ru-RU"));
+        return str[0].ToString().ToUpper() + str[1..] + ", " + date.ToString("dd.MM.yyyy");
+    }
+    private string GetDatesRange()
+    {
+        return $"{Model.Dates.First().ToString("dd.MM.yyyy")} - {Model.Dates.Last().ToString("dd.MM.yyyy")}";
+    }
+}

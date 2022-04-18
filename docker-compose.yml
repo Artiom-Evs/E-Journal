@@ -3,14 +3,15 @@ version: '3.4'
 # name: 'e_journal'
 
 services:
-  e-journal.server:
-    image: ${DOCKER_REGISTRY-}ejournalserver
-    container_name: e-journal.server
+  e-journal.webui:
+    image: ${DOCKER_REGISTRY-}ejournalwebui
+    container_name: e-journal.webui
     build:
       context: .
-      dockerfile: E-Journal.Server/Dockerfile
+      dockerfile: E-Journal.WebUI/Dockerfile
     ports:
       - 80:80
+      - 443:443
     environment:
       ConnectionString: "server=mysql;port=3306;database=JournalDB;user=root;password=12345"
     restart: always
@@ -44,4 +45,3 @@ services:
     restart: always
     
     
-

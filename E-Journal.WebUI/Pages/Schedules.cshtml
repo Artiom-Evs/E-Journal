@@ -1,0 +1,20 @@
+﻿@page
+@model E_Journal.WebUI.Pages.SchedulesModel
+@{
+    ViewData["Title"] = "Расписания групп";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model.GroupDataModels.Max(m => m.ActualScheduleIds.Length) == 0)
+{
+    <p><em>Расписания отсутствуют.</em></p>
+}
+else
+{
+    @foreach (var dataModel in Model.GroupDataModels)
+    {
+        @await Component.InvokeAsync("GroupSchedule", dataModel)
+        <br />
+    }
+}
