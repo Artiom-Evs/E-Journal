@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 using E_Journal.Infrastructure;
 using E_Journal.Shared;
+using E_Journal.WebUI.Data;
+using E_Journal.WebUI.Models;
 
 namespace E_Journal.WebUI
 {
@@ -21,6 +24,23 @@ namespace E_Journal.WebUI
         {
             services.AddRazorPages();
 
+            services.AddDbContext<ApplicationIdentityDbContext>(options =>
+                {
+                    string connectionString = Configuration["IdentityConnectionString"];
+                    options.UseMySql(
+                        connectionString,
+                        ServerVersion.AutoDetect(connectionString),
+                        mySqlOptionsAction: options =>
+                        {
+                            options.EnableRetryOnFailure();
+                        });
+                });
+
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationIdentityDbContext>()
+                .AddDefaultTokenProviders()
+                .AddDefaultUI();
+
             services.AddDbContext<JournalDbContext>(options =>
             {
                 string connectionString = Configuration["ConnectionString"];
@@ -32,6 +52,7 @@ namespace E_Journal.WebUI
                         options.EnableRetryOnFailure();
                     });
             });
+
             services.AddScoped<IJournalRepository, JournalRepository>();
         }
         public void Configure(IApplicationBuilder app)
@@ -50,6 +71,7 @@ namespace E_Journal.WebUI
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
