@@ -14,9 +14,11 @@ services:
       - 443:443
     environment:
       ConnectionString: "server=journaldb;port=3306;database=JournalDB;user=root;password=12345"
+      IdentityConnectionString: "server=identitydb;port=3306;database=IdentityDB;user=root;password=12345"
     restart: always
     depends_on:
       - e-journal.journaldb
+      - e-journal.identitydb
 
   e-journal.update_service:
     image: ${DOCKER_REGISTRY-}ejournalupdateservice
@@ -44,4 +46,16 @@ services:
       MYSQL_DATABASE: JournalDB
     restart: always
     
+  e-journal.identitydb:
+    image: mariadb
+    hostname: identitydb
+    container_name: e-journal.identitydb
+    command: --innodb_use_native_aio=0
+    expose:
+      - 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: "12345"
+      MYSQL_DATABASE: IdentityDB
+    restart: always
+  
     
