@@ -1,0 +1,31 @@
+﻿@model LessonViewModel[]
+
+@if (Model.Length == 0)
+{
+    <td>-</td>
+    <td>-</td>
+}
+else if (Model.Length == 1)
+{
+    <td>
+        @Model[0].DisciplineName<br />
+        @Model[0].TeacherName
+    </td>
+    <td>@Model[0].Room</td>
+}
+else
+{
+    <td>
+        @foreach (var viewModel in Model)
+        {
+            @($"{viewModel.Subgroup}. {viewModel.DisciplineName}")<br />
+            @viewModel.TeacherName<br />
+        }
+    </td>
+    <td>
+        @foreach (var viewModel in Model)
+        {
+            @viewModel.Room<br />
+        }
+    </td>
+}
