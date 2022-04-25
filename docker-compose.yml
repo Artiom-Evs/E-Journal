@@ -13,10 +13,10 @@ services:
       - 80:80
       - 443:443
     environment:
-      ConnectionString: "server=mysql;port=3306;database=JournalDB;user=root;password=12345"
+      ConnectionString: "server=journaldb;port=3306;database=JournalDB;user=root;password=12345"
     restart: always
     depends_on:
-      - e-journal.mysql
+      - e-journal.journaldb
 
   e-journal.update_service:
     image: ${DOCKER_REGISTRY-}ejournalupdateservice
@@ -25,17 +25,17 @@ services:
       context: .
       dockerfile: E-Journal.UpdateService/Dockerfile
     environment:
-      ConnectionString: "server=mysql;port=3306;database=JournalDB;user=root;password=12345"
+      ConnectionString: "server=journaldb;port=3306;database=JournalDB;user=root;password=12345"
       GroupsTimetableAddress: "http://mgke.minsk.edu.by/ru/main.aspx?guid=3791"
       UPDATE_FREQUENCY_MS: 30000
     restart: always
     depends_on:
-      - e-journal.mysql
+      - e-journal.journaldb
 
-  e-journal.mysql:
+  e-journal.journaldb:
     image: mariadb
-    hostname: mysql
-    container_name: e-journal.mysql
+    hostname: journaldb
+    container_name: e-journal.journaldb
     command: --innodb_use_native_aio=0
     expose:
       - 3306
