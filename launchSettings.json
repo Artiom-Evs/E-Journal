@@ -8,7 +8,7 @@
       "commandVersion": "1.0",
       "serviceActions": {
         "e-journal.identitydb": "StartWithoutDebugging",
-        "e-journal.mysql": "StartWithoutDebugging",
+        "e-journal.journaldb": "StartWithoutDebugging",
         "e-journal.update_service": "StartDebugging",
         "e-journal.webui": "StartDebugging"
       }
