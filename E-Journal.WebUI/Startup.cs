@@ -55,7 +55,7 @@ namespace E_Journal.WebUI
 
             services.AddScoped<IJournalRepository, JournalRepository>();
         }
-        public void Configure(IApplicationBuilder app)
+        public async void Configure(IApplicationBuilder app)
         {
             if (Environment.IsDevelopment())
             {
@@ -78,6 +78,8 @@ namespace E_Journal.WebUI
             {
                 endpoints.MapRazorPages();
             });
+
+            await IdentitySeedData.EnsurePopulated(app);
         }
     }
 }
