@@ -17,6 +17,25 @@
                 <label asp-for="Input.Email"></label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
+
+            <div class="form-floating">
+                <select asp-for="Input.Role" id="role" class="form-control">
+                    <option></option>
+                    <option value="student">Учащийся</option>
+                    <option value="teacher">Преподаватель</option>
+                </select>
+                <label for="role" asp-for="Input.Role"></label>
+                <span asp-validation-for="Input.Role" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating">
+                <select asp-for="Input.AssociatedName" id="role_items" class="form-control">
+                    <option></option>
+                </select>
+                <label asp-for="Input.AssociatedName"></label>
+                <span asp-validation-for="Input.AssociatedName" class="text-danger"></span>
+            </div>
+
             <div class="form-floating">
                 <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" />
                 <label asp-for="Input.Password">Введите пароль</label>
@@ -66,5 +85,47 @@
 </div>
 
 @section Scripts {
+    <script type="text/javascript">
+        function createOptions(listItems){
+            var options = '<option></option>';
+
+            for(item of listItems){
+                options += '<option>' + item + '</option>';
+            }
+
+            return options;
+        }
+
+        const groups = createOptions('@Model.GroupSelectorOptions'.split('|'));
+        const teachers = createOptions('@Model.TeacherSelectorOptions'.split('|'));
+
+        $(function () {
+            var roleName = $('#role').val();
+                
+            // вставить элементы списка
+            if (roleName == 'student'){
+                $('#role_items').html(groups);
+            }
+            else if(roleName == 'teacher'){
+                $('#role_items').html(teachers);
+            }
+
+            // привязать событие
+            $('#role').change(function()
+            {
+                // получить выбранную роль
+                var roleName = $(this).val();
+                
+                // вставить элементы списка
+                if (roleName == 'student'){
+                    $('#role_items').html(groups);
+                }
+                else if(roleName == 'teacher'){
+                    $('#role_items').html(teachers);
+                }
+            });
+        })
+    </script>
+
     <partial name="_ValidationScriptsPartial" />
 }

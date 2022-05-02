@@ -24,9 +24,9 @@ namespace E_Journal.WebUI.Data
             RoleManager<IdentityRole> roleManager = app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             UserManager<ApplicationUser> userManager = app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            IdentityRole adminRole = new("admin");
-            IdentityRole teacherRole = new("teacher");
-            IdentityRole studentRole = new("student");
+            IdentityRole adminRole = new(ApplicationRoles.Admin);
+            IdentityRole teacherRole = new(ApplicationRoles.Teacher);
+            IdentityRole studentRole = new(ApplicationRoles.Student);
 
             await CheckRoleExistance(adminRole, roleManager);
             await CheckRoleExistance(teacherRole, roleManager);
