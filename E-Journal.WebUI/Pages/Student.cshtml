@@ -1,0 +1,65 @@
+﻿@page
+@model StudentModel
+@{
+    ViewData["title"] = "Персональное расписание";
+}
+
+<h1>@ViewData["title"]</h1>
+<div class="row">
+    <div class="col-md">
+        <h2>Сегодня</h2>
+        @if (!Model.LessonsToday.Any())
+        {
+            <p><em>Расписание на сегодня отсутствует.</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Дисциплина</th>
+                        <th>Аудитория</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 1; i <= Model.LessonsToday.Max(l => l.Number); i++)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            @await Component.InvokeAsync("LessonCell", Model.LessonsToday.Where(l => l.Number == i))
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+    <div class="col-md">
+        <h2>Завтра</h2>
+        @if (!Model.LessonsTomorrow.Any())
+        {
+            <p><em>Расписание на завтра отсутствует.</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Дисциплина</th>
+                        <th>Аудитория</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 1; i <= Model.LessonsTomorrow.Max(l => l.Number); i++)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            @await Component.InvokeAsync("LessonCell", Model.LessonsTomorrow.Where(l => l.Number == i))
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
