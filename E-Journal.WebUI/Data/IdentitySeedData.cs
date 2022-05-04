@@ -33,13 +33,20 @@ namespace E_Journal.WebUI.Data
             await CheckRoleExistance(studentRole, roleManager);
 
             string name = configuration["WebUIDefaultAdmin:Name"];
+            string email = configuration["WebUIDefaultAdmin:Email"];
             string password = configuration["WebUIDefaultAdmin:Password"];
 
-            var defaultAdminUser = await userManager.FindByNameAsync(name);
+            var defaultAdminUser = await userManager.FindByEmailAsync(email);
             
             if (defaultAdminUser == null)
             {
-                var result = await userManager.CreateAsync(new ApplicationUser(name), password);
+                ApplicationUser user = new()
+                {
+                    UserName = name,
+                    Email = email
+                };
+
+                var result = await userManager.CreateAsync(user, password);
 
                 if (!result.Succeeded)
                 {
