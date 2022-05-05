@@ -1,0 +1,77 @@
+@page
+@model TeacherModel
+@{
+    ViewData["title"] = "Персональное расписание";
+}
+
+<h2>@ViewData["title"]</h2>
+<div>
+    <div class="col-md">
+        <h3>Сегодня</h3>
+        @if (!Model.LessonsToday.Any())
+        {
+            <p><em>Расписание на сегодня отсутствует.</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Дисциплина</th>
+                        <th>Аудитория</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 1; i <= Model.LessonsToday.Max(l => l.Number); i++)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            @await Component.InvokeAsync("LessonCell", Model.LessonsToday.Where(l => l.Number == i))
+                            <td>
+                                @if (Model.LessonsToday.Where(l => l.Number == i).Any())
+                                {
+                                    <a class="btn btn-secondary" 
+                                        asp-page="EditLessonTopic" 
+                                        asp-route-lessonid="">
+                                            @*TODO: после изменения модели добавить проверку наличия темы*@
+                                            @(true ? "Добавить тему" : "Изменить тему")
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+    <div class="col-md">
+        <h3>Завтра</h3>
+        @if (!Model.LessonsTomorrow.Any())
+        {
+            <p><em>Расписание на сегодня отсутствует.</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead class="table">
+                    <tr>
+                        <th>№</th>
+                        <th>Дисциплина</th>
+                        <th>Аудитория</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 1; i <= Model.LessonsTomorrow.Max(l => l.Number); i++)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            @await Component.InvokeAsync("LessonCell", Model.LessonsTomorrow.Where(l => l.Number == i))
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

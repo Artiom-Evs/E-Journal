@@ -19,6 +19,10 @@ namespace E_Journal.WebUI.Pages
             {
                 return RedirectToPage(ApplicationRoles.Student);
             }
+            else if (User.IsInRole(ApplicationRoles.Teacher))
+            {
+                return RedirectToPage(ApplicationRoles.Teacher);
+            }
 
             return Page();
         }
