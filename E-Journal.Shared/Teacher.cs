@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace E_Journal.Shared;
 
-namespace E_Journal.Shared
+public class Teacher
 {
-    public class Teacher
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+
+    public Teacher() { }
+    public Teacher(string name)
     {
-        public Teacher(string name)
-        {
-            Name = name;
-            Disciplines = new List<Discipline>();
-        }
+        Name = name;
+    }
 
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public ICollection<Discipline> Disciplines { get; set; }
-
-        public override string ToString()
-        {
-            return Name;
-        }
+    public override string ToString()
+    {
+        return Name;
     }
 }

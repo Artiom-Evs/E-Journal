@@ -1,22 +1,22 @@
-﻿namespace E_Journal.Shared
+﻿namespace E_Journal.Shared;
+
+public class Student
 {
-    public class Student
+    public int Id { get; set; }
+    public int GroupId { get; set; }
+    
+    public string Name { get; set; } = string.Empty;
+    public Group Group { get; set; }
+
+    public Student() { }
+    public Student(string name, Group group)
     {
-        public Student() { }
-        public Student(string name, Group group)
-        {
-            Name = name;
-            Group = group;
-        }
+        Name = name;
+        Group = group;
+    }
 
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public int GroupId { get; set; }
-        public Group Group { get; set; }
-
-        public override string ToString()
-        {
-            return Name;
-        }
+    public override string ToString()
+    {
+        return Name;
     }
 }
