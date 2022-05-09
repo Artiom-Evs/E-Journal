@@ -24,7 +24,7 @@ else
                 <tr>
                     @foreach (var date in Model.Dates)
                     {
-                        @await Component.InvokeAsync("StudentLessonCell", Model.Lessons.Where(l => l.Date == date && l.Number == lessonNumber))
+                        @await Component.InvokeAsync("StudentLessonCell", Model.Lessons.Where(l => l.Date == date && l.Number == lessonNumber).OrderBy(l => l.Subgroup))
                     }
                 </tr>
             }
