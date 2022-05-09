@@ -13,11 +13,11 @@ namespace E_Journal.Infrastructure
         }
 
         public IQueryable<Group> Groups => context.Groups;
-        public IQueryable<Student> Students => context.Students;
-        public IQueryable<Teacher> Teachers => context.Teachers;
         public IQueryable<Discipline> Disciplines => context.Disciplines;
+        public IQueryable<Teacher> Teachers => context.Teachers;
+        public IQueryable<Student> Students => context.Students;
         public IQueryable<Lesson> Lessons => context.Lessons;
-        public IQueryable<Schedule> Schedules => context.Schedules;
+        public IQueryable<Score> Scores => context.Scores;
 
         public void Add<T>(T item) where T : class
         {
@@ -43,7 +43,6 @@ namespace E_Journal.Infrastructure
         {
             return context.Find<T>(id);
         }
-
 
         public async ValueTask AddAsync<T>(T item) where T : class
         {
@@ -73,63 +72,52 @@ namespace E_Journal.Infrastructure
 
         public Group GetGroup(int id) =>
             context.Groups
-            .Include(g => g.Disciplines)
-            .Include(g => g.Students)
             .First(g => g.Id == id);
+        public Discipline GetDiscipline(int id) =>
+            context.Disciplines
+            .First(s => s.Id == id);
+        public Teacher GetTeacher(int id) =>
+            context.Teachers
+            .First(t => t.Id == id);
         public Student GetStudent(int id) =>
             context.Students
             .Include(s => s.Group)
             .First(s => s.Id == id);
-        public Teacher GetTeacher(int id) =>
-            context.Teachers
-            .Include(t => t.Disciplines)
-            .First(t => t.Id == id);
-        public Discipline GetDiscipline(int id) =>
-            context.Disciplines
-            .Include(d => d.Groups)
-            .Include(d => d.Teachers)
-            .First(s => s.Id == id);
         public Lesson GetLesson(int id) =>
             context.Lessons
-            .Include(l => l.Schedule)
             .Include(l => l.Discipline)
             .Include(l => l.Teacher)
+            .Include(l => l.Group)
             .First(l => l.Id == id);
-        public Schedule GetSchedule(int id) =>
-            context.Schedules
-            .Include(s => s.Group)
-            .Include(s => s.Lessons)
+        public Score GetScore(int id) =>
+            context.Scores
+            .Include(s => s.Student)
+            .Include(s => s.Lesson)
             .First(s => s.Id == id);
 
         public Task<Group> GetGroupAsync(int id) =>
             context.Groups
-            .Include(g => g.Disciplines)
-            .Include(g => g.Students)
-            .Include(g => g.Schedules)
             .FirstAsync(g => g.Id == id);
+        public Task<Discipline> GetDisciplineAsync(int id) =>
+            context.Disciplines
+            .FirstAsync(s => s.Id == id);
+        public Task<Teacher> GetTeacherAsync(int id) =>
+            context.Teachers
+            .FirstAsync(t => t.Id == id);
         public Task<Student> GetStudentAsync(int id) =>
             context.Students
             .Include(s => s.Group)
             .FirstAsync(s => s.Id == id);
-        public Task<Teacher> GetTeacherAsync(int id) =>
-            context.Teachers
-            .Include(t => t.Disciplines)
-            .FirstAsync(t => t.Id == id);
-        public Task<Discipline> GetDisciplineAsync(int id) =>
-            context.Disciplines
-            .Include(d => d.Groups)
-            .Include(d => d.Teachers)
-            .FirstAsync(s => s.Id == id);
         public Task<Lesson> GetLessonAsync(int id) =>
             context.Lessons
-            .Include(l => l.Schedule)
             .Include(l => l.Discipline)
             .Include(l => l.Teacher)
+            .Include(l => l.Group)
             .FirstAsync(l => l.Id == id);
-        public Task<Schedule> GetScheduleAsync(int id) =>
-            context.Schedules
-            .Include(s => s.Group)
-            .Include(s => s.Lessons)
+        public Task<Score> GetScoreAsync(int id) =>
+            context.Scores
+            .Include(s => s.Student)
+            .Include(s => s.Lesson)
             .FirstAsync(s => s.Id == id);
 
         public async Task ClearDatabaseAsync()

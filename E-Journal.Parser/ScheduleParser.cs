@@ -79,7 +79,7 @@ namespace E_Journal.Parser
                     Name = name,
                     DateRange = dateRange,
                     Days = days,
-                    TextSchedules = grid,
+                    LessonsText = grid,
                     HashCode = hashCode,
                     Exception = ex
                 };
@@ -90,7 +90,7 @@ namespace E_Journal.Parser
                 Name = name,
                 DateRange = dateRange,
                 Days = days,
-                TextSchedules = grid,
+                LessonsText = grid,
                 HashCode = hashCode
             };
         }

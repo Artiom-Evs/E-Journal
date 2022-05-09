@@ -6,11 +6,11 @@ namespace E_Journal.Infrastructure
     public interface IJournalRepository : IDisposable
     {
         IQueryable<Group> Groups { get; }
-        IQueryable<Student> Students { get; }
-        IQueryable<Teacher> Teachers { get; }
         IQueryable<Discipline> Disciplines { get; }
+        IQueryable<Teacher> Teachers { get; }
+        IQueryable<Student> Students { get; }
         IQueryable<Lesson> Lessons { get; }
-        IQueryable<Schedule> Schedules { get; }
+        IQueryable<Score> Scores { get; }
 
         void Add<T>(T item) where T : class;
         void Update<T>(T item) where T : class;
@@ -23,18 +23,18 @@ namespace E_Journal.Infrastructure
         ValueTask<T?> GetAsync<T>(int id) where T : class;
 
         Group GetGroup(int id);
-        Student GetStudent(int id);
-        Teacher GetTeacher(int id);
         Discipline GetDiscipline(int id);
+        Teacher GetTeacher(int id);
+        Student GetStudent(int id);
         Lesson GetLesson(int id);
-        Schedule GetSchedule(int id);
+        Score GetScore(int id);
 
         Task<Group> GetGroupAsync(int id);
-        Task<Student> GetStudentAsync(int id);
-        Task<Teacher> GetTeacherAsync(int id);
         Task<Discipline> GetDisciplineAsync(int id);
+        Task<Teacher> GetTeacherAsync(int id);
+        Task<Student> GetStudentAsync(int id);
         Task<Lesson> GetLessonAsync(int id);
-        Task<Schedule> GetScheduleAsync(int id);
+        Task<Score> GetScoreAsync(int id);
 
         Task ClearDatabaseAsync();
     }
