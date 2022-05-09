@@ -7,7 +7,7 @@ namespace E_Journal.WebUI.Models.ViewModels
     {
         public string GroupName { get; init; }
         public DateTime[] Dates { get; init; }
-        public LessonViewModel[] Lessons { get; init; }
+        public StudentLessonViewModel[] Lessons { get; init; }
         public int MaxLessonsPerDay { get; init; }
     }
 }

@@ -27,7 +27,7 @@
                     {
                         <tr>
                             <td>@i</td>
-                            @await Component.InvokeAsync("LessonCell", Model.LessonsToday.Where(l => l.Number == i))
+                            @await Component.InvokeAsync("StudentLessonCell", Model.LessonsToday.Single(l => l.Number == i))
                         </tr>
                     }
                 </tbody>
@@ -55,7 +55,7 @@
                     {
                         <tr>
                             <td>@i</td>
-                            @await Component.InvokeAsync("LessonCell", Model.LessonsTomorrow.Where(l => l.Number == i))
+                            @await Component.InvokeAsync("StudentLessonCell", Model.LessonsTomorrow.Single(l => l.Number == i))
                         </tr>
                     }
                 </tbody>

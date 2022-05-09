@@ -15,8 +15,8 @@ public class StudentModel : PageModel
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly JournalDbContext _context;
 
-    public LessonViewModel[] LessonsToday { get; set; } = Array.Empty<LessonViewModel>();
-    public LessonViewModel[] LessonsTomorrow { get; set; } = Array.Empty<LessonViewModel>();
+    public StudentLessonViewModel[] LessonsToday { get; set; } = Array.Empty<StudentLessonViewModel>();
+    public StudentLessonViewModel[] LessonsTomorrow { get; set; } = Array.Empty<StudentLessonViewModel>();
 
     public StudentModel(
         ILogger<StudentModel> logger,
@@ -43,7 +43,7 @@ public class StudentModel : PageModel
         var lessonsToday = _context.Lessons
             .Where(l => l.Date == dateToday && l.GroupId == groupId)
             .Select(l =>
-                new LessonViewModel
+                new StudentLessonViewModel
                 {
                     DisciplineName = l.Discipline.Name,
                     TeacherName = l.Teacher.Name,
@@ -66,7 +66,7 @@ public class StudentModel : PageModel
         var lessonsTomorrow = _context.Lessons
             .Where(l => l.Date == dateTomorrow && l.GroupId == groupId)
             .Select(l =>
-                new LessonViewModel
+                new StudentLessonViewModel
                 {
                     DisciplineName = l.Discipline.Name,
                     TeacherName = l.Teacher.Name,

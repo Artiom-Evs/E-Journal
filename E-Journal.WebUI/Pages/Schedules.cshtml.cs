@@ -29,11 +29,10 @@ namespace E_Journal.WebUI.Pages
                     DateTime firstDateOfLastWeek = GetFirstWeekDate(GetLastLessonDate(group.Id));
                     DateTime[] lastWeekDates = GetWeekDates(firstDateOfLastWeek);
 
-                    LessonViewModel[] lessons = _repository.Lessons
+                    StudentLessonViewModel[] lessons = _repository.Lessons
                         .Where(l => l.Date >= firstDateOfLastWeek && l.GroupId == group.Id)
-                        .Select(l => new LessonViewModel()
+                        .Select(l => new StudentLessonViewModel()
                         {
-                            LessonId = l.Id,
                             DisciplineName = l.Discipline.Name, 
                             TeacherName = l.Teacher.Name,
                             Date = l.Date,
@@ -87,7 +86,7 @@ namespace E_Journal.WebUI.Pages
             };
         }
 
-        private int GetMaxLessonsPerDay(LessonViewModel[] lessons) =>
+        private int GetMaxLessonsPerDay(StudentLessonViewModel[] lessons) =>
             lessons.DefaultIfEmpty().Max(l => l?.Number ?? 0);
     }
 }
