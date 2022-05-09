@@ -15,8 +15,8 @@ public class TeacherModel : PageModel
     private readonly UserManager<ApplicationUser> _userManager; 
     private readonly JournalDbContext _context;
 
-    public LessonViewModel[] LessonsToday {get;set;} = Array.Empty<LessonViewModel>();
-    public LessonViewModel[] LessonsTomorrow {get;set;} = Array.Empty<LessonViewModel>();
+    public TeacherLessonViewModel[] LessonsToday { get; set; } = Array.Empty<TeacherLessonViewModel>();
+    public TeacherLessonViewModel[] LessonsTomorrow { get; set; } = Array.Empty<TeacherLessonViewModel>();
 
     public TeacherModel(
         ILogger<TeacherModel> logger,
@@ -42,13 +42,15 @@ public class TeacherModel : PageModel
         var lessonsToday = _context.Lessons
             .Where(l => l.TeacherId == teacherId && l.Date == dateToday)
             .Select(l => 
-                new LessonViewModel{
+                new TeacherLessonViewModel
+                {
                     LessonId = l.Id, 
                     DisciplineName = l.Discipline.Name, 
-                    TeacherName = l.Teacher.Name, 
+                    GroupName = l.Group.Name, 
                     Room = l.Room, 
                     Number = l.Number, 
-                    Subgroup = l.Subgroup
+                    Subgroup = l.Subgroup, 
+                    HasTopic = !string.IsNullOrEmpty(l.Topic)
                 })
             .ToArray();
 
@@ -65,9 +67,10 @@ public class TeacherModel : PageModel
         var lessonsTomorrow = _context.Lessons
             .Where(l => l.TeacherId == teacherId && l.Date == dateTomorrow)
             .Select(l => 
-                new LessonViewModel{
+                new TeacherLessonViewModel
+                {
                     DisciplineName = l.Discipline.Name, 
-                    TeacherName = l.Teacher.Name, 
+                    GroupName = l.Group.Name, 
                     Room = l.Room,
                     Number = l.Number,
                     Subgroup = l.Subgroup

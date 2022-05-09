@@ -1,0 +1,20 @@
+﻿@model TeacherLessonViewModel
+
+@if (Model == null)
+{
+    <td>-</td>
+    <td>-</td>
+}
+else
+{
+    <td>
+        @Model.DisciplineName<br />
+        @($"Группа №{Model.GroupName}")
+        @if (Model.Subgroup != '\0')
+        {
+            <br />
+            @($"Подгруппа №{Model.Subgroup}")
+        }
+    </td>
+    <td>@Model.Room</td>
+}
