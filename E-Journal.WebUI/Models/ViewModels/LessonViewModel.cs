@@ -4,6 +4,7 @@ namespace E_Journal.WebUI.Models.ViewModels
 {
     public record LessonViewModel
     {
+        public int LessonId { get; init; }
         public string TeacherName { get; init; }
         public string DisciplineName { get; init; }
         public string Room { get; init; }

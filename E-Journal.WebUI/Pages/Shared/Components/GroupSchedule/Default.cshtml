@@ -1,11 +1,11 @@
 ﻿@model GroupScheduleViewModel
 
 <h2>Группа - @Model.GroupName</h2>
-<h3>@GetDatesRange()</h3>
+<h3>@GetDatesRange(Model.Dates)</h3>
 
 @if(!Model.Lessons.Any())
 {
-    <p><em>Расписание отсутствуют.</em></p>
+    <p><em>Расписание отсутствует.</em></p>
 }
 else
 {
@@ -19,12 +19,12 @@ else
             </tr>
         </thead>
         <tbody>
-            @for (int lessonNumber = 1; lessonNumber <= Model.MaxLessonsCount; lessonNumber++)
+            @for (int lessonNumber = 1; lessonNumber <= Model.MaxLessonsPerDay; lessonNumber++)
             {
                 <tr>
-                    @foreach (var dayLessons in Model.Lessons)
+                    @foreach (var date in Model.Dates)
                     {
-                        @await Component.InvokeAsync("LessonCell", dayLessons.Where(l => l.Number == lessonNumber))
+                        @await Component.InvokeAsync("LessonCell", Model.Lessons.Where(l => l.Date == date && l.Number == lessonNumber))
                     }
                 </tr>
             }
@@ -33,26 +33,12 @@ else
 }
 
 @functions {
-    private LessonViewModel[] cellLessons = Array.Empty<LessonViewModel>();
-
-    private LessonViewModel[] GetLessonsByNumber(int number)
-    {
-        List<LessonViewModel> lessons = new();
-
-        foreach (var dayLessons in Model.Lessons.Where(l => l.Any()))
-        {
-            lessons.AddRange(dayLessons.Where(l => l.Number == number));
-        }
-
-        return lessons.ToArray();
-    }
-
     private string DateToString(DateTime date){
         string str = date.ToString("dddd", new System.Globalization.CultureInfo("ru-RU"));
         return str[0].ToString().ToUpper() + str[1..] + ", " + date.ToString("dd.MM.yyyy");
     }
-    private string GetDatesRange()
+    private string GetDatesRange(DateTime[] dates)
     {
-        return $"{Model.Dates.First().ToString("dd.MM.yyyy")} - {Model.Dates.Last().ToString("dd.MM.yyyy")}";
+        return $"{dates.First().ToString("dd.MM.yyyy")} - {dates.Last().ToString("dd.MM.yyyy")}";
     }
 }

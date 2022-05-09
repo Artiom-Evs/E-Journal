@@ -40,12 +40,8 @@ public class StudentModel : PageModel
     {
         DateTime dateToday = DateTime.Now.Date;
 
-        var scheduleId = _context.Schedules
-            .SingleOrDefault(s => s.Date == dateToday && s.GroupId == groupId)
-            ?.Id ?? 0;
-
         var lessonsToday = _context.Lessons
-            .Where(l => l.ScheduleId == scheduleId)
+            .Where(l => l.Date == dateToday && l.GroupId == groupId)
             .Select(l =>
                 new LessonViewModel
                 {
@@ -67,12 +63,8 @@ public class StudentModel : PageModel
     {
         DateTime dateTomorrow = DateTime.Now.Date.AddDays(1);
 
-        var scheduleId = _context.Schedules
-            .SingleOrDefault(s => s.Date == dateTomorrow && s.GroupId == groupId)
-            ?.Id ?? 0;
-
         var lessonsTomorrow = _context.Lessons
-            .Where(l => l.ScheduleId == scheduleId)
+            .Where(l => l.Date == dateTomorrow && l.GroupId == groupId)
             .Select(l =>
                 new LessonViewModel
                 {

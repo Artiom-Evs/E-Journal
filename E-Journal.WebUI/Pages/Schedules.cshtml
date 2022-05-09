@@ -6,15 +6,15 @@
 
 <h1>@ViewData["Title"]</h1>
 
-@if (Model.GroupDataModels.Max(m => m.ActualScheduleIds.Length) == 0)
+@if (!Model.GroupSchedules.Any())
 {
     <p><em>Расписания отсутствуют.</em></p>
 }
 else
 {
-    @foreach (var dataModel in Model.GroupDataModels)
+    @foreach (var groupSchedule in Model.GroupSchedules)
     {
-        @await Component.InvokeAsync("GroupSchedule", dataModel)
+        @await Component.InvokeAsync("GroupSchedule", groupSchedule )
         <br />
     }
 }

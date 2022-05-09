@@ -40,9 +40,10 @@ public class TeacherModel : PageModel
         DateTime dateToday = DateTime.Now.Date;
 
         var lessonsToday = _context.Lessons
-            .Where(l => l.TeacherId == teacherId && l.Schedule.Date == dateToday)
+            .Where(l => l.TeacherId == teacherId && l.Date == dateToday)
             .Select(l => 
                 new LessonViewModel{
+                    LessonId = l.Id, 
                     DisciplineName = l.Discipline.Name, 
                     TeacherName = l.Teacher.Name, 
                     Room = l.Room, 
@@ -62,7 +63,7 @@ public class TeacherModel : PageModel
         DateTime dateTomorrow = DateTime.Now.Date.AddDays(1);
 
         var lessonsTomorrow = _context.Lessons
-            .Where(l => l.TeacherId == teacherId && l.Schedule.Date == dateTomorrow)
+            .Where(l => l.TeacherId == teacherId && l.Date == dateTomorrow)
             .Select(l => 
                 new LessonViewModel{
                     DisciplineName = l.Discipline.Name, 
