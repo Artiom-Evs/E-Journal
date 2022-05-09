@@ -43,7 +43,9 @@ namespace E_Journal.UpdateService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Exception occured while updating schedules.", ex);
+                    _logger.LogError($"Exception occured while updating schedules.\r\n" +
+                        $"Message: {ex.ToString()}\r\n" +
+                        $"Stack Trace: {ex.StackTrace}", ex);
                 }
 
                 await Task.Delay(_configuration.GetValue<int>("UPDATE_FREQUENCY_MS"), stoppingToken);
@@ -53,35 +55,74 @@ namespace E_Journal.UpdateService
         private async Task<int[]> StartUpdating(CancellationToken stoppingToken)
         {
             List<int> changedGroupIds = new();
-            string pageText = await client.GetStringAsync(_configuration["GroupsTimetableAddress"], stoppingToken);
-            ParseResult[] results = ScheduleParser.ParseSchedules(pageText);
-            var newParseResults = GetNewParseResults(results);
+            
+            // получение веб-страницы расписаний
+            var responce = await client.GetAsync(_configuration["GroupsTimetableAddress"], HttpCompletionOption.ResponseContentRead, stoppingToken);
+            responce.EnsureSuccessStatusCode();
+            string pageText = await responce.Content.ReadAsStringAsync(stoppingToken);
 
+            // Получение результатов парсинга веб-страницы расписани. 
+            ParseResult[] results = ScheduleParser.ParseSchedules(pageText);
+            ParseResult[] newParseResults = GetNewParseResults(results).ToArray();
+
+            // Если хеши результатов парсинга совпадают с сохранёнными хешами - ничего не делать. 
             if (!newParseResults.Any())
             {
-                return changedGroupIds.ToArray();
+                return Array.Empty<int>(); 
             }
 
-            Schedule[][] updateCandidates = newParseResults
-                .Select(r => builder.BuildWeekSchedules(r))
-                .Select(g => g.Schedules.ToArray())
-                .ToArray();
-
-            foreach (var groupUpdateCandidates in updateCandidates)
+            // Перебор новых расписаний. 
+            foreach (var newResult in newParseResults)
             {
-                var newSchedules = GetNewSchedules(groupUpdateCandidates);
-
-                if (!newSchedules.Any())
+                // Если не указаны даты - расписание отсутствует. 
+                if (newResult.Days is null)
                 {
                     continue;
                 }
 
-                AddNewSchedules(newSchedules.Where(s => s.Item1 == null).Select(s => s.Item2));
-                ReplaceOldSchedules(newSchedules.Where(s => s.Item1 != null));
+                // полученные с сайта занятия
+                var parsedLessons = builder.BuildWeekLessons(newResult);
 
-                _context.SaveChanges();
+                // Если на сайте не указаны занятия - делать ничего не надо. 
+                if (!parsedLessons.Any())
+                {
+                    continue;
+                }
 
-                changedGroupIds.Add(newSchedules.First().Item2.Group.Id);
+                var groupId = _context.Groups
+                    .Single(g => g.Name == newResult.Name)
+                    .Id;
+
+                // имеющиеся занятия на те же даты
+                var oldLessons = _context.Lessons
+                    .Where(l => l.Date >= newResult.Days.First() && l.Date <= newResult.Days.Last())
+                    .Where(l => l.GroupId == groupId)
+                    .ToArray();
+
+                // Все новые занятия. Как совсем новые, так и обновлённые
+                var newLessons = parsedLessons
+                    .Except(oldLessons)
+                    .ToArray();
+
+                // Если новых занятий нет - делать ничего не надо. 
+                if (!newLessons.Any())
+                {
+                    continue;
+                }
+
+                // получаем устаревшие занятия, чьи места в расписании заняты обновлёнными занятиями. 
+                // Выборка по учебной группе, дате, номеру пары и кабинету проведения. 
+                // Они все идут под удаление.
+                var outdatedLessons = oldLessons
+                    .Intersect(newLessons, new LessonEqualityComparer())
+                    .ToArray();
+
+                // Сохраняем изменения. 
+                _context.Lessons.RemoveRange(outdatedLessons);
+                await _context.Lessons.AddRangeAsync(newLessons, stoppingToken);
+                await _context.SaveChangesAsync(stoppingToken);
+
+                changedGroupIds.Add(groupId);
             }
 
             return changedGroupIds.ToArray();
@@ -98,64 +139,7 @@ namespace E_Journal.UpdateService
                 }
             }
         }
-        private (Schedule?, Schedule)[] GetNewSchedules(Schedule[] newSchedules)
-        {
-            List<(Schedule?, Schedule)> itemsToReplace = new();
-
-            foreach (var newSchedule in newSchedules)
-            {
-                var existSchedule = _context.Schedules
-                    .Include(s => s.Lessons)
-                    .FirstOrDefault(s => s.GroupId == newSchedule.Group.Id && s.Date == newSchedule.Date);
-
-                if (existSchedule == null)
-                {
-                    itemsToReplace.Add(new(null, newSchedule));
-                }
-                else if (!IsSchedulesEqual(existSchedule, newSchedule))
-                {
-                    itemsToReplace.Add(new(existSchedule, newSchedule));
-                }
-            }
-
-            return itemsToReplace.ToArray();
-        }
-        private bool IsSchedulesEqual(Schedule x, Schedule y)
-        {
-            if (x.Group.Id != y.Group.Id || x.Date != y.Date || x.Lessons.Count != y.Lessons.Count)
-            {
-                return false;
-            }
-
-            foreach (var (l1, l2) in x.Lessons.Zip(y.Lessons))
-            {
-                if (l1.Discipline.Id != l2.Discipline.Id ||
-                    l1.Teacher.Id != l2.Teacher.Id ||
-                    l1.Room != l2.Room ||
-                    l1.Subgroup != l2.Subgroup)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-        private void AddNewSchedules(IEnumerable<Schedule> schedules)
-        {
-            _context.AddRange(schedules);
-        }
-        private void ReplaceOldSchedules(IEnumerable<(Schedule?, Schedule)> schedules)
-        {
-            foreach (var (OldSchedule, NewSchedule) in schedules)
-            {
-                if (OldSchedule != null)
-                {
-                    _context.Schedules.Remove(OldSchedule);
-                    _context.Schedules.Add(NewSchedule);
-                }
-            }
-        }
-
+        
         public override void Dispose()
         {
             client.Dispose();

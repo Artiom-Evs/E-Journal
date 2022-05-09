@@ -28,6 +28,7 @@ namespace E_Journal.Infrastructure
                 foreach (var lesson in BuildDayLessons(date, dayLessonsText))
                 {
                     lesson.Group = group;
+                    lesson.GroupId = group.Id;
                     yield return lesson;
                 }
             }
@@ -57,7 +58,9 @@ namespace E_Journal.Infrastructure
                 Lesson lesson = new()
                 {
                     Discipline = discipline,
+                    DisciplineId = discipline.Id,
                     Teacher = teacher,
+                    TeacherId = teacher.Id,
                     Date = date, 
                     // вычисляется индекс для получения номера кабинета
                     Room = (row < roomRows.Length) ? roomRows[row] : roomRows[0], 

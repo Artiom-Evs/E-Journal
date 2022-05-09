@@ -37,4 +37,17 @@ public class Lesson
 
         return false;
     }
+
+    public override int GetHashCode()
+    {
+        long hCode = this.DisciplineId ^
+                this.TeacherId ^
+                this.GroupId ^
+                this.Subgroup ^
+                this.Date.Ticks ^
+                this.Room.GetHashCode() ^
+                this.Number;
+
+        return hCode.GetHashCode();
+    }
 }
