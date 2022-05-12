@@ -4,10 +4,10 @@
     ViewData["title"] = "Персональное расписание";
 }
 
-<h2>@ViewData["title"]</h2>
+<h1>@ViewData["title"]</h1>
 <div class="row">
     <div class="col-md">
-        <h3>Сегодня</h3>
+        <h2>Сегодня</h2>
         @if (!Model.LessonsToday.Any())
         {
             <p><em>Расписание на сегодня отсутствует.</em></p>
@@ -26,7 +26,7 @@
                 <tbody>
                     @for (int i = 1; i <= Model.LessonsToday.Max(l => l.Number); i++)
                     {
-                        @(selectedViewModel = Model.LessonsToday.SingleOrDefault(l => l.Number == i))
+                        selectedViewModel = Model.LessonsToday.SingleOrDefault(l => l.Number == i);
 
                         <tr>
                             <td>@i</td>
@@ -36,8 +36,9 @@
                                 {
                                     <a class="btn btn-secondary" 
                                         asp-page="EditLessonTopic" 
-                                        asp-route-lessonid="@selectedViewModel.LessonId">
-                                            @(selectedViewModel.HasTopic ? "Добавить тему" : "Изменить тему")
+                                        asp-route-lessonid="@selectedViewModel.LessonId"
+                                        asp-route-returnurl="@Url.Page("/Teacher")">
+                                            @(selectedViewModel.HasTopic ? "Изменить тему" : "Добавить тему")
                                     </a>
                                 }
                             </td>
@@ -48,7 +49,7 @@
         }
     </div>
     <div class="col-md">
-        <h3>Завтра</h3>
+        <h2>Завтра</h2>
         @if (!Model.LessonsTomorrow.Any())
         {
             <p><em>Расписание на сегодня отсутствует.</em></p>
