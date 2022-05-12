@@ -1,0 +1,16 @@
+﻿@page
+@model E_Journal.WebUI.Pages.EditLessonTopicModel
+
+<h1>@ViewData["title"]</h1>
+<form method="post">
+    <input type="hidden" asp-for="@Model.Input.LessonId" />
+    <div class="form-floating">
+        <input class="form-control" type="text" asp-for="@Model.Input.Topic" />
+        <label asp-for="@Model.Input.Topic"></label>
+    </div>
+    <div class="form-floating">
+        <input class="form-control" type="text" asp-for="@Model.Input.Description" />
+        <label asp-for="@Model.Input.Description"></label>
+    </div>
+    <button class="btn" type="submit">Сохранить</button>
+</form>
