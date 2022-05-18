@@ -9,10 +9,10 @@ public class Score
     public Student Student { get; set; }
     public Lesson Lesson { get; set; }
 
-    public int Value { get; set; }
+    public ScoreValue Value { get; set; }
 
     public Score() { }
-    public Score(Student student, Lesson lesson, int value)
+    public Score(Student student, Lesson lesson, ScoreValue value)
     {
         Student = student;
         Lesson = lesson;
