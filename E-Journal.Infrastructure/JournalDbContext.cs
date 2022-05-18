@@ -11,7 +11,8 @@ namespace E_Journal.Infrastructure
         public DbSet<Student> Students { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<Score> Scores { get; set; }
-        
+        public DbSet<ScoreValue> ScoreValues { get; set; }
+
 
         public JournalDbContext(DbContextOptions options)
             : base(options)

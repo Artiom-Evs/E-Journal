@@ -18,6 +18,7 @@ namespace E_Journal.Infrastructure
         public IQueryable<Student> Students => context.Students;
         public IQueryable<Lesson> Lessons => context.Lessons;
         public IQueryable<Score> Scores => context.Scores;
+        public IQueryable<ScoreValue> ScoreValues => context.ScoreValues;
 
         public void Add<T>(T item) where T : class
         {
@@ -94,6 +95,9 @@ namespace E_Journal.Infrastructure
             .Include(s => s.Student)
             .Include(s => s.Lesson)
             .First(s => s.Id == id);
+        public ScoreValue GetScoreValue(int id) =>
+            context.ScoreValues
+            .First(v => v.Id == id);
 
         public Task<Group> GetGroupAsync(int id) =>
             context.Groups
@@ -119,6 +123,9 @@ namespace E_Journal.Infrastructure
             .Include(s => s.Student)
             .Include(s => s.Lesson)
             .FirstAsync(s => s.Id == id);
+        public Task<ScoreValue> GetScoreValueAsync(int id) =>
+            context.ScoreValues
+            .FirstAsync(v => v.Id == id);
 
         public async Task ClearDatabaseAsync()
         {

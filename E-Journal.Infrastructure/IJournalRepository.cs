@@ -11,6 +11,7 @@ namespace E_Journal.Infrastructure
         IQueryable<Student> Students { get; }
         IQueryable<Lesson> Lessons { get; }
         IQueryable<Score> Scores { get; }
+        IQueryable<ScoreValue> ScoreValues { get; }
 
         void Add<T>(T item) where T : class;
         void Update<T>(T item) where T : class;
@@ -28,6 +29,7 @@ namespace E_Journal.Infrastructure
         Student GetStudent(int id);
         Lesson GetLesson(int id);
         Score GetScore(int id);
+        ScoreValue GetScoreValue(int id);
 
         Task<Group> GetGroupAsync(int id);
         Task<Discipline> GetDisciplineAsync(int id);
@@ -35,6 +37,7 @@ namespace E_Journal.Infrastructure
         Task<Student> GetStudentAsync(int id);
         Task<Lesson> GetLessonAsync(int id);
         Task<Score> GetScoreAsync(int id);
+        Task<ScoreValue> GetScoreValueAsync(int id);
 
         Task ClearDatabaseAsync();
     }
