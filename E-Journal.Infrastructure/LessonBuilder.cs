@@ -66,7 +66,11 @@ namespace E_Journal.Infrastructure
                     Room = (row < roomRows.Length) ? roomRows[row] : roomRows[0], 
                     Number = lessonNumber
                 };
-                    
+                
+                // TODO: переделать присвоение подгрупп
+                // в одной паре может появиться занятие для одной конкретной подгруппы
+                // в таком случае определение подгруппы по количеству занятий в паре будет работать неправильно
+                // можно попробовать присваивать значение подгруппы по значению первых двух символов в стоке с именем занятия
                 if (lessonRows.Length > 3)
                 {
                     lesson.Subgroup = char.Parse((row + 1).ToString());
