@@ -9,9 +9,7 @@ using E_Journal.Shared;
 using E_Journal.Infrastructure;
 using E_Journal.WebUI.Models;
 
-
-
-namespace E_Journal.WebUI.Pages;
+namespace E_Journal.WebUI.Areas.Teacher.Pages;
 
 [Authorize(Roles = ApplicationRoles.Teacher)]
 public class EditLessonTopicModel : PageModel

@@ -17,11 +17,15 @@ namespace E_Journal.WebUI.Pages
         {
             if (User.IsInRole(ApplicationRoles.Student))
             {
-                return RedirectToPage(ApplicationRoles.Student);
+                return RedirectToRoute(new { area = ApplicationRoles.Student });
             }
             else if (User.IsInRole(ApplicationRoles.Teacher))
             {
-                return RedirectToPage(ApplicationRoles.Teacher);
+                return RedirectToRoute(new { area = ApplicationRoles.Teacher });
+            }
+            else if (User.IsInRole(ApplicationRoles.Admin))
+            {
+                return RedirectToRoute(new { area = ApplicationRoles.Admin });
             }
 
             return Page();

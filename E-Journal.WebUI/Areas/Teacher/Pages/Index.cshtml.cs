@@ -6,20 +6,20 @@ using E_Journal.WebUI.Models;
 using E_Journal.WebUI.Models.ViewModels;
 using E_Journal.Infrastructure; 
 
-namespace E_Journal.WebUI.Pages;
+namespace E_Journal.WebUI.Areas.Teacher.Pages;
 
 [Authorize(Roles = ApplicationRoles.Teacher)]
-public class TeacherModel : PageModel
+public class IndexModel : PageModel
 {
-    private readonly ILogger<TeacherModel> _logger;
+    private readonly ILogger<IndexModel> _logger;
     private readonly UserManager<ApplicationUser> _userManager; 
     private readonly JournalDbContext _context;
 
     public TeacherLessonViewModel[] LessonsToday { get; set; } = Array.Empty<TeacherLessonViewModel>();
     public TeacherLessonViewModel[] LessonsTomorrow { get; set; } = Array.Empty<TeacherLessonViewModel>();
 
-    public TeacherModel(
-        ILogger<TeacherModel> logger,
+    public IndexModel(
+        ILogger<IndexModel> logger,
         UserManager<ApplicationUser> userManager, 
         JournalDbContext context)
     {

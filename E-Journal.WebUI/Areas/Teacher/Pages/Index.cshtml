@@ -1,5 +1,5 @@
-﻿@page
-@model StudentModel
+@page
+@model IndexModel
 @{
     ViewData["title"] = "Персональное расписание";
 }
@@ -20,14 +20,28 @@
                         <th>№</th>
                         <th>Дисциплина</th>
                         <th>Аудитория</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     @for (int i = 1; i <= Model.LessonsToday.Max(l => l.Number); i++)
                     {
+                        selectedViewModel = Model.LessonsToday.SingleOrDefault(l => l.Number == i);
+
                         <tr>
                             <td>@i</td>
-                            @await Component.InvokeAsync("StudentLessonCell", Model.LessonsToday.Where(l => l.Number == i).OrderBy(l => l.Subgroup))
+                            @await Component.InvokeAsync("TeacherLessonCell", selectedViewModel)
+                            <td>
+                                @if (selectedViewModel != null)
+                                {
+                                    <a class="btn btn-secondary" 
+                                        asp-page="EditLessonTopic" 
+                                        asp-route-lessonid="@selectedViewModel.LessonId"
+                                        asp-route-returnurl="@Url.Page("/Teacher")">
+                                            @(selectedViewModel.HasTopic ? "Изменить тему" : "Добавить тему")
+                                    </a>
+                                }
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -38,12 +52,12 @@
         <h2>Завтра</h2>
         @if (!Model.LessonsTomorrow.Any())
         {
-            <p><em>Расписание на завтра отсутствует.</em></p>
+            <p><em>Расписание на сегодня отсутствует.</em></p>
         }
         else
         {
             <table class="table">
-                <thead>
+                <thead class="table">
                     <tr>
                         <th>№</th>
                         <th>Дисциплина</th>
@@ -55,7 +69,7 @@
                     {
                         <tr>
                             <td>@i</td>
-                            @await Component.InvokeAsync("StudentLessonCell", Model.LessonsTomorrow.Where(l => l.Number == i).OrderBy(l => l.Subgroup))
+                            @await Component.InvokeAsync("TeacherLessonCell", Model.LessonsTomorrow.SingleOrDefault(l => l.Number == i))
                         </tr>
                     }
                 </tbody>
@@ -63,3 +77,7 @@
         }
     </div>
 </div>
+
+@functions {
+    private TeacherLessonViewModel? selectedViewModel;
+}
