@@ -1,0 +1,10 @@
+﻿@{
+    
+}
+
+<ul class="nav nav-pills flex-column">
+    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" asp-page="./Index">Общая информация</a></li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.StudentsNavClass(ViewContext)" asp-page="./Students">Учащиеся</a></li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.TeachersNavClass(ViewContext)" asp-page="./Teachers">Преподаватели</a></li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.UnconfirmedNavClass(ViewContext)" asp-page="./UnconfirmedUsers">Неподтверждённые</a></li>
+</ul>

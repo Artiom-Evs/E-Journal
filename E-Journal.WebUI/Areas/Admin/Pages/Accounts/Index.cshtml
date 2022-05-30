@@ -1,0 +1,21 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Общая информация";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    Всего пользователей: @Model.UsersCount
+</p>
+<p>
+    Неподтверждённых пользователей: @Model.UnconfirmedUsersCount
+</p>
+<p>
+    Зарегистрированных учащихся: @Model.StudentsCount
+</p>
+<p>
+    Зарегистрированных преподавателей: @Model.TeachersCount
+</p>

@@ -1,6 +1,11 @@
 ﻿@page
 @model IndexModel
 @{
+    ViewData["Title"] = "Администрирование";
 }
 
-<h1>Администрирование</h1>
+<h1>@ViewData["Title"]</h1>
+
+<ul class="nav nav-pills flex-column">
+    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="./Accounts/Index">Управление пользователями</a></li>
+</ul>

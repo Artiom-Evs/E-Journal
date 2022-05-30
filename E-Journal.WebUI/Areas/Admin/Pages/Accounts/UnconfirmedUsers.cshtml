@@ -1,0 +1,34 @@
+﻿@page
+@model UnconfirmedUsersModel
+@{
+    ViewData["Title"] = "Неподтверждённые пользователи";
+    ViewData["ActivePage"] = ManageNavPages.UnconfirmedUsers;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Электронная почта</th>
+            <th>Роль</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.UnconfirmedUsers)
+        {
+            <tr>
+                <td>@user.Email</td>
+                <td>@user.Role</td>
+                <td>
+                    <a class="btn btn-secondary"
+                       asp-page-handler="ConfirmUser"
+                       asp-route-userId="@user.Id">
+                       Подтвердить
+                   </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

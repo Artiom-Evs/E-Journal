@@ -1,0 +1,28 @@
+﻿@page
+@model TeachersModel
+@{
+    ViewData["Title"] = "Преподаватели";
+    ViewData["ActivePage"] = ManageNavPages.Teachers;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Электронная почта</th>
+            <th>Состояние</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.Teachers)
+        {
+            <tr>
+                <td>@user.Email</td>
+                <td>@(user.IsConfirmed ? "Подтверждён" : "Не подтверждён")</td>
+                <td></td>
+            </tr>
+        }
+    </tbody>
+</table>
