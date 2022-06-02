@@ -12,8 +12,11 @@ namespace E_Journal.WebUI.Models
         {
         }
 
+        [PersonalData]
         public string FirstName { get; set; } = string.Empty;
+        [PersonalData]
         public string SecondName { get; set; } = string.Empty;
+        [PersonalData]
         public string LastName { get; set; } = string.Empty;
 
         public int AssociatedId { get; set; }

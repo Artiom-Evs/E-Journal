@@ -26,8 +26,9 @@ namespace E_Journal.WebUI.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        [Display(Name = "Имя пользователя")]
+        [Display(Name = "Логин пользователя")]
         public string Username { get; set; }
+
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -37,21 +38,29 @@ namespace E_Journal.WebUI.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Phone(ErrorMessage = "{0} введён некорректно")]
-            [Display(Name = "Номер телефона")]
-            public string PhoneNumber { get; set; }
+            [Required(ErrorMessage = "{0} является обязательным полем.")]
+            [Display(Name = "Имя")]
+            public string FirstName { get; set; }
+
+            [Required(ErrorMessage = "{0} является обязательным полем.")]
+            [Display(Name = "Фамилия")]
+            public string SecondName { get; set; }
+
+            [Required(ErrorMessage = "{0} является обязательным полем.")]
+            [Display(Name = "Отчество")]
+            public string LastName { get; set; }
+
         }
 
-        private async Task LoadAsync(ApplicationUser user)
+        private void Load(ApplicationUser user)
         {
-            var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-            Username = userName;
+            Username = user.UserName;
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                FirstName = user.FirstName, 
+                SecondName = user.SecondName, 
+                LastName = user.LastName
             };
         }
 
@@ -63,7 +72,7 @@ namespace E_Journal.WebUI.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Не удалось загрузить пользователя с идентификатором '{_userManager.GetUserId(User)}'.");
             }
 
-            await LoadAsync(user);
+            Load(user);
             return Page();
         }
 
@@ -77,17 +86,22 @@ namespace E_Journal.WebUI.Areas.Identity.Pages.Account.Manage
 
             if (!ModelState.IsValid)
             {
-                await LoadAsync(user);
+                Load(user);
                 return Page();
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
+            if (Input.FirstName != user.FirstName ||
+                Input.SecondName != user.SecondName || 
+                Input.LastName != user.LastName)
             {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
+                user.FirstName = Input.FirstName;
+                user.SecondName = Input.SecondName;
+                user.LastName = Input.LastName;
+
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
                 {
-                    StatusMessage = "Не удалось сохранить номер телефона.";
+                    StatusMessage = "Не удалось изменить новые персональные данные.";
                     return RedirectToPage();
                 }
             }
