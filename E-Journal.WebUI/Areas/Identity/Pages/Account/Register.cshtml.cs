@@ -61,6 +61,18 @@ namespace E_Journal.WebUI.Areas.Identity.Pages.Account
 
         public class InputModel
         {
+            [Required(ErrorMessage = "{0} является обязательным полем.")]
+            [Display(Name = "Имя")]
+            public string FirstName { get; set; }
+
+            [Required(ErrorMessage = "{0} является обязательным полем.")]
+            [Display(Name = "Фамилия")]
+            public string SecondName { get; set; }
+
+            [Required(ErrorMessage = "{0} является обязательным полем.")]
+            [Display(Name = "Отчество")]
+            public string LastName { get; set; }
+
             [Required(ErrorMessage = "{0} обязателен для ввода.")]
             [EmailAddress(ErrorMessage = "Введён некорректный Email.")]
             [Display(Name = "Email")]
@@ -104,8 +116,12 @@ namespace E_Journal.WebUI.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                user.Email = Input.Email;
+                user.UserName = Input.Email;
+                user.FirstName = Input.FirstName;
+                user.SecondName = Input.SecondName;
+                user.LastName = Input.LastName;
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
