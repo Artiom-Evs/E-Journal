@@ -1,4 +1,4 @@
-﻿@model GroupScheduleViewModel
+﻿@model TeacherScheduleViewModel
 
 <h2>@Model.Title</h2>
 <h3>@GetDatesRange(Model.Dates)</h3>
@@ -24,7 +24,7 @@ else
                 <tr>
                     @foreach (var date in Model.Dates)
                     {
-                        @await Component.InvokeAsync("StudentLessonCell", Model.Lessons.Where(l => l.Date == date && l.Number == lessonNumber).OrderBy(l => l.Subgroup))
+                        @await Component.InvokeAsync("TeacherLessonCell", Model.Lessons.SingleOrDefault(l => l.Date == date && l.Number == lessonNumber))
                     }
                 </tr>
             }

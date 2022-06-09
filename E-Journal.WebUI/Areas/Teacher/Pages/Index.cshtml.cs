@@ -17,6 +17,7 @@ public class IndexModel : PageModel
 
     public TeacherLessonViewModel[] LessonsToday { get; set; } = Array.Empty<TeacherLessonViewModel>();
     public TeacherLessonViewModel[] LessonsTomorrow { get; set; } = Array.Empty<TeacherLessonViewModel>();
+    public TeacherScheduleViewModel WeekSchedule { get; set; }
 
     public IndexModel(
         ILogger<IndexModel> logger,
@@ -33,6 +34,7 @@ public class IndexModel : PageModel
 
         SetLessonsToday(user.AssociatedId);
         SetLessonsTomorrow(user.AssociatedId);
+        SetWeekLessons(user.AssociatedId);
     }
 
     private void SetLessonsToday(int teacherId)
@@ -82,4 +84,62 @@ public class IndexModel : PageModel
             LessonsTomorrow = lessonsTomorrow;
         }
     }
+
+    private void SetWeekLessons(int teacherId)
+    {
+        DateTime lastLessonDate = GetLastLessonDate(teacherId);
+        DateTime firstWeekDate = GetFirstWeekDate(lastLessonDate);
+        
+        var weekLessons = _context.Lessons
+            .Where(l => l.TeacherId == teacherId && l.Date >= firstWeekDate)
+            .Select(l =>
+                new TeacherLessonViewModel
+                {
+                    DisciplineName = l.Discipline.Name,
+                    GroupName = l.Group.Name,
+                    Date = l.Date,
+                    Room = l.Room,
+                    Number = l.Number,
+                    Subgroup = l.Subgroup
+                })
+            .ToArray();
+
+        int maxLessonsPerDay = GetMaxLessonsPerDay(weekLessons);
+
+        WeekSchedule = new()
+        {
+            Title = "На неделю",
+            Dates = GetWeekDates(lastLessonDate),
+            Lessons = weekLessons,
+            MaxLessonsPerDay = maxLessonsPerDay
+        };
+    }
+
+    public DateTime GetLastLessonDate(int teacherId) =>
+        _context.Lessons
+            .Where(l => l.TeacherId == teacherId)
+            .OrderBy(l => l.Date)
+            .LastOrDefault()
+            ?.Date ?? DateTime.Now.Date;
+
+    private DateTime GetFirstWeekDate(DateTime date) =>
+        date.Date.AddDays((int)date.DayOfWeek * -1 + 1);
+
+    private DateTime[] GetWeekDates(DateTime someDateOfRequiredWeek)
+    {
+        DateTime firstDateOfWeek = GetFirstWeekDate(someDateOfRequiredWeek);
+
+        return new[]
+        {
+            firstDateOfWeek,
+            firstDateOfWeek.AddDays(1),
+            firstDateOfWeek.AddDays(2),
+            firstDateOfWeek.AddDays(3),
+            firstDateOfWeek.AddDays(4),
+            firstDateOfWeek.AddDays(5)
+        };
+    }
+
+    private int GetMaxLessonsPerDay(TeacherLessonViewModel[] lessons) =>
+        lessons.DefaultIfEmpty().Max(l => l?.Number ?? 0);
 }

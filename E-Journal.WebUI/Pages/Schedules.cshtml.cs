@@ -46,7 +46,7 @@ namespace E_Journal.WebUI.Pages
 
                     GroupSchedules.Add(new GroupScheduleViewModel()
                     {
-                        GroupName = group.Name, 
+                        Title = $"Группа - {group.Name}", 
                         Dates = lastWeekDates, 
                         Lessons = lessons, 
                         MaxLessonsPerDay = maxLessonsPerDay

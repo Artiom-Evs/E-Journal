@@ -76,6 +76,9 @@
             </table>
         }
     </div>
+    <div>
+        @await Component.InvokeAsync("TeacherSchedule", Model.WeekSchedule)
+    </div>
 </div>
 
 @functions {

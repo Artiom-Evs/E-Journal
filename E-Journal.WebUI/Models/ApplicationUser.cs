@@ -21,5 +21,8 @@ namespace E_Journal.WebUI.Models
 
         public int AssociatedId { get; set; }
         public bool UserConfirmed { get; set; }
+
+        public string GetInitials() =>
+            $"{SecondName} {FirstName[0]}. {LastName[0]}.";
     }
 }

@@ -20,7 +20,7 @@ public class Student
     }
 
     public string GetInitials() =>
-        $"{FirstName} {SecondName[0]}. {LastName[0]}.";
+        $"{SecondName} {FirstName[0]}. {LastName[0]}.";
 
     public override string ToString()
     {
