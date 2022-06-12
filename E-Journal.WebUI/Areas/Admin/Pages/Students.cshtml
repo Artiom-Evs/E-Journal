@@ -31,7 +31,20 @@
                     <td>@s.FirstName</td>
                     <td>@s.LastName</td>
                     <td>@s.Group</td>
-                    <td></tr>
+                    <td>
+                        <a class="btn btn-danger" 
+                           asp-page="./EditStudent"
+                           asp-route-studentId="@s.Id"
+                           asp-route-returnUrl="@Url.Page("/Students", new { currentPage = Model.ViewModel.PaginingInfo.CurrentPage })">
+                            Редактировать</a>
+                        <a class="btn btn-danger" 
+                           asp-page="@Url.Content("./Students")"
+                           asp-page-handler="DeleteStudent"
+                           asp-route-studentId="@s.Id"
+                           asp-route-currentPage="@Model.ViewModel.PaginingInfo.CurrentPage">
+                            Удалить</a>
+                    </td>
+                </tr>
             }
         </tbody>
         <tfoot>

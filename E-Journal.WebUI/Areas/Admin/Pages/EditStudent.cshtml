@@ -1,0 +1,47 @@
+﻿@page
+@model EditStudentModel
+@{
+    ViewData["title"] = "Редактирование учащегося";
+}
+
+<h1>@ViewData["title"]</h1>
+        
+<form id="profile-form" method="post" asp-route-returnUrl="@Model.ReturnUrl">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    
+    <input type="hidden" asp-for="Input.Id" />
+
+    <div class="form-floating">
+        <input asp-for="Input.SecondName" class="form-control" />
+        <label asp-for="Input.SecondName" class="form-label"></label>
+        <span asp-validation-for="Input.SecondName" class="text-danger"></span>
+    </div>
+            
+    <div class="form-floating">
+        <input asp-for="Input.FirstName" class="form-control" />
+        <label asp-for="Input.FirstName" class="form-label"></label>
+        <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating">
+        <input asp-for="Input.LastName" class="form-control" />
+        <label asp-for="Input.LastName" class="form-label"></label>
+        <span asp-validation-for="Input.LastName" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating">
+        <select asp-for="Input.Group" class="form-control">
+            <option></option>
+            @foreach (var g in Model.Groups)
+            {
+                <option value="@g">@g</option>
+            }
+        </select>
+        <label asp-for="Input.Group" class="form-label"></label>
+        <span asp-validation-for="Input.Group" class="text-danger"></span>
+    </div>
+            
+    <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Сохранить</button>
+</form>
+
+
