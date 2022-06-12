@@ -43,7 +43,8 @@ namespace E_Journal.WebUI.Data
                 ApplicationUser user = new()
                 {
                     UserName = name,
-                    Email = email
+                    Email = email, 
+                    UserConfirmed = true
                 };
 
                 var result = await userManager.CreateAsync(user, password);

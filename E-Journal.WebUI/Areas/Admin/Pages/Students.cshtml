@@ -1,0 +1,44 @@
+﻿@page
+@model StudentsModel
+@{
+    ViewData["title"] = "Учащиеся";
+}
+
+<h1>@ViewData["title"]</h1>
+
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Фамилия</th>
+                <th>Имя</th>
+                <th>Отчество</th>
+                <th>Группа</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model.ViewModel.Students)
+            {
+                <tr>
+                    <td>@s.SecondName</td>
+                    <td>@s.FirstName</td>
+                    <td>@s.LastName</td>
+                    <td>@s.Group</td>
+                    <td></tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5">
+                    @for (int i = 1; i <= Model.ViewModel.PaginingInfo.PagesCount; i++)
+                    {
+                        <a class="btn @(i == Model.ViewModel.PaginingInfo.CurrentPage ? "btn-primary" : "btn-secondary")"
+                            asp-route-currentPage="@i">
+                            @i</a>
+                    }
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
