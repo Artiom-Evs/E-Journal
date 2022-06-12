@@ -10,10 +10,10 @@ using E_Journal.Infrastructure;
 using E_Journal.WebUI.Models;
 using E_Journal.WebUI.Models.ViewModels;
 
-namespace E_Journal.WebUI.Areas.Admin.Pages;
+namespace E_Journal.WebUI.Areas.Admin.Pages.Students;
 
 [Authorize(Roles = ApplicationRoles.Admin)]
-public class StudentsModel : PageModel
+public class IndexModel : PageModel
 {
     public class StudentsViewModel
     {
@@ -25,7 +25,7 @@ public class StudentsModel : PageModel
     private JournalDbContext _context;
     public StudentsViewModel ViewModel { get; }
     
-    public StudentsModel(JournalDbContext context)
+    public IndexModel(JournalDbContext context)
     {
         _context = context;
         ViewModel = new StudentsViewModel();

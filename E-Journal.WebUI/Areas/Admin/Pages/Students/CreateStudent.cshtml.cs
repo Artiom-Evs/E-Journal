@@ -9,26 +9,23 @@ using E_Journal.Shared;
 using E_Journal.Infrastructure;
 using E_Journal.WebUI.Models;
 
-namespace E_Journal.WebUI.Areas.Admin.Pages;
+namespace E_Journal.WebUI.Areas.Admin.Pages.Students;
 
 [Authorize(Roles = ApplicationRoles.Admin)]
-public class EditStudentModel : PageModel
+public class CreateStudentModel : PageModel
 {
     public class InputModel
     {
-        [Required]
-        [Range(1, int.MaxValue)]
-        public int Id { get; set; } = 0;
-        [Required]
+        [Required(ErrorMessage = "{0} является обязательным полем.")]
         [Display(Name = "Имя")]
         public string FirstName { get; set; }
-        [Required]
+        [Required(ErrorMessage = "{0} является обязательным полем.")]
         [Display(Name = "Фамилия")]
         public string SecondName { get; set; }
-        [Required]
+        [Required(ErrorMessage = "{0} является обязательным полем.")]
         [Display(Name = "Отчество")]
         public string LastName { get; set; }
-        [Required]
+        [Required(ErrorMessage = "{0} является обязательным полем.")]
         [Display(Name = "Учебная группа")]
         public string Group { get; set; }
     }
@@ -36,40 +33,26 @@ public class EditStudentModel : PageModel
     private JournalDbContext _context;
     [BindProperty]
     public InputModel Input { get; set; }
-    [BindProperty]
     public string[] Groups { get; set; }
     public string ReturnUrl { get; set; }
 
-    public EditStudentModel(JournalDbContext context)
+    public CreateStudentModel(JournalDbContext context)
     {
         _context = context;
     }
 
-    public IActionResult OnGet(int? studentId, string returnUrl = null)
+    public void OnGet(string returnUrl = null)
     {
         ReturnUrl = returnUrl ?? "/";
-
-        if (studentId == null || studentId <= 0)
-        {
-            throw new ArgumentException("Parameter cannot be equal to zero.", nameof(studentId));
-        }
-
-        var student = _context.Students
-            .SingleOrDefault(g => g.Id == studentId);
-
-        if (student == null)
-        {
-            return NotFound();
-        }
-
-        Load(student);
-
-        return Page();
+        Input = new InputModel();
+        Load();
     }
 
     public async Task<IActionResult> OnPostAsync(string returnUrl = null)
     {
         ReturnUrl = returnUrl ?? "/";
+
+        Load();
 
         if (!ModelState.IsValid)
         {
@@ -85,32 +68,26 @@ public class EditStudentModel : PageModel
 
         E_Journal.Shared.Student student = new()
         {
-            Id = Input.Id,
             FirstName = Input.FirstName,
             SecondName = Input.SecondName,
             LastName = Input.LastName,
             Group = group
         };
 
-        _context.Students.Update(student);
+        // TODO: в дальнейшем можно будет попробовать
+        // сделать внесение изменений в БД отдельной функцией
+        // Администратор сможет добавлять/удалять/редактировать учащихся
+        // и только в конце одним действием вносить изменения
+        await _context.Students.AddAsync(student);
         await _context.SaveChangesAsync();
 
         return Redirect(ReturnUrl);
     }
 
-    private void Load(E_Journal.Shared.Student student)
+    private void Load()
     {
-        Groups = _context.Groups.Select(g => g.Name).ToArray();
-
-        Input = new InputModel
-        {
-            Id = student.Id,
-            FirstName = student.FirstName,
-            SecondName = student.SecondName,
-            LastName = student.LastName,
-            Group = _context.Groups
-                .Single(g => g.Id == student.GroupId)
-                .Name
-        };
+        Groups = _context.Groups
+            .Select(g => g.Name)
+            .ToArray();
     }
 }

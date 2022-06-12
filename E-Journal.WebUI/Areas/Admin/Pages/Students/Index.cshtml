@@ -1,5 +1,5 @@
 ﻿@page
-@model StudentsModel
+@model IndexModel
 @{
     ViewData["title"] = "Учащиеся";
 }
@@ -9,7 +9,7 @@
 <div>
     <a class="btn btn-primary"
        asp-page="CreateStudent"
-       asp-route-returnUrl="@Url.Page("/Students", new { currentPage = Model.ViewModel.PaginingInfo.CurrentPage })">
+       asp-route-returnUrl="@Url.Page("./Index", new { currentPage = Model.ViewModel.PaginingInfo.CurrentPage })">
         Добавить учащегося</a>
 </div>
 <div>
@@ -35,10 +35,10 @@
                         <a class="btn btn-danger" 
                            asp-page="./EditStudent"
                            asp-route-studentId="@s.Id"
-                           asp-route-returnUrl="@Url.Page("/Students", new { currentPage = Model.ViewModel.PaginingInfo.CurrentPage })">
+                           asp-route-returnUrl="@Url.Page("./Index", new { currentPage = Model.ViewModel.PaginingInfo.CurrentPage })">
                             Редактировать</a>
                         <a class="btn btn-danger" 
-                           asp-page="@Url.Content("./Students")"
+                           asp-page="@Url.Content("./Index")"
                            asp-page-handler="DeleteStudent"
                            asp-route-studentId="@s.Id"
                            asp-route-currentPage="@Model.ViewModel.PaginingInfo.CurrentPage">
