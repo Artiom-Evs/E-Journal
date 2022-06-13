@@ -49,6 +49,12 @@
                 <td>@s.StudentInitials</td>
                 <td>@s.Value.Title</td>
                 <td>
+                    <a class="btn btn-secondary"
+                        asp-page="EditScore"
+                        asp-route-scoreId="@s.ScoreId"
+                        asp-route-returnUrl="@Url.Page("./LessonScores", new { lessonId = Model.LessonId })">
+                            Изменить
+                    </a>
                     <a class="btn btn-danger"
                         asp-page-handler="DeleteScore"
                         asp-route-lessonId="@Model.LessonId"
