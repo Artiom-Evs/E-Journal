@@ -80,6 +80,7 @@ namespace E_Journal.WebUI
             });
 
             await IdentitySeedData.EnsurePopulated(app);
+            SeedData.EnsureScoreValuesCreation(app);
         }
     }
 }

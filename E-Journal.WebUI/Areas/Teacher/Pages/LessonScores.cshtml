@@ -28,6 +28,12 @@
 </dl>
 
 <h2>Выставленные оценки</h2>
+<a class="btn btn-secondary"
+    asp-page="CreateScore"
+    asp-route-lessonId="@Model.LessonId"
+    asp-route-returnUrl="@Url.Page("./LessonScores", new { lessonId = Model.LessonId })">
+        Выставить новую оценку
+</a>
 <table class="table">
     <thead>
         <tr>

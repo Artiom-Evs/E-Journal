@@ -14,6 +14,7 @@ public class LessonScoresModel : PageModel
 {
     private JournalDbContext _context;
 
+    public int LessonId { get; set; }
     public string DisciplineName { get; set; } = string.Empty;
     public string TeacherName { get; set; } = string.Empty;
     public string GroupName { get; set; } = string.Empty;
@@ -38,6 +39,7 @@ public class LessonScoresModel : PageModel
             return NotFound();
         }
 
+        LessonId = lesson.Id;
         Date = lesson.Date;
         Topic = lesson.Topic;
         Description = lesson.Description;
