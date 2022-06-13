@@ -37,8 +37,13 @@
                                     <a class="btn btn-secondary" 
                                         asp-page="EditLessonTopic" 
                                         asp-route-lessonid="@selectedViewModel.LessonId"
-                                        asp-route-returnurl="@Url.Page("/Teacher")">
+                                        asp-route-returnUrl="@Url.Page("/Teacher")">
                                             @(selectedViewModel.HasTopic ? "Изменить тему" : "Добавить тему")
+                                    </a>
+                                    <a class="btn btn-secondary"
+                                        asp-page="LessonScores"
+                                        asp-route-LessonId="@selectedViewModel.LessonId">
+                                            Просмотреть оценки
                                     </a>
                                 }
                             </td>

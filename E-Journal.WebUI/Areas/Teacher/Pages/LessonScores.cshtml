@@ -1,0 +1,49 @@
+﻿@page
+@model LessonScoresModel
+@{
+    ViewData["title"] = "Выставление отметок";
+}
+
+<h1>@ViewData["title"]</h1>
+<h2>Информация</h2>
+<dl>
+    <dt>Учебный предмет</dt>
+    <dd>@Model.DisciplineName</dd>
+    <dt>Преподаватель</dt>
+    <dd>@Model.TeacherName</dd>
+    <dt>Учебная группа</dt>
+    <dd>@Model.GroupName</dd>
+    <dt>Дата проведения</dt>
+    <dd>@Model.Date.ToString("dd.MM.yyyy")</dd>
+    @if (!string.IsNullOrEmpty(Model.Topic))
+    {
+        <dt>Тема занятия</dt>
+        <dd>@Model.Topic</dd>
+    }
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <dt>Описание темы</dt>
+        <dd>@Model.Description</dd>
+    }
+</dl>
+
+<h2>Выставленные оценки</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <td>Учащийся</td>
+            <td>Отметка</td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in Model.Scores)
+        {
+            <tr>
+                <td>@s.StudentInitials</td>
+                <td>@s.Value.Title</td>
+                <td></td>
+            </tr>
+        }
+    </tbody>
+</table>
