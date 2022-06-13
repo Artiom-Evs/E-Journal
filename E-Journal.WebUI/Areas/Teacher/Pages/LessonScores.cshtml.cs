@@ -29,7 +29,7 @@ public class LessonScoresModel : PageModel
     }
 
     // TODO: уточнить, нужно ли контроллировать какой преподаватель выставляет оценки
-    public IActionResult OnGet(int? lessonId = null)
+    public IActionResult OnGet(int lessonId = 0)
     {
         var lesson = _context.Lessons
             .SingleOrDefault(l => l.Id == lessonId);
@@ -64,5 +64,21 @@ public class LessonScoresModel : PageModel
             .ToArray();
         
         return Page();
+    }
+
+    public async Task<IActionResult> OnGetDeleteScoreAsync(int lessonId = 0, int scoreId = 0)
+    {
+        var score = _context.Scores
+            .SingleOrDefault(s => s.Id == scoreId);
+
+        if (score == null)
+        {
+            return NotFound();
+        }
+
+        _context.Scores.Remove(score);
+        await _context.SaveChangesAsync();
+
+        return RedirectToPage(new { lessonId });
     }
 }

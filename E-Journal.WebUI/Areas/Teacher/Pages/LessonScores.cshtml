@@ -48,7 +48,14 @@
             <tr>
                 <td>@s.StudentInitials</td>
                 <td>@s.Value.Title</td>
-                <td></td>
+                <td>
+                    <a class="btn btn-danger"
+                        asp-page-handler="DeleteScore"
+                        asp-route-lessonId="@Model.LessonId"
+                        asp-route-scoreId="@s.ScoreId">
+                            Удалить
+                    </a>
+                </td>
             </tr>
         }
     </tbody>
