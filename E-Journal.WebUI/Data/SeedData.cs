@@ -19,6 +19,8 @@ public static class SeedData
             new() { Title = "10" },
             new() { Title = "Зачёт" },
             new() { Title = "Незачёт" },
+            new() { Title = "Пропуск" },
+            new() { Title = "Не был" },
         };
 
     public static void EnsureScoreValuesCreation(IApplicationBuilder app)

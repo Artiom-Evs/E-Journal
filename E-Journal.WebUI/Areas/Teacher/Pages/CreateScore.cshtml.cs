@@ -10,14 +10,13 @@ using E_Journal.WebUI.Models.ViewModels;
 
 namespace E_Journal.WebUI.Areas.Teacher.Pages;
 
+// TODO: подумать, как обработать ситуацию, в которой оценка у студента уже есть,
+// но при этом возникает попытка выставить ещё одну оценку 
 [Authorize(Roles = ApplicationRoles.Teacher)]
 public class CreateScoreModel : PageModel
 {
     public class InputModel
     {
-        [Required(ErrorMessage = "{0} является обязательным полем")]
-        [Display(Name = "ФИО учащегося")]
-        public int? StudentId { get; set; }
         [Required(ErrorMessage = "{0} является обязательным полем")]
         [Display(Name = "Отметка")]
         public string ScoreValue { get; set; } = String.Empty;
@@ -27,8 +26,9 @@ public class CreateScoreModel : PageModel
 
     public string ReturnUrl { get; set; } = string.Empty;
     public int LessonId { get; set; }
+    public int StudentId { get; set; }
+    public string StudentInitials { get; set; }
     public string[] ScoreValues { get; set; } = Array.Empty<string>();
-    public StudentViewModel[] Students { get; set; } = Array.Empty<StudentViewModel>();
     [BindProperty]
     public InputModel Input { get; set; }
 
@@ -37,40 +37,42 @@ public class CreateScoreModel : PageModel
         _context = context;
     }
 
-    public IActionResult OnGet(int lessonId = 0, string returnUrl = "/")
+    public IActionResult OnGet(int lessonId = 0, int studentId = 0, string returnUrl = "/")
     {
-        ReturnUrl = returnUrl;
-
-        if (lessonId <= 0)
+        if (lessonId <= 0 || studentId <= 0)
         {
             return NotFound();
         }
 
-        Load(lessonId);
         LessonId = lessonId;
+        StudentId = studentId;
+        ReturnUrl = returnUrl;
+
+        Load(studentId);
         Input = new InputModel();
         
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(int lessonId = 0, string returnUrl =  "/")
+    public async Task<IActionResult> OnPostAsync(int lessonId = 0, int studentId = 0, string returnUrl =  "/")
     {
-        ReturnUrl = returnUrl;
-
-        if (lessonId <= 0)
+        if (lessonId <= 0 || studentId <= 0)
         {
             return NotFound();
         }
 
+        LessonId = lessonId;
+        StudentId = studentId;
+        ReturnUrl = returnUrl;
+
         if (!ModelState.IsValid)
         {
-            Load(lessonId);
-            LessonId = lessonId;
+            Load(studentId);
             return Page();
         }
 
         var student = _context.Students
-            .SingleOrDefault(s => s.Id == Input.StudentId);
+            .SingleOrDefault(s => s.Id == StudentId);
         var scoreValue = _context.ScoreValues
             .SingleOrDefault(v => v.Title == Input.ScoreValue);
         var lesson = _context.Lessons
@@ -94,22 +96,11 @@ public class CreateScoreModel : PageModel
         return Redirect(returnUrl);
     }
 
-    private void Load(int lessonId)
+    private void Load(int studentId)
     {
-        int groupId = _context.Lessons
-            .Single(l => l.Id == lessonId)
-            .GroupId;
-
-        Students = _context.Students
-            .Where(s => s.GroupId == groupId)
-            .Select(s => new StudentViewModel()
-            {
-                Id = s.Id,
-                FirstName = s.FirstName,
-                SecondName = s.SecondName,
-                LastName = s.LastName
-            })
-            .ToArray();
+        StudentInitials = _context.Students
+            .Single(s => s.Id == studentId)
+            .GetInitials();
 
         ScoreValues = _context.ScoreValues
             .Select(v => v.Title)

@@ -25,7 +25,8 @@ public class EditScoreModel : PageModel
 
     [BindProperty]
     public InputModel Input { get; set; }
-    public int ScoreId { get; set; }
+    public int LessonId { get; set; }
+    public int StudentId { get; set; }
     public string ReturnUrl { get; set; } = string.Empty;
     public string StudentInitials { get; set; }
     public string[] ScoreValues { get; set; } = Array.Empty<string>();
@@ -35,19 +36,26 @@ public class EditScoreModel : PageModel
         _context = context;
     }
 
-    public IActionResult OnGet(int scoreId = 0, string returnUrl = "/")
+    public IActionResult OnGet(int lessonId = 0, int studentId = 0, string returnUrl = "/")
     {
+        if (lessonId <= 0 || studentId <= 0)
+        {
+            return NotFound();
+        }
+
+        LessonId = lessonId;
+        StudentId = studentId;
         ReturnUrl = returnUrl;
 
         var score = _context.Scores
-            .SingleOrDefault(s => s.Id == scoreId);
+            .SingleOrDefault(s => s.LessonId == lessonId && s.StudentId == studentId);
 
         if (score == null)
         {
             return NotFound();
         }
 
-        Load(score);
+        Load(studentId);
 
         string scoreValue = _context.ScoreValues
             .Single(v => v.Id == score.ValueId)
@@ -61,12 +69,19 @@ public class EditScoreModel : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(int scoreId = 0, string returnUrl =  "/")
+    public async Task<IActionResult> OnPostAsync(int lessonId = 0, int studentId = 0, string returnUrl = "/")
     {
+        if (lessonId <= 0 || studentId <= 0)
+        {
+            return NotFound();
+        }
+
+        LessonId = lessonId;
+        StudentId = studentId;
         ReturnUrl = returnUrl;
 
         var score = _context.Scores
-            .SingleOrDefault(s => s.Id == scoreId);
+            .SingleOrDefault(s => s.LessonId == lessonId && s.StudentId == studentId);
 
         if (score == null)
         {
@@ -75,7 +90,7 @@ public class EditScoreModel : PageModel
 
         if (!ModelState.IsValid)
         {
-            Load(score);   
+            Load(studentId);   
             return Page();
         }
         
@@ -95,11 +110,10 @@ public class EditScoreModel : PageModel
         return Redirect(returnUrl);
     }
 
-    private void Load(Score score)
+    private void Load(int studentId)
     {
-        ScoreId = score.Id;
         StudentInitials = _context.Students
-            .Single(s => s.Id == score.StudentId)
+            .Single(s => s.Id == studentId)
             .GetInitials();
         ScoreValues = _context.ScoreValues
             .Select(v => v.Title)

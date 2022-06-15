@@ -27,13 +27,7 @@
     }
 </dl>
 
-<h2>Выставленные оценки</h2>
-<a class="btn btn-secondary"
-    asp-page="CreateScore"
-    asp-route-lessonId="@Model.LessonId"
-    asp-route-returnUrl="@Url.Page("./LessonScores", new { lessonId = Model.LessonId })">
-        Выставить новую оценку
-</a>
+<h2>Отметки</h2>
 <table class="table">
     <thead>
         <tr>
@@ -47,20 +41,24 @@
         {
             <tr>
                 <td>@s.StudentInitials</td>
-                <td>@s.Value.Title</td>
+                <td>@s.Value</td>
                 <td>
                     <a class="btn btn-secondary"
-                        asp-page="EditScore"
-                        asp-route-scoreId="@s.ScoreId"
-                        asp-route-returnUrl="@Url.Page("./LessonScores", new { lessonId = Model.LessonId })">
-                            Изменить
-                    </a>
-                    <a class="btn btn-danger"
-                        asp-page-handler="DeleteScore"
+                        asp-page=@(s.IsMarked ? "EditScore" : "CreateScore")
                         asp-route-lessonId="@Model.LessonId"
-                        asp-route-scoreId="@s.ScoreId">
-                            Удалить
+                        asp-route-studentId="@s.StudentId"
+                        asp-route-returnUrl="@Url.Page("./LessonScores", new { lessonId = Model.LessonId })">
+                            @(s.IsMarked ? "Изменить отметку" : "Добавить отметку")
                     </a>
+                    @if (s.IsMarked)
+                    {
+                        <a class="btn btn-danger"
+                            asp-page-handler="DeleteScore"
+                            asp-route-lessonId="@Model.LessonId"
+                            asp-route-studentId="@s.StudentId">
+                                Удалить
+                        </a>
+                    }
                 </td>
             </tr>
         }

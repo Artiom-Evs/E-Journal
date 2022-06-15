@@ -1,7 +1,7 @@
 ﻿@page
 @model EditScoreModel
 @{
-    ViewData["title"] = "Редактирование оценки";
+    ViewData["title"] = "Изменение отметки";
 }
 
 <h1>@ViewData["title"]</h1>
@@ -13,7 +13,8 @@
     
 <form method="post" 
     asp-route-returnUrl="@Model.ReturnUrl"
-    asp-route-scoreId="@Model.ScoreId">
+    asp-route-lessonId="@Model.LessonId"
+    asp-route-studentId="@Model.StudentId">
 
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     
@@ -29,5 +30,5 @@
         <span asp-validation-for="Input.ScoreValue" class="text-danger"></span>
     </div>
     
-    <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Сохранить</button>
+    <button type="submit" class="w-100 btn btn-lg btn-primary">Сохранить</button>
 </form>

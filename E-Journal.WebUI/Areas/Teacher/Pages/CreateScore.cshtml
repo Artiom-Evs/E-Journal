@@ -1,27 +1,22 @@
 ﻿@page
 @model CreateScoreModel
 @{
-    ViewData["title"] = "Выставление новой оценки";
+    ViewData["title"] = "Добавление отметки";
 }
 
 <h1>@ViewData["title"]</h1>
 
+<dl>
+    <dt>ФИО учащегося</dt>
+    <dd>@Model.StudentInitials</dd>
+</dl>
+    
 <form method="post" 
     asp-route-returnUrl="@Model.ReturnUrl"
-    asp-route-lessonId="@Model.LessonId">
+    asp-route-lessonId="@Model.LessonId"
+    asp-route-studentId="@Model.StudentId">
+
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    
-    <div class="form-floating">
-        <select asp-for="Input.StudentId" class="form-control">
-            <option></option>
-            @foreach (var s in Model.Students)
-            {
-                <option value="@s.Id">@s.GetInitials()</option>
-            }
-        </select>
-        <label asp-for="Input.StudentId" class="form-label"></label>
-        <span asp-validation-for="Input.StudentId" class="text-danger"></span>
-    </div>
     
     <div class="form-floating">
         <select asp-for="Input.ScoreValue" class="form-control">
@@ -35,5 +30,5 @@
         <span asp-validation-for="Input.ScoreValue" class="text-danger"></span>
     </div>
     
-    <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Сохранить</button>
+    <button type="submit" class="w-100 btn btn-lg btn-primary">Сохранить</button>
 </form>

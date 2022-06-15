@@ -1,11 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Authorization;
-
-using E_Journal.Shared;
 using E_Journal.Infrastructure;
 using E_Journal.WebUI.Models;
 using E_Journal.WebUI.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace E_Journal.WebUI.Areas.Teacher.Pages;
 
@@ -39,6 +37,9 @@ public class LessonScoresModel : PageModel
             return NotFound();
         }
 
+        var group = _context.Groups
+            .Single(g => g.Id == lesson.GroupId);
+
         LessonId = lesson.Id;
         Date = lesson.Date;
         Topic = lesson.Topic;
@@ -50,26 +51,33 @@ public class LessonScoresModel : PageModel
         TeacherName = _context.Teachers
             .Single(t => t.Id == lesson.TeacherId)
             .Name;
-        GroupName = _context.Groups
-            .Single(g => g.Id == lesson.GroupId)
-            .Name;
-        Scores = _context.Scores
-            .Where(s => s.LessonId == lessonId)
-            .Select(s => new ScoreViewModel()
+        GroupName = group.Name;
+
+        List<ScoreViewModel> scoreList = new();
+
+        foreach (var student in _context.Students.Where(s => s.GroupId == group.Id))
+        {
+            var score = _context.Scores
+                .SingleOrDefault(s => s.LessonId == lessonId && s.StudentId == student.Id);
+
+            scoreList.Add(new ScoreViewModel()
             {
-                ScoreId = s.Id, 
-                StudentInitials = s.Student.GetInitials(),
-                Value = s.Value
-            })
-            .ToArray();
-        
+                StudentId = student.Id,
+                StudentInitials = student.GetInitials(),
+                Value = score == null ? "-" : _context.ScoreValues.Single(s => s.Id == score.ValueId).Title,
+                IsMarked = score != null,
+            });
+        }
+
+        Scores = scoreList.ToArray();
+
         return Page();
     }
 
-    public async Task<IActionResult> OnGetDeleteScoreAsync(int lessonId = 0, int scoreId = 0)
+    public async Task<IActionResult> OnGetDeleteScoreAsync(int lessonId = 0, int studentId = 0)
     {
         var score = _context.Scores
-            .SingleOrDefault(s => s.Id == scoreId);
+            .SingleOrDefault(s => s.LessonId == lessonId && s.StudentId == studentId);
 
         if (score == null)
         {
