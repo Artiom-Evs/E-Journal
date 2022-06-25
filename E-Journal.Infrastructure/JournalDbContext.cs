@@ -18,6 +18,7 @@ namespace E_Journal.Infrastructure
             : base(options)
         {
             Database.EnsureCreated();
+            Database.Migrate();
         }
     }
 }
