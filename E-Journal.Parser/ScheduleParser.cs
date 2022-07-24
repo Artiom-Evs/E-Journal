@@ -22,7 +22,10 @@ namespace E_Journal.Parser
 
             var nodeGroups = DivideToNodeGroups(contentNode).ToList();
 
-            return nodeGroups.Select(group => ParseNodeGroup(group)).ToArray();
+            var result = nodeGroups.Select(group => ParseNodeGroup(group)).ToArray(); ;
+
+            return result;
+
         }
 
         private static HtmlNode ConvertToHtmlNode(string textPage)
@@ -104,7 +107,8 @@ namespace E_Journal.Parser
 
             var gridNodes = ConvertToGridNodes(tableRows.Skip(2));
             var gridStrs = ConvertToGridStrs(gridNodes);
-            var invertedGrid = InverseGrid(gridStrs);
+            var filledStrs = RemoveEmptyRows(gridStrs.ToList());
+            var invertedGrid = InverseGrid(filledStrs.ToArray());
 
             return (days, invertedGrid);
         }
@@ -152,6 +156,22 @@ namespace E_Journal.Parser
             }
 
             return newGrid;
+        }
+        private static List<string[]> RemoveEmptyRows(List<string[]> rows)
+        {
+            for (int i = rows.Count - 1; i >= 0; i--)
+            {
+                if (rows[i].All(s => s == ""))
+                {
+                    rows.Remove(rows[i]);
+                }
+                else
+                {
+                    return rows;
+                }
+            }
+
+            return rows;
         }
 
         private static IEnumerable<HtmlNode> ContentNodeChildSelector(IEnumerable<HtmlNode> nodes) => nodes
