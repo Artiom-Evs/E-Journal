@@ -3,14 +3,11 @@
     "Docker Compose": {
       "commandName": "DockerCompose",
       "composeLaunchAction": "LaunchBrowser",
-      "composeLaunchServiceName": "e-journal.webui",
-      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}",
+      "composeLaunchServiceName": "e-journal.schedulesapi",
+      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
       "commandVersion": "1.0",
       "serviceActions": {
-        "e-journal.identitydb": "StartWithoutDebugging",
-        "e-journal.journaldb": "StartWithoutDebugging",
-        "e-journal.update_service": "StartDebugging",
-        "e-journal.webui": "StartDebugging"
+        "e-journal.schedulesapi": "StartDebugging"
       }
     }
   }

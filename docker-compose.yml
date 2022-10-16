@@ -1,61 +1,13 @@
 version: '3.4'
 
-# name: 'e_journal'
+name: 'e_journal'
 
 services:
-  e-journal.webui:
-    image: ${DOCKER_REGISTRY-}ejournalwebui
-    container_name: e-journal.webui
+  e-journal.schedulesapi:
+    image: ${DOCKER_REGISTRY-}ejournalschedulesapi
+    container_name: schedulesapi
     build:
       context: .
-      dockerfile: E-Journal.WebUI/Dockerfile
-    ports:
-      - 80:80
-      - 443:443
-    environment:
-      ConnectionString: "server=journaldb;port=3306;database=JournalDB;user=root;password=12345"
-      IdentityConnectionString: "server=identitydb;port=3306;database=IdentityDB;user=root;password=12345"
+      dockerfile: E-Journal.SchedulesApi/Dockerfile
     restart: always
-    depends_on:
-      - e-journal.journaldb
-      - e-journal.identitydb
-
-  e-journal.update_service:
-    image: ${DOCKER_REGISTRY-}ejournalupdateservice
-    container_name: e-journal.update_service
-    build:
-      context: .
-      dockerfile: E-Journal.UpdateService/Dockerfile
-    environment:
-      ConnectionString: "server=journaldb;port=3306;database=JournalDB;user=root;password=12345"
-      GroupsTimetableAddress: "http://mgke.minsk.edu.by/ru/main.aspx?guid=3791"
-      UPDATE_FREQUENCY_MS: 30000
-    restart: always
-    depends_on:
-      - e-journal.journaldb
-
-  e-journal.journaldb:
-    image: mariadb
-    hostname: journaldb
-    container_name: e-journal.journaldb
-    command: --innodb_use_native_aio=0
-    expose:
-      - 3306
-    environment:
-      MYSQL_ROOT_PASSWORD: "12345"
-      MYSQL_DATABASE: JournalDB
-    restart: always
-    
-  e-journal.identitydb:
-    image: mariadb
-    hostname: identitydb
-    container_name: e-journal.identitydb
-    command: --innodb_use_native_aio=0
-    expose:
-      - 3306
-    environment:
-      MYSQL_ROOT_PASSWORD: "12345"
-      MYSQL_DATABASE: IdentityDB
-    restart: always
-  
     
