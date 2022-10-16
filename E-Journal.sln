@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E-Journal.Shared", "E-Journal.Shared\E-Journal.Shared.csproj", "{8A4C2532-3947-45CF-9EC3-E77F636C754F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E-Journal.Parser", "E-Journal.Parser\E-Journal.Parser.csproj", "{31A65530-E0A8-4745-BE4C-387A268C140A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E-Journal.Parser.Tests", "E-Journal.Parser.Tests\E-Journal.Parser.Tests.csproj", "{469039D9-D7A0-419E-9368-25CC4FC73C9C}"
@@ -21,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8A4C2532-3947-45CF-9EC3-E77F636C754F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8A4C2532-3947-45CF-9EC3-E77F636C754F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8A4C2532-3947-45CF-9EC3-E77F636C754F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8A4C2532-3947-45CF-9EC3-E77F636C754F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{31A65530-E0A8-4745-BE4C-387A268C140A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{31A65530-E0A8-4745-BE4C-387A268C140A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31A65530-E0A8-4745-BE4C-387A268C140A}.Release|Any CPU.ActiveCfg = Release|Any CPU
