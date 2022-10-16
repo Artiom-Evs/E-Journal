@@ -6,7 +6,7 @@
     <ProjectGuid>db8f9e4d-e6c4-45d7-b5ef-d923fd8e3c3c</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
-    <DockerServiceName>e-journal.server</DockerServiceName>
+    <DockerServiceName>e-journal</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
