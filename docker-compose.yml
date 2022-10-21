@@ -10,4 +10,13 @@ services:
       context: .
       dockerfile: E-Journal.SchedulesApi/Dockerfile
     restart: always
+    depends_on:
+      - e-journal.schedulesdb
     
+  e-journal.schedulesdb:
+    image: postgres
+    container_name: schedulesdb
+    restart: always
+    
+
+
