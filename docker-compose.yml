@@ -14,8 +14,9 @@ services:
       - e-journal.schedulesdb
     
   e-journal.schedulesdb:
-    image: postgres
+    image: mariadb
     container_name: schedulesdb
+    command: --innodb_use_native_aio=0
     restart: always
     
 
