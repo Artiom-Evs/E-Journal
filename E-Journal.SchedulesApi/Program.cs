@@ -10,17 +10,15 @@ public static class Program
         string connectionString = Environment.GetEnvironmentVariable("SCHEDULES_DB_CONNECTION_STRING")
                 ?? throw new InvalidOperationException("Environment has not contain the API_DB_CONNECTION_STRING variable that contains database connection string.");
 
-        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseNpgsql(
+            options.UseMySql(
                 connectionString,
-                npgsqlOptionsAction: options =>
+                ServerVersion.AutoDetect(connectionString),
+                mySqlOptionsAction: options =>
                 {
                     options.EnableRetryOnFailure();
-                })
-                .UseSnakeCaseNamingConvention();
+                });
         });
 
         services.AddControllers();

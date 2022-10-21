@@ -6,7 +6,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_HTTPS_PORT=443
-      - SCHEDULES_DB_CONNECTION_STRING=Server=schedulesdb;Port=5432;Database=schedules;User Id=postgres;Password=postgres;
+      - SCHEDULES_DB_CONNECTION_STRING=Server=schedulesdb;Port=3306;Database=schedules;User=root;Password=12345;
+      - UPDATE_CHECK_FREQUENCY_MINUTES=30
     expose:
       - "80"
       - "443"
@@ -19,9 +20,8 @@ services:
 
   e-journal.schedulesdb:
     expose:
-      - 5432
+      - 3306
     environment:
-      - POSTGRES_DB=schedules
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    
+      - MYSQL_ROOT_PASSWORD=12345
+      - MYSQL_DATABASE=schedules
+      
