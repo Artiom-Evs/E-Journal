@@ -26,6 +26,7 @@ public static class Program
         services.AddSwaggerGen();
 
         services.AddScoped<ISchedulesRepository, SchedulesRepository>();
+        services.AddHostedService<SchedulesService>();
     }
 
     public static void Configure(this WebApplication app)
