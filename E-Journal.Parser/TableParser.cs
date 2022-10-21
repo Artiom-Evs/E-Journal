@@ -24,7 +24,7 @@ public static class TableParser
             .Select(row => row.Elements("td").Skip(1).ToArray()).ToArray();
 
         // get preparsed cells from grid of table cells
-        var preparsedCells = BuildPreparsedCells(tableCells, preparsedTable.ColumnsDates, firstLessonNumber);
+        var preparsedCells = BuildPreparsedCells(tableCells, preparsedTable.ColumnsDates, preparsedTable.ColumnsTitles, firstLessonNumber);
 
         foreach (var daylyCells in preparsedCells)
         {
@@ -59,7 +59,7 @@ public static class TableParser
     /// <summary>
     /// Groups lesson cells and room cells and returns them by dates
     /// </summary>
-    private static IEnumerable<IEnumerable<PreparsedCell>> BuildPreparsedCells(HtmlNode[][] tableCells, DateTime[] studyDates, int firstLessonNumber)
+    private static IEnumerable<IEnumerable<PreparsedCell>> BuildPreparsedCells(HtmlNode[][] tableCells, DateTime[] studyDates, string[] scheduleHeaders, int firstLessonNumber)
     {
         for (int day = 0; day < studyDates.Length; day++)
         {
@@ -74,6 +74,7 @@ public static class TableParser
                     LessonCell = tableCells[row][day * 2],
                     RoomCell = tableCells[row][day * 2 + 1],
                     LessonDate = studyDates[day],
+                    ScheduleHeader = scheduleHeaders[day],
                     LessonNumber = firstLessonNumber + row
                 });
             }
