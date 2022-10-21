@@ -13,4 +13,5 @@ public class PreparsedCell
     public HtmlNode RoomCell { get; set; }
     public int LessonNumber { get; set; }
     public DateTime LessonDate { get; set; }
+    public string ScheduleHeader { get; set; }
 }

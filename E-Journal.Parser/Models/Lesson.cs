@@ -7,11 +7,12 @@ namespace E_Journal.Parser.Models;
 
 public class Lesson
 {
-    [JsonIgnore]
     public int Id { get; init; }
+    public DateTime Date { get; set; }
     public string Title { get; init; }
     public string Type { get; init; }
-    public string Subtitle { get; init; }
+    public string TeatherName { get; init; }
+    public string GroupName { get; init; }
     public string Room { get; init; }
     public int Number { get; init; }
     public int? Subgroup { get; init; }
@@ -20,9 +21,10 @@ public class Lesson
     {
         if (obj is Lesson lesson)
         {
-            return Title.Equals(lesson.Title) &&
+            return GroupName.Equals(lesson.GroupName) &&
+                Title.Equals(lesson.Title) &&
                 Type.Equals(lesson.Type) &&
-                Subtitle.Equals(lesson.Subtitle) &&
+                TeatherName.Equals(lesson.TeatherName) &&
                 Room.Equals(lesson.Room) &&
                 Number.Equals(lesson.Number) &&
                 Subgroup.Equals(lesson.Subgroup);
@@ -33,9 +35,10 @@ public class Lesson
 
     public override int GetHashCode()
     {
-        string str = Title +
+        string str = GroupName +
+            Title +
             Type +
-            Subtitle +
+            TeatherName +
             Room +
             Number.ToString() +
             Subgroup ?? "NULL";

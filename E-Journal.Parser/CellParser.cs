@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using E_Journal.Parser.Models;
 using System.Text.RegularExpressions;
+using System.Reflection.Metadata;
 
 namespace E_Journal.Parser;
 
@@ -43,7 +44,7 @@ public static class CellParser
         if (lessonsCellRows[0][1] != '.' ||
             !int.TryParse(lessonsCellRows[0][0..1], out _))
         {
-            yield return BuildLesson(lessonsCellRows, roomsCellRows[0], cell.LessonNumber);
+            yield return BuildLesson(lessonsCellRows, roomsCellRows[0], cell.ScheduleHeader, cell.LessonDate, cell.LessonNumber);
         }
         else
         {
@@ -65,7 +66,7 @@ public static class CellParser
 
             foreach (var (lessonRows, room) in lessons.Zip(roomsCellRows))
             {
-                yield return BuildLesson(lessonRows.ToArray(), room, cell.LessonNumber);
+                yield return BuildLesson(lessonRows.ToArray(), room, cell.ScheduleHeader, cell.LessonDate, cell.LessonNumber);
             }
         }
     }
@@ -121,8 +122,8 @@ public static class CellParser
     /// Build lesson object based on data from lesson cell
     /// </summary>
     /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="NotImplementedException"></exception>
-    public static Lesson BuildLesson(string[] rows, string room, int lessonNumber)
+    /// <exception cref="InvalidOperationException"></exception>
+    public static Lesson BuildLesson(string[] rows, string room, string scheduleHeader, DateTime date, int lessonNumber)
     {
         if (rows.Length <= 0)
         {
@@ -153,9 +154,11 @@ public static class CellParser
         {
             return new Lesson()
             {
+                GroupName = scheduleHeader, 
+                Date = date, 
                 Title = rows[0],
                 Type = rows[1].Replace("(", "").Replace(")", ""),
-                Subtitle = rows[2],
+                TeatherName = rows[2],
                 Room = room,
                 Number = lessonNumber,
                 Subgroup = subgroup == 0 ? null : subgroup
@@ -173,9 +176,11 @@ public static class CellParser
 
             return new Lesson()
             {
+                GroupName = scheduleHeader,
+                Date = date,
                 Title = rows[0],
                 Type = lessonType.Replace("(", "").Replace(")", ""),
-                Subtitle = rows[1],
+                TeatherName = rows[1],
                 Room = room,
                 Number = lessonNumber,
                 Subgroup = subgroup == 0 ? null : subgroup
@@ -183,7 +188,39 @@ public static class CellParser
         }
         else
         {
-            throw new NotImplementedException("Processing of single-line lessons is not implemented.");
+            int lb = rows[0].LastIndexOf("(");
+            int rb = rows[0].LastIndexOf(")");
+
+            if (lb == -1 || rb == -1)
+            {
+                return new Lesson()
+                {
+                    GroupName = scheduleHeader,
+                    Date = date,
+                    Title = rows[0],
+                    Type = "",
+                    TeatherName = "",
+                    Room = room,
+                    Number = lessonNumber,
+                    Subgroup = subgroup == 0 ? null : subgroup
+                };
+            }
+
+            string title = rows[0][..lb];
+            string type = rows[0][(lb + 1)..rb];
+            string subtitle = rows[0][(rb + 1)..];
+            ;
+            return new Lesson()
+            {
+                GroupName = scheduleHeader,
+                Date = date,
+                Title = title,
+                Type = type,
+                TeatherName = subtitle,
+                Room = room,
+                Number = lessonNumber,
+                Subgroup = subgroup == 0 ? null : subgroup
+            };
         }
     }
 }
