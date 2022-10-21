@@ -26,6 +26,8 @@ public static class Program
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
+
+        services.AddScoped<ISchedulesRepository, SchedulesRepository>();
     }
 
     public static void Configure(this WebApplication app)
