@@ -1,9 +1,28 @@
+using Microsoft.EntityFrameworkCore;
+using E_Journal.SchedulesApi.Services;
+
 namespace E_Journal.SchedulesApi;
 
 public static class Program
 {
     public static void ConfigureServices(this IServiceCollection services)
     {
+        string connectionString = Environment.GetEnvironmentVariable("SCHEDULES_DB_CONNECTION_STRING")
+                ?? throw new InvalidOperationException("Environment has not contain the API_DB_CONNECTION_STRING variable that contains database connection string.");
+
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+        services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseNpgsql(
+                connectionString,
+                npgsqlOptionsAction: options =>
+                {
+                    options.EnableRetryOnFailure();
+                })
+                .UseSnakeCaseNamingConvention();
+        });
+
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
