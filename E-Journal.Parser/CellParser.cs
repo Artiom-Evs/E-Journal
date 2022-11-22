@@ -154,10 +154,10 @@ public static class CellParser
         int subgroup = 0;
 
         // handle subgroup number
-        if (rows[0][1] == '.' ||
-            int.TryParse(rows[0][0..1], out subgroup))
+        if (rows[0][1] == '.'
+            && int.TryParse(rows[0][0..1], out subgroup))
         {
-            rows[0] = rows[0][2..];
+            rows[0] = rows[0][2..].TrimStart();
         }
 
         // standard lessons
@@ -178,6 +178,11 @@ public static class CellParser
                 Number = lessonNumber,
                 Subgroup = subgroup
             };
+        }
+        
+        if (subgroup != 0)
+        {
+            rows[0] = $"{subgroup}.{rows[0]}";
         }
 
         return BuildUncorrectLesson(rows, room, scheduleHeader, date, lessonNumber);
@@ -223,10 +228,10 @@ public static class CellParser
         }
 
         // handle subgroup number
-        if (rows[0][1] == '.' ||
-            int.TryParse(rows[0][0..1], out subgroup))
+        if (rows[0][1] == '.'
+            && int.TryParse(rows[0][0..1], out subgroup))
         {
-            rows[0] = rows[0][2..];
+            rows[0] = rows[0][2..].TrimStart();
         }
 
         // replace uncorrect room row information
