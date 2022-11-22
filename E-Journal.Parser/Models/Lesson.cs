@@ -15,7 +15,7 @@ public class Lesson
     public string GroupName { get; init; }
     public string Room { get; init; }
     public int Number { get; init; }
-    public int? Subgroup { get; init; }
+    public int Subgroup { get; init; }
 
     public override bool Equals(object obj)
     {
@@ -41,7 +41,7 @@ public class Lesson
             TeatherName +
             Room +
             Number.ToString() +
-            Subgroup ?? "NULL";
+            Subgroup;
 
         return str.GetHashCode();
     }
