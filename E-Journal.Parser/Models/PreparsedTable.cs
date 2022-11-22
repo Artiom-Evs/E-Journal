@@ -8,5 +8,5 @@ public class PreparsedTable
 
     public string[] ColumnsTitles { get; set; } = Array.Empty<string>();
     public DateTime[] ColumnsDates { get; set; } = Array.Empty<DateTime>();
-    public HtmlNode[] Rows { get; set; } = Array.Empty<HtmlNode>();
+    public HtmlNode[][] RowsCells { get; set; } = Array.Empty<HtmlNode[]>();
 }
