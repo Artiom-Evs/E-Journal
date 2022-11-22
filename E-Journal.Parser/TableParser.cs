@@ -14,14 +14,15 @@ public static class TableParser
     public static IEnumerable<IEnumerable<PreparsedCell>> ParseTable(PreparsedTable preparsedTable)
     {
         // check empty table
-        if (preparsedTable.Rows?.Any() != true) yield break;
+        if (preparsedTable.RowsCells?.Any() != true) yield break;
 
         // take number of first lesson 
-        int firstLessonNumber = GetFirstLessonNumber(preparsedTable.Rows.First());
+        int firstLessonNumber = GetFirstLessonNumber(preparsedTable.RowsCells.First().First());
 
         // take table cells from each table row
-        var tableCells = preparsedTable.Rows
-            .Select(row => row.Elements("td").Skip(1).ToArray()).ToArray();
+        var tableCells = preparsedTable.RowsCells
+            .Select(rowCells => rowCells.Skip(1).ToArray())
+            .ToArray();
 
         // get preparsed cells from grid of table cells
         var preparsedCells = BuildPreparsedCells(tableCells, preparsedTable.ColumnsDates, preparsedTable.ColumnsTitles, firstLessonNumber);
@@ -38,17 +39,11 @@ public static class TableParser
     /// <exception cref="InvalidCastException">Throws when execution failed</exception>
     private static int GetFirstLessonNumber(HtmlNode firstTableRow)
     {
-        int firstLessonNumber = 0;
-
         // take text from first cell of table row
-        string? firstNumberCellText = firstTableRow
-            .Elements("td")
-            .FirstOrDefault()
-            ?.InnerText
-            .Trim();
+        string firstNumberCellText = firstTableRow.InnerText.Trim();
 
-        if (!string.IsNullOrEmpty(firstNumberCellText)
-            && int.TryParse(firstNumberCellText, out firstLessonNumber))
+        if (firstNumberCellText.Length == 1 &&
+            int.TryParse(firstNumberCellText, out int firstLessonNumber))
         {
             return firstLessonNumber;
         }
@@ -81,5 +76,25 @@ public static class TableParser
 
             yield return dayCells;
         }
+    }
+
+    /// <summary>
+    /// Get target table cells from table row. 
+    /// </summary>
+    private static IEnumerable<HtmlNode> GetRowCells(HtmlNode row)
+    {
+        var rowCells = row.Elements("td");
+        string firstCellContent = row.Element("td")
+            .InnerText
+            .Replace("&nbsp;", "")
+            .Trim();
+
+        // this condition required for skip possible empty first column
+        if (string.IsNullOrWhiteSpace(firstCellContent))
+        {
+            return rowCells.Skip(2);
+        }
+
+        return rowCells.Skip(1);
     }
 }

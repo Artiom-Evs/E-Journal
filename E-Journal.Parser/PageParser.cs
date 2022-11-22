@@ -74,9 +74,9 @@ public static class PageParser
             .Element("tbody")
             .Elements("tr")
             .Where(tr =>
-                int.TryParse(tr.Element("td").InnerText, out _) ||
-                tr.Element("td").InnerText.Contains('№') ||
-                TryParseDaylyDateTableRow(tr, out _));
+                TryParseDaylyTableLessonRow(tr, out _) ||
+                TryParseDaylyTableTitlesRow(tr, out _) ||
+                TryParseDaylyTableDateRow(tr, out _));
 
     /// <summary>
     /// Split single dayly schedule table by dates rows to blocks into dayly schedules
@@ -88,7 +88,7 @@ public static class PageParser
 
         foreach (var row in tableRows)
         {
-            var result = TryParseDaylyDateTableRow(row, out _);
+            var result = TryParseDaylyTableDateRow(row, out _);
 
             if (result)
             {
@@ -108,14 +108,14 @@ public static class PageParser
     /// Try to get the date from the date row from the weekly schedule table 
     /// </summary>
     /// <returns>Returns true if the operation was successful</returns>
-    private static bool TryParseDaylyDateTableRow(HtmlNode tableRow, out DateTime result)
+    private static bool TryParseDaylyTableDateRow(HtmlNode tableRow, out DateTime result)
     {
         var node = tableRow
-            .Element("td")
+            .Elements("td")
+            .FirstOrDefault(n => n.InnerText.Contains("День - "))
             ?.Element("p");
 
         if (node == null ||
-            !node.InnerText.Contains("День - ") ||
             !DateTime.TryParse(node.InnerText[7..], new CultureInfo("ru-Ru"), DateTimeStyles.None, out result))
         {
             result = default;
@@ -126,33 +126,100 @@ public static class PageParser
     }
 
     /// <summary>
+    /// Try to get the titles from the titles row from the weekly schedule table 
+    /// </summary>
+    /// <returns>Returns true if the operation was successful</returns>
+    private static bool TryParseDaylyTableTitlesRow(HtmlNode tableRow, out string[]? result)
+    {
+        string rowText = tableRow.InnerText
+            .Replace("&nbsp;", "")
+            .Trim();
+
+        if (rowText.ElementAtOrDefault(0) != '№')
+        {
+            result = null;
+            return false;
+        }
+
+        result = rowText[1..]
+            .Split("\r\n", StringSplitOptions.RemoveEmptyEntries)
+            .ToArray();
+
+        return true;
+    }
+
+    /// <summary>
+    /// Try to get the lesson row cells from the titles row from the weekly schedule table 
+    /// </summary>
+    /// <returns>Returns true if the operation was successful</returns>
+    private static bool TryParseDaylyTableLessonRow(HtmlNode tableRow, out HtmlNode[]? result)
+    {
+        string rowText = tableRow.InnerText.Trim();
+        result = tableRow.Elements("td").ToArray();
+
+        if (rowText.StartsWith("&nbsp;"))
+        {
+            rowText = rowText[("&nbsp;".Length)..].TrimStart();
+            result = result[1..];
+        }
+
+        // determine if a table row is a lesson row
+        // lessons row starts always with a numeric character that defines the lesson number
+        bool isLessonRow = char.IsNumber(rowText[0]) && !char.IsNumber(rowText[1]);
+
+        if (!isLessonRow)
+        {
+            result = null;
+            return false;
+        }
+
+        if (result.Count() % 2 == 0)
+        {
+            result = result[..^1];
+        }
+
+        return true;
+    }
+
+    /// <summary>
     /// Build preparsed table object based on rows of dayly schedule table
     /// </summary>
     private static PreparsedTable BuildDaylyPreparsedTable(HtmlNode[] tableRows)
     {
-        DateTime tableDate;
-        TryParseDaylyDateTableRow(tableRows[0], out tableDate);
+        // throw an exception if it was not possible to get date of dayly schedule
+        if (!TryParseDaylyTableDateRow(tableRows[0], out DateTime tableDate)
+            || tableDate == default)
+        {
+            throw new InvalidOperationException("Failed to get date of the dayly schedule");
+        }
 
-        // take titles from titles row of dayly schedule table
-        var titles = tableRows[1]
-            .Elements("td")
-            .Skip(1)
-            .Select(r => r.InnerText.Trim())
-            .Where(t => !t.Equals("&nbsp;"))
-            .ToArray();
+        // throw an exception if it was not possible to get groups titles
+        if (!TryParseDaylyTableTitlesRow(tableRows[1], out string[]? titles)
+            || titles == null)
+        {
+            throw new InvalidOperationException("Failed to get groups titles from the dayly schedule");
+        }
 
         // create date array with date for each dayly schedule
         var dates = Enumerable.Range(0, titles.Length)
             .Select(i => tableDate)
             .ToArray();
 
-        var targetRows = tableRows.Skip(2).ToArray();
+        List<HtmlNode[]> rowsCells = new();
+
+        foreach (var row in tableRows.Skip(2))
+        {
+            if (TryParseDaylyTableLessonRow(row, out HtmlNode[]? rowCells) && rowCells != null)
+            {
+                rowsCells.Add(rowCells);
+            }
+        }
 
         return new PreparsedTable()
         {
             ColumnsTitles = titles,
             ColumnsDates = dates,
-            Rows = targetRows
+            RowsCells = rowsCells.ToArray()
         };
     }
 
@@ -222,14 +289,18 @@ public static class PageParser
 
         var columnsDates = ParseWeeklyScheduleDatesRow(tableRows.First());
         var columnsTitles = Enumerable.Range(0, columnsDates.Length)
-            .Select(i => title.InnerText)
+            .Select(i => title.InnerText.Replace("Группа - ", "").Replace("Преподаватель - ", ""))
+            .ToArray();
+
+        var rowsCells = tableRows.Skip(2)
+            .Select(tr => tr.Elements("td").ToArray())
             .ToArray();
 
         return new PreparsedTable()
         {
             ColumnsTitles = columnsTitles,
             ColumnsDates = columnsDates,
-            Rows = tableRows.Skip(2).ToArray()
+            RowsCells = rowsCells
         };
     }
 

@@ -10,6 +10,8 @@ namespace E_Journal.Parser;
 /// </summary>
 public static class CellParser
 {
+    public const string EmptyParameter = "unknown";
+
     /// <summary>
     /// Parse enumerable of schedule cells and return lessons from them
     /// </summary>
@@ -44,7 +46,7 @@ public static class CellParser
         if (lessonsCellRows[0][1] != '.' ||
             !int.TryParse(lessonsCellRows[0][0..1], out _))
         {
-            yield return BuildLesson(lessonsCellRows, roomsCellRows[0], cell.ScheduleHeader, cell.LessonDate, cell.LessonNumber);
+            yield return BuildLesson(lessonsCellRows, roomsCellRows.FirstOrDefault() ?? "-", cell.ScheduleHeader, cell.LessonDate, cell.LessonNumber);
         }
         else
         {
@@ -122,12 +124,11 @@ public static class CellParser
     /// Build lesson object based on data from lesson cell
     /// </summary>
     /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="InvalidOperationException"></exception>
     public static Lesson BuildLesson(string[] rows, string room, string scheduleHeader, DateTime date, int lessonNumber)
     {
-        if (rows.Length <= 0)
+        if (rows.Length == 0)
         {
-            throw new ArgumentException("Count of rows cannot be less or equal than zero.", nameof(rows));
+            throw new ArgumentException("Count of rows cannot be equal zero.", nameof(rows));
         }
 
         if (string.IsNullOrEmpty(room))
@@ -152,75 +153,128 @@ public static class CellParser
         // standard lessons
         if (rows.Length >= 3)
         {
-            return new Lesson()
-            {
-                GroupName = scheduleHeader, 
-                Date = date, 
-                Title = rows[0],
-                Type = rows[1].Replace("(", "").Replace(")", ""),
-                TeatherName = rows[2],
-                Room = room,
-                Number = lessonNumber,
-                Subgroup = subgroup == 0 ? null : subgroup
-            };
+            string type = rows[1].Replace("(", "").Replace(")", "");
+            return CreateLessonObject(rows[0], type, rows[2], room, scheduleHeader, date, lessonNumber, subgroup);
         }
 
-        // this block designed to handle lessons that do not have separator before lesson type
-        // such lessons consists to two lines
-        else if (rows.Length == 2)
+        return BuildUncorrectLesson(rows, room, scheduleHeader, date, lessonNumber);
+    }
+
+    /// <summary>
+    /// Build lesson object based uncorrect on data from lesson cell
+    /// </summary>
+    /// <param name="rows">Rows from lesson cell</param>
+    /// <param name="room">Lesson room row</param>
+    /// <exception cref="ArgumentException"></exception>
+    public static Lesson BuildUncorrectLesson(string[] rows, string room, string scheduleHeader, DateTime date, int lessonNumber)
+    {
+        if (rows.Length == 0)
         {
-            Regex reg = new(@"\(\S+?\)$");
-            string lessonType = reg.Match(rows[0]).Value;
-
-            rows[0] = rows[0].Substring(0, rows[0].Length - lessonType.Length);
-
-            return new Lesson()
-            {
-                GroupName = scheduleHeader,
-                Date = date,
-                Title = rows[0],
-                Type = lessonType.Replace("(", "").Replace(")", ""),
-                TeatherName = rows[1],
-                Room = room,
-                Number = lessonNumber,
-                Subgroup = subgroup == 0 ? null : subgroup
-            };
+            throw new ArgumentException("Count of rows cannot be equal zero.", nameof(rows));
         }
+
+        if (string.IsNullOrEmpty(room))
+        {
+            throw new ArgumentException("String cannot be empty.", nameof(room));
+        }
+
+        if (lessonNumber <= 0)
+        {
+            throw new ArgumentException("Value cannot be less or equal than zero.", nameof(lessonNumber));
+        }
+
+        int subgroup = 0;
+
+        // handle subgroup number
+        if (rows[0][1] == '.' ||
+            int.TryParse(rows[0][0..1], out subgroup))
+        {
+            rows[0] = rows[0][2..];
+        }
+
+        // replace uncorrect room row information
+        if (room.Contains("час"))
+        {
+            room = "-";
+        }
+
+        // handle lessons that contain two rows
+        if (rows.Length == 2)
+        {
+            // if first row contains lesson type
+            if (rows[0][^1] == ')')
+            {
+                string title = rows[0][..(rows[0].LastIndexOf('('))];
+                string type = rows[0][(rows[0].LastIndexOf('(') + 1)..(rows[0].Length - 1)];
+
+                return CreateLessonObject(title, type, rows[1], room, scheduleHeader, date, lessonNumber, subgroup);
+            }
+            // if second row contains lesson type
+            else if (rows[1][0] == '(')
+            {
+                string type = rows[1][1..(rows[1].IndexOf(')'))];
+                string subtitle = EmptyParameter;
+
+                if (rows[1][^1] != ')')
+                {
+                    subtitle = rows[1][(rows[1].IndexOf(')') + 1)..];
+                }
+
+                return CreateLessonObject(rows[0], type, subtitle, room, scheduleHeader, date, lessonNumber, subgroup);
+            }
+            // if both rows not contain lesson type
+            else
+            {
+                return CreateLessonObject(rows[0], EmptyParameter, rows[1], room, scheduleHeader, date, lessonNumber, subgroup);
+            }
+        }
+        // handle lessons that contain single row
         else
         {
-            int lb = rows[0].LastIndexOf("(");
-            int rb = rows[0].LastIndexOf(")");
-
-            if (lb == -1 || rb == -1)
+            // if single row contains lesson type
+            if (rows[0].Contains('(') &&
+                rows[0].Contains(')'))
             {
-                return new Lesson()
+                string[] newRows = rows[0]
+                    .Replace("(", "\r\n(")
+                    .Replace(")", ")\r\n")
+                    .Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+
+                if (subgroup != 0)
                 {
-                    GroupName = scheduleHeader,
-                    Date = date,
-                    Title = rows[0],
-                    Type = "",
-                    TeatherName = "",
-                    Room = room,
-                    Number = lessonNumber,
-                    Subgroup = subgroup == 0 ? null : subgroup
-                };
+                    newRows[0] = $"{subgroup}.{newRows[0]}";
+                }
+
+                return BuildLesson(newRows, room, scheduleHeader, date, lessonNumber);
+            }
+            // if single row contain teacher initials
+            else if (rows[0][^1] == '.')
+            {
+                Regex reg = new(@"[А-Я][а-я]+\s?[А-Я]\.\s?[А-Я]\.$");
+                string subtitle = reg.Match(rows[0]).Value;
+
+                if (subtitle != "" && subtitle != rows[0])
+                {
+                    string title = rows[0][..(rows[0].IndexOf(subtitle))];
+                    return CreateLessonObject(title, EmptyParameter, subtitle, room, scheduleHeader, date, lessonNumber, subgroup);
+                }
             }
 
-            string title = rows[0][..lb];
-            string type = rows[0][(lb + 1)..rb];
-            string subtitle = rows[0][(rb + 1)..];
-            ;
-            return new Lesson()
-            {
-                GroupName = scheduleHeader,
-                Date = date,
-                Title = title,
-                Type = type,
-                TeatherName = subtitle,
-                Room = room,
-                Number = lessonNumber,
-                Subgroup = subgroup == 0 ? null : subgroup
-            };
+            // if single row contains only lesson title
+            return CreateLessonObject(rows[0], EmptyParameter, EmptyParameter, room, scheduleHeader, date, lessonNumber, subgroup);
         }
     }
+
+    private static Lesson CreateLessonObject(string title, string type, string subtitle, string room, string scheduleHeader, DateTime date, int lessonNumber, int subgroup) =>
+        new Lesson()
+        {
+            Date = date,
+            Title = title,
+            Type = type,
+            TeatherName = subtitle,
+            GroupName = scheduleHeader,
+            Room = room,
+            Number = lessonNumber,
+            Subgroup = subgroup == 0 ? null : subgroup
+        };
 }
