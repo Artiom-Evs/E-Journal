@@ -1,18 +1,17 @@
 ﻿using E_Journal.Parser;
 using E_Journal.Parser.Models;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Writers;
-using System.Collections.Immutable;
 
 namespace E_Journal.SchedulesApi.Services;
 
 public class SchedulesService : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger<SchedulesService> _logger;
     
-    public SchedulesService(IServiceScopeFactory scopeFactory)
+    public SchedulesService(IServiceScopeFactory scopeFactory, ILogger<SchedulesService> logger)
     {
         _scopeFactory = scopeFactory;
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -27,23 +26,32 @@ public class SchedulesService : BackgroundService
             {
                 throw new InvalidOperationException("ENVIRONMENT do not contasin 'UPDATE_CHECK_FREQUENCY_MINUTES' variable.");
             }
+            
+            if (string.IsNullOrEmpty(configuraion["GROUP_DAYLY_SCHEDULE_URL"]))
+            {
+                throw new InvalidOperationException("ENVIRONMENT do not contasin 'GROUP_DAYLY_SCHEDULE_URL' variable.");
+            }
         }
 
         while (!stoppingToken.IsCancellationRequested)
         {
+            _logger.LogInformation(">> Update started");
             await UpdateSchedulesAsync(stoppingToken);
+            _logger.LogInformation(">> Update ended");
+
             await Task.Delay(TimeSpan.FromMinutes(checkFrequency), stoppingToken);
         }
     }
 
-
     public async Task UpdateSchedulesAsync(CancellationToken stoppingToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
-        ISchedulesRepository repository = scope.ServiceProvider.GetRequiredService<ISchedulesRepository>();
 
-        string uri = @"http://mgke.minsk.edu.by/ru/main.aspx?guid=3841";
-        string pageText = await (new HttpClient()).GetStringAsync(uri);
+        ISchedulesRepository repository = scope.ServiceProvider.GetRequiredService<ISchedulesRepository>();
+        IConfiguration configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+        string uri = configuration["GROUP_DAYLY_SCHEDULE_URL"];
+        string pageText = await new HttpClient().GetStringAsync(uri, stoppingToken);
         
         var preparsedTables = PageParser.ParseDaylySchedules(pageText);
 
@@ -53,7 +61,28 @@ public class SchedulesService : BackgroundService
 
             foreach (var (dayCells, groupName, date) in preparsedCells.Zip(preparsedTable.ColumnsTitles, preparsedTable.ColumnsDates))
             {
-                var lessons = CellParser.ParseCells(dayCells);
+                List<Lesson> lessons = new();
+
+                foreach (var cell in dayCells)
+                {
+                    try
+                    {
+                        lessons.AddRange(CellParser.ParseCell(cell));
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = $">> Exception occurred while schedule cell parsing" +
+                                $"\r\nNot parsed data:" +
+                                $"\r\nLesson cell: {cell.LessonCell.InnerHtml.Trim()}" +
+                                $"\r\nRoom cell: {cell.RoomCell.InnerHtml.Trim()}" +
+                                $"\r\nLesson number: {cell.LessonNumber}" +
+                                $"\r\nLesson date: {cell.LessonDate}" +
+                                $"\r\nSchedule header: {cell.ScheduleHeader}" +
+                                $"\r\n";
+
+                        _logger.LogError(ex, message);
+                    }
+                }
 
                 var storedLessons = repository.Lessons
                     .Where(l => l.Date == date && l.GroupName == groupName)

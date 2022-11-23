@@ -8,6 +8,7 @@ services:
       - ASPNETCORE_HTTPS_PORT=443
       - SCHEDULES_DB_CONNECTION_STRING=Server=schedulesdb;Port=3306;Database=schedules;User=root;Password=12345;
       - UPDATE_CHECK_FREQUENCY_MINUTES=30
+      - GROUP_DAYLY_SCHEDULE_URL=http://mgke.minsk.edu.by/ru/main.aspx?guid=3841
     expose:
       - "80"
       - "443"
