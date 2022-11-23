@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+﻿using E_Journal.SchedulesApi.Services;
+using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -9,10 +9,133 @@ namespace E_Journal.SchedulesApi.Controllers
     [Route("api/[controller]")]
     public class SchedulesController : ControllerBase
     {
-        [HttpGet("/{name}/", Name = nameof(Group))]
-        public IResult Group(string name)
+        private readonly ISchedulesRepository _repository;
+
+        public SchedulesController(ISchedulesRepository repository)
         {
-            return Results.Ok($"Requested group: {name}");
+            _repository = repository;
+        }
+
+        [HttpGet("/groups/{name}/", Name = nameof(GetGroup))]
+        [Consumes("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetGroup(string name, [FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
+        {
+            var query = _repository.Lessons
+                .Where(l => l.GroupName == name);
+
+            if (!query.Any())
+            {
+                return NotFound();
+            }
+
+            if (startDate != default)
+            {
+                query = query.Where(l => l.Date >= startDate);
+            }
+
+            if (endDate != default)
+            {
+                query = query.Where(l => l.Date <= endDate);
+            }
+
+            return Ok(query);
+        }
+
+        [HttpGet("/groups/all/", Name = nameof(GetAllGroups))]
+        [Consumes("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllGroups([FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
+        {
+            var query = _repository.Lessons;
+
+            if (startDate != default)
+            {
+                query = query.Where(l => l.Date >= startDate);
+            }
+
+            if (endDate != default)
+            {
+                query = query.Where(l => l.Date <= endDate);
+            }
+
+            var result = query.AsEnumerable()
+                .GroupBy(l => l.GroupName)
+                .ToDictionary(g => g.Key, g => g.ToArray());
+
+            return new JsonResult(result);
+        }
+
+        [HttpGet("/teathers/{name}/", Name = nameof(GetTeather))]
+        [Consumes("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetTeather(string name, [FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
+        {
+            var query = _repository.Lessons
+                .Where(l => l.TeatherName == name);
+
+            if (!query.Any())
+            {
+                return NotFound();
+            }
+
+            if (startDate != default)
+            {
+                query = query.Where(l => l.Date >= startDate);
+            }
+
+            if (endDate != default)
+            {
+                query = query.Where(l => l.Date <= endDate);
+            }
+
+            return Ok(query);
+        }
+
+        [HttpGet("/teathers/all/", Name = nameof(GetAllTeathers))]
+        [Consumes("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllTeathers([FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
+        {
+            var query = _repository.Lessons;
+
+            if (startDate != default)
+            {
+                query = query.Where(l => l.Date >= startDate);
+            }
+
+            if (endDate != default)
+            {
+                query = query.Where(l => l.Date <= endDate);
+            }
+
+            var result = query.AsEnumerable()
+                .GroupBy(l => l.TeatherName)
+                .ToDictionary(g => g.Key, g => g.ToArray());
+
+            return new JsonResult(result);
+        }
+
+        [HttpGet("/all/", Name = nameof(GetAll))]
+        [Consumes("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAll([FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
+        {
+            var query = _repository.Lessons;
+
+            if (startDate != default)
+            {
+                query = query.Where(l => l.Date >= startDate);
+            }
+
+            if (endDate != default)
+            {
+                query = query.Where(l => l.Date <= endDate);
+            }
+
+            var result = query.AsEnumerable();
+
+            return new JsonResult(result);
         }
     }
 }
