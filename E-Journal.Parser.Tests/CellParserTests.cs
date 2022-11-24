@@ -10,6 +10,7 @@ using System.Linq;
 
 namespace E_Journal.Parser.Tests;
 
+[TestFixture]
 public  class CellParserTests
 {
     [Test]
