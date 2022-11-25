@@ -4,6 +4,8 @@ using HtmlAgilityPack;
 using System.Text.Json;
 using System;
 using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace E_Journal.Parser.Tests;
 
@@ -22,7 +24,7 @@ internal static class ConvertationExtensions
 
         return System.Text.Json.JsonSerializer.Serialize(obj);
     }
-    internal static string ToJson(this PreparsedCell[][] nodes)
+    internal static string ToJson(this IEnumerable<IEnumerable<PreparsedCell>> nodes)
     {
 
         string[][] jsonCells = nodes
