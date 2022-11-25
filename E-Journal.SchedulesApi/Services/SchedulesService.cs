@@ -1,5 +1,6 @@
 ﻿using E_Journal.Parser;
 using E_Journal.Parser.Models;
+using E_Journal.SchedulesApi.Extensions;
 
 namespace E_Journal.SchedulesApi.Services;
 
@@ -52,13 +53,34 @@ public class SchedulesService : BackgroundService
 
         string uri = configuration["GROUP_DAYLY_SCHEDULE_URL"];
         string pageText = await new HttpClient().GetStringAsync(uri, stoppingToken);
-        
-        var preparsedTables = PageParser.ParseDaylySchedules(pageText);
+        IEnumerable<PreparsedTable> preparsedTables;
 
+        try
+        {
+            preparsedTables = PageParser.ParseDaylySchedules(pageText);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ">> Exception occurred while schedule page parsing\r\n");
+            return;
+        }
         foreach (var preparsedTable in preparsedTables)
         {
-            var preparsedCells = TableParser.ParseTable(preparsedTable);
+            IEnumerable<IEnumerable<PreparsedCell>> preparsedCells;
 
+            try
+            {
+                preparsedCells = TableParser.ParseTable(preparsedTable);
+            }
+            catch (Exception ex)
+            {
+                string message = ">> Exception occurred while schedule table parsing\r\n" +
+                    preparsedTable.ToErrorString();
+
+                _logger.LogError(ex, message);
+                continue;
+            }
+            
             foreach (var (dayCells, groupName, date) in preparsedCells.Zip(preparsedTable.ColumnsTitles, preparsedTable.ColumnsDates))
             {
                 List<Lesson> lessons = new();
@@ -71,14 +93,8 @@ public class SchedulesService : BackgroundService
                     }
                     catch (Exception ex)
                     {
-                        string message = $">> Exception occurred while schedule cell parsing" +
-                                $"\r\nNot parsed data:" +
-                                $"\r\nLesson cell: {cell.LessonCell.InnerHtml.Trim()}" +
-                                $"\r\nRoom cell: {cell.RoomCell.InnerHtml.Trim()}" +
-                                $"\r\nLesson number: {cell.LessonNumber}" +
-                                $"\r\nLesson date: {cell.LessonDate}" +
-                                $"\r\nSchedule header: {cell.ScheduleHeader}" +
-                                $"\r\n";
+                        string message = ">> Exception occurred while schedule cell parsing\r\n" +
+                                cell.ToErrorString();
 
                         _logger.LogError(ex, message);
                     }
