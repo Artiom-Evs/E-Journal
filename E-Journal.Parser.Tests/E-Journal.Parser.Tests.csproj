@@ -20,9 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="timetable.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="timetable_new.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

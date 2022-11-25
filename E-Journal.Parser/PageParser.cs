@@ -165,7 +165,7 @@ public static class PageParser
 
         // determine if a table row is a lesson row
         // lessons row starts always with a numeric character that defines the lesson number
-        bool isLessonRow = char.IsNumber(rowText[0]) && !char.IsNumber(rowText[1]);
+        bool isLessonRow = result.Any() && char.IsNumber(rowText[0]) && !char.IsNumber(rowText[1]);
 
         if (!isLessonRow)
         {
