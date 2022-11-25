@@ -16,9 +16,7 @@ public class TableParserTests
     [TestCaseSource("GetDaylySchedulesAndExpectedResults")]
     public void CanParseDaylySchedules((PreparsedTable Table, string ExpectedResult) data)
     {
-        PreparsedCell[][] cells = TableParser.ParseTable(data.Table)
-            .Select(e => e.ToArray())
-            .ToArray();
+        IEnumerable<IEnumerable<PreparsedCell>> cells = TableParser.ParseTable(data.Table);
 
         string resultAsJson = cells.ToJson();
         
