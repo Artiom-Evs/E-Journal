@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace E_Journal.SchedulesApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
     public class SchedulesController : ControllerBase
     {
         private readonly ISchedulesRepository _repository;
@@ -16,7 +15,7 @@ namespace E_Journal.SchedulesApi.Controllers
             _repository = repository;
         }
 
-        [HttpGet("/groups/{name}/", Name = nameof(GetGroup))]
+        [HttpGet("api/[controller]/groups/{name}/", Name = nameof(GetGroup))]
         [Consumes("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetGroup(string name, [FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
@@ -42,7 +41,7 @@ namespace E_Journal.SchedulesApi.Controllers
             return Ok(query);
         }
 
-        [HttpGet("/groups/all/", Name = nameof(GetAllGroups))]
+        [HttpGet("api/[controller]/groups/all/", Name = nameof(GetAllGroups))]
         [Consumes("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAllGroups([FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
@@ -66,7 +65,7 @@ namespace E_Journal.SchedulesApi.Controllers
             return new JsonResult(result);
         }
 
-        [HttpGet("/teathers/{name}/", Name = nameof(GetTeather))]
+        [HttpGet("api/[controller]/teathers/{name}/", Name = nameof(GetTeather))]
         [Consumes("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetTeather(string name, [FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
@@ -92,7 +91,7 @@ namespace E_Journal.SchedulesApi.Controllers
             return Ok(query);
         }
 
-        [HttpGet("/teathers/all/", Name = nameof(GetAllTeathers))]
+        [HttpGet("api/[controller]/teathers/all/", Name = nameof(GetAllTeathers))]
         [Consumes("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAllTeathers([FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
@@ -116,7 +115,7 @@ namespace E_Journal.SchedulesApi.Controllers
             return new JsonResult(result);
         }
 
-        [HttpGet("/all/", Name = nameof(GetAll))]
+        [HttpGet("api/[controller]/all/", Name = nameof(GetAll))]
         [Consumes("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAll([FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
