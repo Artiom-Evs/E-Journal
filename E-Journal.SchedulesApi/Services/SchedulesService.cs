@@ -18,41 +18,59 @@ public class SchedulesService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         int checkFrequency;
+        string uri1 = string.Empty;
+        string uri2 = string.Empty;
 
         using (IServiceScope scope = _scopeFactory.CreateScope())
         {
-            var configuraion = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-            if (!int.TryParse(configuraion["UPDATE_CHECK_FREQUENCY_MINUTES"], out checkFrequency))
+            uri1 = configuration["BUILDING_1_GROUP_DAYLY_SCHEDULE_URL"];
+            uri2 = configuration["BUILDING_2_GROUP_DAYLY_SCHEDULE_URL"];
+
+            if (!int.TryParse(configuration["UPDATE_CHECK_FREQUENCY_MINUTES"], out checkFrequency))
             {
                 throw new InvalidOperationException("ENVIRONMENT do not contasin 'UPDATE_CHECK_FREQUENCY_MINUTES' variable.");
             }
-            
-            if (string.IsNullOrEmpty(configuraion["GROUP_DAYLY_SCHEDULE_URL"]))
+
+            if (string.IsNullOrEmpty(uri1))
             {
-                throw new InvalidOperationException("ENVIRONMENT do not contasin 'GROUP_DAYLY_SCHEDULE_URL' variable.");
+                throw new InvalidOperationException("ENVIRONMENT do not contasin 'BUILDING_1_GROUP_DAYLY_SCHEDULE_URL' variable.");
+            }
+
+            if (string.IsNullOrEmpty(uri2))
+            {
+                throw new InvalidOperationException("ENVIRONMENT do not contasin 'BUILDING_2_GROUP_DAYLY_SCHEDULE_URL' variable.");
             }
         }
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            _logger.LogInformation(">> Update started");
-            await UpdateSchedulesAsync(stoppingToken);
-            _logger.LogInformation(">> Update ended");
+            _logger.LogInformation(">> Update of the dayly schedules of the building 1 has started");
+            await UpdateDaylySchedulesAsync(uri1, stoppingToken);
+            _logger.LogInformation(">> Update of the dayly schedules of the building 1 has ended");
+
+            _logger.LogInformation(">> Update of the dayly schedules of the building 2 has started");
+            await UpdateDaylySchedulesAsync(uri2, stoppingToken);
+            _logger.LogInformation(">> Update of the dayly schedules of the building 2 has ended");
 
             await Task.Delay(TimeSpan.FromMinutes(checkFrequency), stoppingToken);
         }
     }
 
-    public async Task UpdateSchedulesAsync(CancellationToken stoppingToken)
+    public async Task UpdateDaylySchedulesAsync(string url, CancellationToken stoppingToken)
     {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) && uri != null)
+        {
+            throw new ArgumentException($"Uncorrect URL format: '{url}'");
+        }
+
         using IServiceScope scope = _scopeFactory.CreateScope();
 
         ISchedulesRepository repository = scope.ServiceProvider.GetRequiredService<ISchedulesRepository>();
-        IConfiguration configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-
-        string uri = configuration["GROUP_DAYLY_SCHEDULE_URL"];
+        
         string pageText = await new HttpClient().GetStringAsync(uri, stoppingToken);
+
         IEnumerable<PreparsedTable> preparsedTables;
 
         try
@@ -64,6 +82,7 @@ public class SchedulesService : BackgroundService
             _logger.LogError(ex, ">> Exception occurred while schedule page parsing\r\n");
             return;
         }
+
         foreach (var preparsedTable in preparsedTables)
         {
             IEnumerable<IEnumerable<PreparsedCell>> preparsedCells;
