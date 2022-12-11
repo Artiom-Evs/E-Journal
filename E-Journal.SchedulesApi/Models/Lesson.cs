@@ -2,11 +2,15 @@
 
 public class Lesson
 {
-    public Lesson(Subject subject, Type type, Teacher teather, Group group, Room room, int number, int subgroup, DateTime date)
+    public Lesson()
+    {
+    }
+
+    public Lesson(Subject subject, Type type, Teacher teacher, Group group, Room room, int number, int subgroup, DateTime date)
     {
         Subject = subject;
         Type = type;
-        Teacher = teather;
+        Teacher = teacher;
         Group = group;
         Room = room;
         Number = number;
