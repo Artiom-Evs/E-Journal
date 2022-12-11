@@ -1,4 +1,5 @@
-﻿using E_Journal.SchedulesApi.Services;
+﻿using E_Journal.SchedulesApi.Models;
+using E_Journal.SchedulesApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -8,11 +9,15 @@ namespace E_Journal.SchedulesApi.Controllers
     [ApiController]
     public class SchedulesController : ControllerBase
     {
-        private readonly ISchedulesRepository _repository;
+        private readonly ILessonsRepository _repository;
+        private readonly IBaseRepository<Group> _groups;
+        private readonly IBaseRepository<Teacher> _teachers;
 
-        public SchedulesController(ISchedulesRepository repository)
+        public SchedulesController(ILessonsRepository repository, IBaseRepository<Group> groups, IBaseRepository<Teacher> teachers)
         {
             _repository = repository;
+            _groups = groups;
+            _teachers = teachers;
         }
 
         [HttpGet("api/[controller]/groups/{name}/", Name = nameof(GetGroup))]
@@ -20,8 +25,15 @@ namespace E_Journal.SchedulesApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetGroup(string name, [FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
         {
+            var group = _groups.Get(name);
+
+            if (group == null)
+            {
+                return NotFound();
+            }
+
             var query = _repository.Lessons
-                .Where(l => l.GroupName == name);
+                .Where(l => l.GroupId == group.Id);
 
             if (!query.Any())
             {
@@ -38,7 +50,7 @@ namespace E_Journal.SchedulesApi.Controllers
                 query = query.Where(l => l.Date <= endDate);
             }
 
-            return Ok(query);
+            return new JsonResult(query);
         }
 
         [HttpGet("api/[controller]/groups/all/", Name = nameof(GetAllGroups))]
@@ -59,7 +71,7 @@ namespace E_Journal.SchedulesApi.Controllers
             }
 
             var result = query.AsEnumerable()
-                .GroupBy(l => l.GroupName)
+                .GroupBy(l => l.Group.Name)
                 .ToDictionary(g => g.Key, g => g.ToArray());
 
             return new JsonResult(result);
@@ -70,8 +82,15 @@ namespace E_Journal.SchedulesApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetTeather(string name, [FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
         {
+            var teacher = _teachers.Get(name);
+
+            if (teacher == null)
+            {
+                return NotFound();
+            }
+
             var query = _repository.Lessons
-                .Where(l => l.TeatherName == name);
+                .Where(l => l.TeacherId == teacher.Id);
 
             if (!query.Any())
             {
@@ -88,7 +107,7 @@ namespace E_Journal.SchedulesApi.Controllers
                 query = query.Where(l => l.Date <= endDate);
             }
 
-            return Ok(query);
+            return new JsonResult(query);
         }
 
         [HttpGet("api/[controller]/teathers/all/", Name = nameof(GetAllTeathers))]
@@ -109,7 +128,7 @@ namespace E_Journal.SchedulesApi.Controllers
             }
 
             var result = query.AsEnumerable()
-                .GroupBy(l => l.TeatherName)
+                .GroupBy(l => l.Teacher.Name)
                 .ToDictionary(g => g.Key, g => g.ToArray());
 
             return new JsonResult(result);
@@ -131,10 +150,8 @@ namespace E_Journal.SchedulesApi.Controllers
             {
                 query = query.Where(l => l.Date <= endDate);
             }
-
-            var result = query.AsEnumerable();
-
-            return new JsonResult(result);
+            
+            return new JsonResult(query);
         }
     }
 }
