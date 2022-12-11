@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using E_Journal.SchedulesApi.Services;
+using E_Journal.SchedulesApi.Models;
+using Microsoft.AspNetCore.Hosting.Server;
 
 namespace E_Journal.SchedulesApi;
 
@@ -7,8 +9,9 @@ public static class Program
 {
     public static void ConfigureServices(this IServiceCollection services)
     {
+        
         string connectionString = Environment.GetEnvironmentVariable("SCHEDULES_DB_CONNECTION_STRING")
-                ?? throw new InvalidOperationException("Environment has not contain the API_DB_CONNECTION_STRING variable that contains database connection string.");
+            ?? throw new InvalidOperationException("Environment has not contain the API_DB_CONNECTION_STRING variable that contains database connection string.");
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {
@@ -25,8 +28,15 @@ public static class Program
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
 
-        services.AddScoped<ISchedulesRepository, SchedulesRepository>();
-        services.AddHostedService<SchedulesService>();
+        services.AddScoped<IBaseRepository<Group>, BaseRepository<Group>>();
+        services.AddScoped<IBaseRepository<Subject>, BaseRepository<Subject>>();
+        services.AddScoped<IBaseRepository<Models.Type>, BaseRepository<Models.Type>>();
+        services.AddScoped<IBaseRepository<Teacher>, BaseRepository<Teacher>>();
+        services.AddScoped<IBaseRepository<Room>, BaseRepository<Room>>();
+        services.AddScoped<ILessonsRepository, LessonsRepository>();
+        services.AddScoped<IParserService, ParserService>();
+        services.AddScoped<IUpdateService, UpdateService>();
+        services.AddHostedService<UpdateHostedService>();
     }
 
     public static void Configure(this WebApplication app)
