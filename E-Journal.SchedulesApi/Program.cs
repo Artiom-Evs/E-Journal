@@ -33,9 +33,9 @@ public static class Program
         services.AddScoped<IBaseRepository<Teacher>, BaseRepository<Teacher>>();
         services.AddScoped<IBaseRepository<Room>, BaseRepository<Room>>();
         services.AddScoped<ILessonsRepository, LessonsRepository>();
-        services.AddScoped<IParserService, ParserService>();
-
-        services.AddScoped<IWebAccessorService, WebAccessorService>();
+        
+        services.AddSingleton<IParserService, ParserService>();
+        services.AddSingleton<IWebAccessorService, WebAccessorService>();
         services.AddScoped<IUpdateService, UpdateService>();
         services.AddHostedService<UpdateHostedService>();
     }

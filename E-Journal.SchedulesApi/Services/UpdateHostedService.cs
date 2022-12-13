@@ -3,28 +3,26 @@
 public class UpdateHostedService : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
-
     private readonly IConfiguration _configuration;
     private readonly ILogger<UpdateHostedService> _logger;
+    private readonly IWebAccessorService _webAccessor;
+    private readonly IParserService _parser;
     
-    private IWebAccessorService _webAccessor;
-    private IParserService _parser;
     private IUpdateService _updater;
-
     private ApplicationDbContext _context;
 
-    public UpdateHostedService(IServiceScopeFactory scopeFactory, IConfiguration configuration, ILogger<UpdateHostedService> logger)
+    public UpdateHostedService(IServiceScopeFactory scopeFactory, IConfiguration configuration, ILogger<UpdateHostedService> logger, IWebAccessorService webAccessor, IParserService parser)
     {
         _scopeFactory = scopeFactory;
         _configuration = configuration;
         _logger = logger;
+        _webAccessor = webAccessor;
+        _parser = parser;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
-        _webAccessor = scope.ServiceProvider.GetRequiredService<IWebAccessorService>();
-        _parser = scope.ServiceProvider.GetRequiredService<IParserService>();
         _updater = scope.ServiceProvider.GetRequiredService<IUpdateService>();
         _context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
