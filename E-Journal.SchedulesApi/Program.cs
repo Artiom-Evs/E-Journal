@@ -8,8 +8,7 @@ namespace E_Journal.SchedulesApi;
 public static class Program
 {
     public static void ConfigureServices(this IServiceCollection services)
-    {
-        
+    {        
         string connectionString = Environment.GetEnvironmentVariable("SCHEDULES_DB_CONNECTION_STRING")
             ?? throw new InvalidOperationException("Environment has not contain the API_DB_CONNECTION_STRING variable that contains database connection string.");
 
@@ -35,6 +34,8 @@ public static class Program
         services.AddScoped<IBaseRepository<Room>, BaseRepository<Room>>();
         services.AddScoped<ILessonsRepository, LessonsRepository>();
         services.AddScoped<IParserService, ParserService>();
+
+        services.AddScoped<IWebAccessorService, WebAccessorService>();
         services.AddScoped<IUpdateService, UpdateService>();
         services.AddHostedService<UpdateHostedService>();
     }
@@ -48,8 +49,10 @@ public static class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-
+        
         app.UseAuthorization();
+
+        app.MapControllers();
     }
 
     public static void Main(string[] args)
@@ -61,8 +64,6 @@ public static class Program
         var app = builder.Build();
 
         app.Configure();
-        
-        app.MapControllers();
         
         app.Run();
     }

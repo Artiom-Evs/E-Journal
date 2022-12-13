@@ -1,6 +1,6 @@
 ﻿namespace E_Journal.SchedulesApi.Services;
 
-public class UpdateHostedService : IHostedService
+public class UpdateHostedService : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
 
@@ -18,7 +18,7 @@ public class UpdateHostedService : IHostedService
         _logger = logger;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
         _parser = scope.ServiceProvider.GetRequiredService<IParserService>();
@@ -57,10 +57,6 @@ public class UpdateHostedService : IHostedService
             await Task.Delay(TimeSpan.FromMinutes(checkFrequency), cancellationToken);
         }
     }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
     }
 
     private async Task UpdateDaylySchedulesAsync(string url, CancellationToken cancellationToken)
