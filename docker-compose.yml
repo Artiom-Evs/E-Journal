@@ -12,6 +12,14 @@ services:
     restart: always
     depends_on:
       - e-journal.schedulesdb
+
+  e-journal.journalapi:
+    image: ${DOCKER_REGISTRY-}ejournaljournalapi
+    container_name: journalapi
+    build:
+      context: .
+      dockerfile: E-Journal.JournalApi/Dockerfile
+    restart: always
     
   e-journal.schedulesdb:
     image: mariadb

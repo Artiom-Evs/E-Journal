@@ -4,8 +4,8 @@ services:
   e-journal.schedulesapi:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ASPNETCORE_HTTPS_PORT=443
+      - ASPNETCORE_URLS=https://+:5011;http://+:5010
+      - ASPNETCORE_HTTPS_PORT=5011
       - SCHEDULES_DB_CONNECTION_STRING=Server=schedulesdb;Port=3306;Database=schedules;User=root;Password=12345;
       - UPDATE_CHECK_FREQUENCY_MINUTES=30
       - BUILDING_1_GROUP_DAYLY_SCHEDULE_URL=http://mgke.minsk.edu.by/ru/main.aspx?guid=3831
@@ -13,11 +13,26 @@ services:
       - BUILDING_1_GROUP_WEEKLY_SCHEDULE_URL=http://mgke.minsk.edu.by/ru/main.aspx?guid=3781
       - BUILDING_2_GROUP_WEEKLY_SCHEDULE_URL=http://mgke.minsk.edu.by/ru/main.aspx?guid=3791
     expose:
-      - "80"
-      - "443"
+      - "5010"
+      - "5011"
     ports:
-      - "80:80"
-      - "443:443"
+      - "5010:5010"
+      - "5011:5011"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  e-journal.journalapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:5021;http://+:5020
+      - ASPNETCORE_HTTPS_PORT=5021
+    expose:
+      - "5020"
+      - "5021"
+    ports:
+      - "5020:5020"
+      - "5021:5021"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
