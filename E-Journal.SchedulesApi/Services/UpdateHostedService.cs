@@ -6,6 +6,8 @@ public class UpdateHostedService : BackgroundService
 
     private readonly IConfiguration _configuration;
     private readonly ILogger<UpdateHostedService> _logger;
+    
+    private IWebAccessorService _webAccessor;
     private IParserService _parser;
     private IUpdateService _updater;
 
@@ -21,6 +23,7 @@ public class UpdateHostedService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
+        _webAccessor = scope.ServiceProvider.GetRequiredService<IWebAccessorService>();
         _parser = scope.ServiceProvider.GetRequiredService<IParserService>();
         _updater = scope.ServiceProvider.GetRequiredService<IUpdateService>();
         _context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -44,25 +47,30 @@ public class UpdateHostedService : BackgroundService
             throw new InvalidOperationException("ENVIRONMENT do not contasin 'BUILDING_2_GROUP_DAYLY_SCHEDULE_URL' variable.");
         }
 
-        while (!cancellationToken.IsCancellationRequested)
+        while (!stoppingToken.IsCancellationRequested)
         {
             _logger.LogInformation(">> Update of the dayly schedules of the building 1 has started");
-            await UpdateDaylySchedulesAsync(uri1, cancellationToken);
+            await UpdateDaylySchedulesAsync(uri1, stoppingToken);
             _logger.LogInformation(">> Update of the dayly schedules of the building 1 has ended");
 
             _logger.LogInformation(">> Update of the dayly schedules of the building 2 has started");
-            await UpdateDaylySchedulesAsync(uri2, cancellationToken);
+            await UpdateDaylySchedulesAsync(uri2, stoppingToken);
             _logger.LogInformation(">> Update of the dayly schedules of the building 2 has ended");
 
-            await Task.Delay(TimeSpan.FromMinutes(checkFrequency), cancellationToken);
+            await Task.Delay(TimeSpan.FromMinutes(checkFrequency), stoppingToken);
         }
     }
-    }
 
-    private async Task UpdateDaylySchedulesAsync(string url, CancellationToken cancellationToken)
+    private async Task<bool> UpdateDaylySchedulesAsync(string url, CancellationToken cancellationToken)
     {
-        string pageText = await new HttpClient().GetStringAsync(url, cancellationToken);
+        string? pageText = await _webAccessor.GetWebPageAsync(url, cancellationToken);
+
+        if (pageText == null)
+        {
+            return false;
+        }
+
         var parsedLessons = _parser.ParseDaylySchedulesPage(pageText);
-        await _updater.UpdateAsync(parsedLessons);
+        return await _updater.UpdateAsync(parsedLessons);
     }
 }
