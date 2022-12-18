@@ -2,7 +2,7 @@
 
 namespace E_Journal.JournalApi.Models;
 
-public record Student
+public class Student
 {
     public Student()
     {
@@ -15,9 +15,9 @@ public record Student
     }
 
     public int Id { get; init; }
-    public string Name { get; init; }
-    public Group Group { get; init; }
-    public int GroupId { get; init; }
+    public string Name { get; set; }
+    public Group Group { get; set; }
+    public int GroupId { get; set; }
 
     public override string ToString()
     {

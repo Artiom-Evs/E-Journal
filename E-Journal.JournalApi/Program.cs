@@ -27,6 +27,7 @@ public static class Program
         services.AddScoped<IBaseRepository<Models.Type>, BaseRepository<Models.Type>>();
         services.AddScoped<IBaseRepository<Teacher>, BaseRepository<Teacher>>();
         services.AddScoped<IBaseRepository<ScoreValue>, BaseRepository<ScoreValue>>();
+        services.AddScoped<IStudentsRepository, StudentsRepository>();
         services.AddScoped<IScoresRepository, ScoresRepository>();
     }
 
