@@ -10,7 +10,7 @@ public static class Program
     public static void ConfigureServices(this IServiceCollection services)
     {        
         string connectionString = Environment.GetEnvironmentVariable("SCHEDULES_DB_CONNECTION_STRING")
-            ?? throw new InvalidOperationException("Environment has not contain the API_DB_CONNECTION_STRING variable that contains database connection string.");
+            ?? throw new InvalidOperationException("Environment has not contain the SCHEDULES_DB_CONNECTION_STRING variable that contains database connection string.");
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {
