@@ -7,7 +7,7 @@
       "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
       "commandVersion": "1.0",
       "serviceActions": {
-        "e-journal.schedulesdb": "StartWithoutDebugging",
+        "e-journal.sqldb": "StartWithoutDebugging",
         "e-journal.schedulesapi": "StartDebugging",
         "e-journal.journalapi": "StartDebugging"
       }

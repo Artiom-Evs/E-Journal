@@ -11,7 +11,7 @@ services:
       dockerfile: E-Journal.SchedulesApi/Dockerfile
     restart: always
     depends_on:
-      - e-journal.schedulesdb
+      - e-journal.sqldb
 
   e-journal.journalapi:
     image: ${DOCKER_REGISTRY-}ejournaljournalapi
@@ -20,11 +20,15 @@ services:
       context: .
       dockerfile: E-Journal.JournalApi/Dockerfile
     restart: always
-    
-  e-journal.schedulesdb:
+    depends_on:
+      - e-journal.sqldb
+
+  e-journal.sqldb:
     image: mariadb
-    container_name: schedulesdb
+    container_name: sqldb
     command: --innodb_use_native_aio=0
-    
+    volumes:
+      - sql_data:/var/lib/mysql
 
-
+volumes:
+  sql_data: 
