@@ -14,60 +14,61 @@ public class StudentsRepository : IStudentsRepository
 
     public IQueryable<Student> Students => _context.Students
         .Include(s => s.Group);
-
-    public bool IsExists(int id)
+    public async ValueTask<bool> IsExistsAsync(int id)
     {
-        return _context.Students.Any(s => s.Id == id);
-    }
-    public bool IsExists(string name)
-    {
-        return _context.Students.Any(s => s.Name == name);
+        return await _context.Students.AnyAsync(s => s.Id == id);
     }
 
-    public bool Create(Student student)
+    public async ValueTask<bool> IsExistsAsync(string name)
     {
-        if (this.IsExists(student.Id))
+        return await _context.Students.AnyAsync(s => s.Name == name);
+    }
+
+    public async ValueTask<bool> CreateAsync(Student student)
+    {
+        if (await this.IsExistsAsync(student.Id))
         {
             return false;
         }
 
-        _context.Students.Add(student);
-        _context.SaveChanges();
+        var group = await _context.Groups.FirstAsync(g => g.Name == student.Group.Name);
+
+        if (group != null)
+        {
+            student.Group = group;
+        }
+
+        await _context.Students.AddAsync(student);
+        await _context.SaveChangesAsync();
         return true;
     }
 
-    public Student? Get(int id)
+    public async ValueTask<Student?> GetAsync(int id)
     {
-        return this.Students.FirstOrDefault(s => s.Id == id);
+        return await this.Students.FirstOrDefaultAsync(s => s.Id == id);
     }
 
-    public bool Update(Student student)
+    public async ValueTask<bool> UpdateAsync(Student student)
     {
-        var storedStudent = this.Get(student.Id);
-
-        if (storedStudent == null)
+        if (!await this.IsExistsAsync(student.Id))
         {
             return false;
         }
 
-        if (storedStudent.Name != student.Name)
+        if (student.Group.Id == 0)
         {
-            storedStudent.Name = student.Name;
+            student.Group = _context.Groups.FirstOrDefault(s => s.Name == student.Group.Name) ?? student.Group;
         }
+        
+        _context.Entry(student).State = EntityState.Modified;
 
-        if (storedStudent.Group.Name != student.Group.Name)
-        {
-            storedStudent.Group = student.Group;
-        }
-
-        _context.Students.Update(storedStudent);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return true;
     }
 
-    public bool Delete(int id)
+    public async ValueTask<bool> DeleteAsync(int id)
     {
-        var student = this.Get(id);
+        var student = await this.GetAsync(id);
 
         if (student == null)
         {
@@ -75,7 +76,7 @@ public class StudentsRepository : IStudentsRepository
         }
 
         _context.Students.Remove(student);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return true;
     }
 }

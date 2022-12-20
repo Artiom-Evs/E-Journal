@@ -22,6 +22,10 @@ public static class Program
                 });
         });
 
+        services.AddControllers();
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
+
         services.AddScoped<IBaseRepository<Group>, BaseRepository<Group>>();
         services.AddScoped<IBaseRepository<Teacher>, BaseRepository<Teacher >>();
         services.AddScoped<IBaseRepository<Models.Type>, BaseRepository<Models.Type>>();
@@ -33,7 +37,16 @@ public static class Program
 
     public static void Configure(this WebApplication app)
     {
-        app.MapGet("/", () => "Hello World!");
+        app.UseHttpsRedirection();
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
+        app.MapControllers();
     }
 
     public static void Main(string[] args)

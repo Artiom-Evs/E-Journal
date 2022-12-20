@@ -6,11 +6,11 @@ public interface IStudentsRepository
 {
     IQueryable<Student> Students { get; }
 
-    bool IsExists(int id);
-    bool IsExists(string name);
+    ValueTask<bool> IsExistsAsync(int id);
+    ValueTask<bool> IsExistsAsync(string name);
 
-    bool Create(Student student);
-    Student? Get(int id);
-    bool Update(Student student);
-    bool Delete(int id);
+    ValueTask<bool> CreateAsync(Student student);
+    ValueTask<Student?> GetAsync(int id);
+    ValueTask<bool> UpdateAsync(Student student);
+    ValueTask<bool> DeleteAsync(int id);
 }
