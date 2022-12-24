@@ -27,9 +27,16 @@ public class StudentsController : ControllerBase
     // GET: api/Students
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentIOModel[]))]
-    public async Task<ActionResult<IEnumerable<StudentIOModel>>> GetStudents()
+    public async Task<ActionResult<IEnumerable<StudentIOModel>>> GetStudents([FromQuery] int groupId = 0)
     {
-        var students = await _repository.Students.ToListAsync();
+        var query = _repository.Students;
+
+        if (groupId != 0)
+        {
+            query = query.Where(s => s.GroupId == groupId);
+        }
+
+        var students = await query.ToListAsync();
 
         return students.Select(s => ConvertToStudentIOModel(s)).ToList();
     }
