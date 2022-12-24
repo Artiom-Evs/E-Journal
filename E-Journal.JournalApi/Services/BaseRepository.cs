@@ -62,6 +62,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel, new()
             return null;
         }
 
+        _context.Set<T>().Attach(item);
         item = _context.Set<T>().Update(item).Entity;
         _context.SaveChanges();
         return item;
