@@ -13,12 +13,7 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Score>().HasKey(m => new { m.StudentId, m.Date, m.Number, m.Subgroup });
-        modelBuilder.Entity<Group>().HasAlternateKey(m => m.Name);
-        modelBuilder.Entity<Subject>().HasAlternateKey(m => m.Name);
-        modelBuilder.Entity<Models.Type>().HasAlternateKey(m => m.Name);
-        modelBuilder.Entity<Teacher>().HasAlternateKey(m => m.Name);
-        modelBuilder.Entity<ScoreValue>().HasAlternateKey(m => m.Name);
+        modelBuilder.Entity<Score>().HasKey(m => new { m.StudentId, m.Date, m.Number });
     }
 
     public DbSet<Score> Scores { get; set; }
