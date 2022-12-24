@@ -6,12 +6,13 @@ public interface IScoresRepository
 {
     IQueryable<Score> Scores { get; }
 
-    bool IsExists(Score score);
-    bool IsExists(int studentId, DateTime date, int number, int subgroup);
+    ValueTask<bool> IsExistsAsync(Score score);
+    ValueTask<bool> IsExistsAsync(int studentId, DateTime date, int number);
+    
+    ValueTask<bool> CreateAsync(Score score);
+    ValueTask<Score?> GetAsync(int studentId, DateTime date, int number);
+    ValueTask<bool> UpdateAsync(int studentId, DateTime date, int number, Score score);
 
-    bool Create(Score score);
-    Score? Get(int studentId, DateTime date, int number, int subgroup);
-    bool Update(Score score);
-    bool Delete(Score score);
-    bool Delete(int studentId, DateTime date, int number, int subgroup);
+    ValueTask<bool> DeleteAsync(Score score);
+    ValueTask<bool> DeleteAsync(int studentId, DateTime date, int number);
 }

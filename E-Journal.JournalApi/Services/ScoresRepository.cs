@@ -5,95 +5,108 @@ namespace E_Journal.JournalApi.Services;
 
 public class ScoresRepository : IScoresRepository
 {
-    protected readonly ApplicationDbContext _context;
-
+    private readonly ApplicationDbContext _context;
+    
     public ScoresRepository(ApplicationDbContext context)
     {
         _context = context;
     }
 
     public IQueryable<Score> Scores => _context.Scores
-        .Include(l => l.StudentId)
+        .Include(l => l.Student)
         .Include(l => l.Subject)
         .Include(l => l.Type)
         .Include(l => l.Teacher)
         .Include(l => l.Value);
 
-    public bool IsExists(Score score)
+    public async ValueTask<bool> IsExistsAsync(Score score)
     {
-        return this.IsExists(score.StudentId, score.Date, score.Number, score.Subgroup);
+        return await this.IsExistsAsync(score.StudentId, score.Date, score.Number);
     }
-    public bool IsExists(int studentId, DateTime date, int number, int subgroup)
+    public async ValueTask<bool> IsExistsAsync(int studentId, DateTime date, int number)
     {
-        return _context.Scores.Any(s =>
+        return await _context.Scores.AnyAsync(s =>
             s.StudentId == studentId &&
-            s.Date == date &&
-            s.Number == number &&
-            s.Subgroup == subgroup);
+            s.Date.Date == date &&
+            s.Number == number);
     }
 
-    public bool Create(Score score)
+    public async ValueTask<bool> CreateAsync(Score score)
     {
-        if (this.IsExists(score))
+        if (await this.IsExistsAsync(score))
         {
             return false;
         }
 
-        _context.Scores.Add(score);
-        _context.SaveChanges();
+        await _context.Scores.AddAsync(score);
+        await _context.SaveChangesAsync();
         return true;
     }
 
-    public Score? Get(int studentId, DateTime date, int number, int subgroup)
+    public async ValueTask<Score?> GetAsync(int studentId, DateTime date, int number)
     {
-        return _context.Scores.FirstOrDefault(s =>
+        return await this.Scores.FirstOrDefaultAsync(s =>
             s.StudentId == studentId &&
             s.Date == date &&
-            s.Number == number &&
-            s.Subgroup == subgroup);
+            s.Number == number);
     }
 
-    public bool Update(Score score)
+    public async ValueTask<bool> UpdateAsync(int studentId, DateTime date, int number, Score score)
     {
-        var storedScore = this.Get(score.StudentId, score.Date, score.Number, score.Subgroup);
+        var storedScore = await this.GetAsync(studentId, date, number);
 
         if (storedScore == null)
         {
             return false;
         }
 
-        if (storedScore.Subject.Name != score.Subject.Name)
+        // if the composite primary key will be changed
+        // delete old score and add updated score as new 
+        // we cannot change primary key or their part 
+        if (studentId != score.StudentId || date != score.Date || number != score.Number)
+        {
+            await this.DeleteAsync(studentId, date, number);
+            await _context.SaveChangesAsync();
+
+            await this.CreateAsync(score);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        if (storedScore.SubjectId != score.Subject.Id)
         {
             storedScore.Subject = score.Subject;
         }
 
-        if (storedScore.Type.Name != score.Type.Name)
+        if (storedScore.TypeId != score.Type.Id)
         {
             storedScore.Type = score.Type;
         }
 
-        if (storedScore.Teacher.Name != score.Teacher.Name)
+        if (storedScore.TeacherId != score.Teacher.Id)
         {
             storedScore.Teacher = score.Teacher;
         }
 
-        if (storedScore.Value.Name != score.Value.Name)
+        if (storedScore.ValueId != score.Value.Id)
         {
             storedScore.Value = score.Value;
         }
 
-        _context.Scores.Update(storedScore);
-        _context.SaveChanges();
+        _context.Entry(storedScore).State = EntityState.Modified;
+
+        await _context.SaveChangesAsync();
         return true;
     }
 
-    public bool Delete(Score score)
+    public async ValueTask<bool> DeleteAsync(Score score)
     {
-        return this.Delete(score.StudentId, score.Date, score.Number, score.Subgroup);
+        return await this.DeleteAsync(score.StudentId, score.Date, score.Number);
     }
-    public bool Delete(int studentId, DateTime date, int number, int subgroup)
+    public async ValueTask<bool> DeleteAsync(int studentId, DateTime date, int number)
     {
-        var score = this.Get(studentId, date, number, subgroup);
+        var score = await this.GetAsync(studentId, date, number);
 
         if (score == null)
         {
@@ -101,7 +114,7 @@ public class ScoresRepository : IScoresRepository
         }
 
         _context.Scores.Remove(score);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return true;
     }
 }
