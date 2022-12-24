@@ -36,9 +36,53 @@ public class ScoresController : ControllerBase
     // GET: api/Scores
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ScoreIOModel[]))]
-    public async Task<ActionResult<IEnumerable<ScoreIOModel>>> GetScores()
+    public async Task<ActionResult<IEnumerable<ScoreIOModel>>> GetScores(
+        [FromQuery] int studentId,
+        [FromQuery] string? subject,
+        [FromQuery] string? type,
+        [FromQuery] string? teacher,
+        [FromQuery] string? value,
+        [FromQuery] DateTime date,
+        [FromQuery] int number)
     {
-        var scores = await _repository.Scores.ToListAsync();
+        var query = _repository.Scores;
+
+        if (studentId != 0)
+        {
+            query = query.Where(s => s.StudentId == studentId);
+        }
+
+        if (!string.IsNullOrEmpty(subject))
+        {
+            query = query.Where(s => s.Subject.Name == subject);
+        }
+
+        if (!string.IsNullOrEmpty(type))
+        {
+            query = query.Where(s => s.Type.Name == type);
+        }
+
+        if (!string.IsNullOrEmpty(teacher))
+        {
+            query = query.Where(s => s.Teacher.Name == teacher);
+        }
+
+        if (!string.IsNullOrEmpty(value))
+        {
+            query = query.Where(s => s.Value.Name == value);
+        }
+
+        if (date != default)
+        {
+            query = query.Where(s => s.Date == date.Date);
+        }
+
+        if (number != 0)
+        {
+            query = query.Where(s => s.Number == number);
+        }
+
+        var scores = await query.ToListAsync();
 
         return scores.Select(s => ConvertToScoreIOModel(s)).ToList();
     }
@@ -87,6 +131,11 @@ public class ScoresController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> PutScore(int studentId, DateTime date, int number, ScoreIOModel score)
     {
+        if (!await _students.IsExistsAsync(score.StudentId))
+        {
+            return BadRequest();
+        }
+
         if (!await _repository.IsExistsAsync(studentId, date.Date, number))
         {
             return NotFound();
