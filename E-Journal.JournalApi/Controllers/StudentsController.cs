@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using E_Journal.JournalApi.Models;
 using E_Journal.JournalApi.Services;
+using Microsoft.Extensions.Hosting;
 
 namespace E_Journal.JournalApi.Controllers;
 
@@ -15,22 +16,29 @@ namespace E_Journal.JournalApi.Controllers;
 public class StudentsController : ControllerBase
 {
     private readonly IStudentsRepository _repository;
+    private readonly IBaseRepository<Group> _groups;
 
-    public StudentsController(IStudentsRepository repository)
+    public StudentsController(IStudentsRepository repository, IBaseRepository<Group> groups)
     {
         _repository = repository;
+        _groups = groups;
     }
 
     // GET: api/Students
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentIOModel[]))]
+    public async Task<ActionResult<IEnumerable<StudentIOModel>>> GetStudents()
     {
-        return await _repository.Students.ToListAsync();
+        var students = await _repository.Students.ToListAsync();
+
+        return students.Select(s => ConvertToStudentIOModel(s)).ToList();
     }
 
     // GET: api/Students/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Student>> GetStudent(int id)
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentIOModel))]
+    public async Task<ActionResult<StudentIOModel>> GetStudent(int id)
     {
         var student = await _repository.GetAsync(id);
 
@@ -39,19 +47,22 @@ public class StudentsController : ControllerBase
             return NotFound();
         }
 
-        return student;
+        return ConvertToStudentIOModel(student);
     }
 
     // PUT: api/Students/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutStudent(int id, Student student)
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> PutStudent(int id, StudentIOModel student)
     {
         if (id != student.Id)
         {
             return BadRequest();
         }
 
-        if (!await _repository.UpdateAsync(student))
+        if (!await _repository.UpdateAsync(ConvertToStudent(student)))
         {
             return NotFound();
         }
@@ -61,15 +72,30 @@ public class StudentsController : ControllerBase
 
     // POST: api/Students
     [HttpPost]
-    public async Task<ActionResult<Student>> PostStudent(Student student)
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(StudentIOModel))]
+    public async Task<ActionResult<StudentIOModel>> PostStudent(StudentIOModel student)
     {
-        await _repository.CreateAsync(student);
+        if (student.Id != 0)
+        {
+            return BadRequest();
+        }
 
-        return CreatedAtAction("GetStudent", new { id = student.Id }, student);
+        if (!await _repository.CreateAsync(ConvertToStudent(student)))
+        {
+            return Conflict();
+        }
+
+        var createdStudent = await _repository.Students.FirstAsync(s => s.Name == student.Name);
+
+        return CreatedAtAction("GetStudent", new { id = createdStudent.Id }, ConvertToStudentIOModel(createdStudent));
     }
 
     // DELETE: api/Students/5
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteStudent(int id)
     {
         if (!await _repository.DeleteAsync(id))
@@ -78,5 +104,30 @@ public class StudentsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    private StudentIOModel ConvertToStudentIOModel(Student student)
+    {
+        return new StudentIOModel()
+        {
+            Id = student.Id,
+            Name = student.Name,
+            Group = student.Group.Name, 
+            GroupId= student.Group.Id
+        };
+    }
+
+    private Student ConvertToStudent(StudentIOModel iOModel)
+    {
+        Student student = new()
+        {
+            Id = iOModel.Id,
+            Name = iOModel.Name,
+        };
+
+        student.Group = _groups.GetOrCreate(iOModel.Group);
+        student.GroupId = student.Group.Id;
+
+        return student;
     }
 }

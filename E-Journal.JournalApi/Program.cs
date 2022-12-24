@@ -27,7 +27,7 @@ public static class Program
         services.AddSwaggerGen();
 
         services.AddScoped<IBaseRepository<Group>, BaseRepository<Group>>();
-        services.AddScoped<IBaseRepository<Teacher>, BaseRepository<Teacher >>();
+        services.AddScoped<IBaseRepository<Subject>, BaseRepository<Subject>>();
         services.AddScoped<IBaseRepository<Models.Type>, BaseRepository<Models.Type>>();
         services.AddScoped<IBaseRepository<Teacher>, BaseRepository<Teacher>>();
         services.AddScoped<IBaseRepository<ScoreValue>, BaseRepository<ScoreValue>>();

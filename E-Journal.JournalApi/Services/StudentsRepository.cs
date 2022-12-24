@@ -14,11 +14,11 @@ public class StudentsRepository : IStudentsRepository
 
     public IQueryable<Student> Students => _context.Students
         .Include(s => s.Group);
+    
     public async ValueTask<bool> IsExistsAsync(int id)
     {
         return await _context.Students.AnyAsync(s => s.Id == id);
     }
-
     public async ValueTask<bool> IsExistsAsync(string name)
     {
         return await _context.Students.AnyAsync(s => s.Name == name);
@@ -31,7 +31,7 @@ public class StudentsRepository : IStudentsRepository
             return false;
         }
 
-        var group = await _context.Groups.FirstAsync(g => g.Name == student.Group.Name);
+        var group = await _context.Groups.FirstOrDefaultAsync(g => g.Name == student.Group.Name);
 
         if (group != null)
         {
@@ -55,11 +55,7 @@ public class StudentsRepository : IStudentsRepository
             return false;
         }
 
-        if (student.Group.Id == 0)
-        {
-            student.Group = _context.Groups.FirstOrDefault(s => s.Name == student.Group.Name) ?? student.Group;
-        }
-        
+        _context.Students.Attach(student);
         _context.Entry(student).State = EntityState.Modified;
 
         await _context.SaveChangesAsync();
