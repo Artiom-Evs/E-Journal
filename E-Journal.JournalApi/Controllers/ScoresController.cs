@@ -126,10 +126,10 @@ public class ScoresController : ControllerBase
     {
         Score score = new()
         {
-            Subject = _subjects.GetOrCreate(iOModel.Subject), 
-            Type = _types.GetOrCreate(iOModel.Type), 
-            Teacher = _teachers.GetOrCreate(iOModel.Teacher), 
-            Value = _scoreValues.GetOrCreate(iOModel.Value),
+            Subject = await _subjects.GetOrCreateAsync(iOModel.Subject), 
+            Type = await _types.GetOrCreateAsync(iOModel.Type), 
+            Teacher = await _teachers.GetOrCreateAsync(iOModel.Teacher), 
+            Value = await _scoreValues.GetOrCreateAsync(iOModel.Value),
         };
 
         score.Student = await _students.GetAsync(iOModel.StudentId);

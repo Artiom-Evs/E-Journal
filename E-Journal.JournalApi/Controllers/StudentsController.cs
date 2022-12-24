@@ -62,7 +62,7 @@ public class StudentsController : ControllerBase
             return BadRequest();
         }
 
-        if (!await _repository.UpdateAsync(ConvertToStudent(student)))
+        if (!await _repository.UpdateAsync(await ConvertToStudentAsync(student)))
         {
             return NotFound();
         }
@@ -82,7 +82,7 @@ public class StudentsController : ControllerBase
             return BadRequest();
         }
 
-        if (!await _repository.CreateAsync(ConvertToStudent(student)))
+        if (!await _repository.CreateAsync(await ConvertToStudentAsync(student)))
         {
             return Conflict();
         }
@@ -117,7 +117,7 @@ public class StudentsController : ControllerBase
         };
     }
 
-    private Student ConvertToStudent(StudentIOModel iOModel)
+    private async Task<Student> ConvertToStudentAsync(StudentIOModel iOModel)
     {
         Student student = new()
         {
@@ -125,7 +125,7 @@ public class StudentsController : ControllerBase
             Name = iOModel.Name,
         };
 
-        student.Group = _groups.GetOrCreate(iOModel.Group);
+        student.Group = await _groups.GetOrCreateAsync(iOModel.Group);
         student.GroupId = student.Group.Id;
 
         return student;

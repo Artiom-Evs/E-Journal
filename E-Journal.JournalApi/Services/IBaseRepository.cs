@@ -6,13 +6,13 @@ public interface IBaseRepository<T> where T : class, IBaseModel, new()
 {
     IQueryable<T> Items { get; }
 
-    bool IsExists(int id);
-    bool IsExists(string name);
+    ValueTask<bool> IsExistsAsync(int id);
+    ValueTask<bool> IsExistsAsync(string name);
 
-    T? Get(int id);
-    T? Get(string name);
-    T GetOrCreate(string name);
-    T? Create(string name);
-    T? Update(T item);
-    T? Delete(int id);
+    ValueTask<T?> GetAsync(int id);
+    ValueTask<T?> GetAsync(string name);
+    ValueTask<T> GetOrCreateAsync(string name);
+    ValueTask<T?> CreateAsync(string name);
+    ValueTask<T?> UpdateAsync(T item);
+    ValueTask<T?> DeleteAsync(int id);
 }

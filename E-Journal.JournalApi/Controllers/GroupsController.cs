@@ -28,9 +28,9 @@ namespace E_Journal.JournalApi.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Group))]
-        public ActionResult<Group> Get(int id)
+        public async Task<ActionResult<Group>> GetAsync(int id)
         {
-            Group? group = _repostory.Get(id);
+            Group? group = await _repostory.GetAsync(id);
 
             if (group == null)
             {
@@ -45,21 +45,21 @@ namespace E_Journal.JournalApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Group))]
-        public ActionResult<Group> Post([FromBody] Group group)
+        public async Task<ActionResult<Group>> PostAsync([FromBody] Group group)
         {
             if (group.Id != 0 || string.IsNullOrWhiteSpace(group.Name))
             {
                 return BadRequest();
             }
 
-            var storedGroup = _repostory.Create(group.Name);
+            var storedGroup = await _repostory.CreateAsync(group.Name);
 
             if (storedGroup == null)
             {
                 return Conflict();
             }
 
-            return CreatedAtAction(nameof(Get), new { Id = storedGroup.Id }, storedGroup);
+            return CreatedAtAction(nameof(GetAsync), new { Id = storedGroup.Id }, storedGroup);
         }
 
         // PUT api/Groups/5
@@ -67,19 +67,19 @@ namespace E_Journal.JournalApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult Put(int id, [FromBody] Group group)
+        public async Task<ActionResult> PutAsync(int id, [FromBody] Group group)
         {
             if (id != group.Id)
             {
                 return BadRequest();
             }
 
-            if (!_repostory.IsExists(id))
+            if (!await _repostory.IsExistsAsync(id))
             {
                 return NotFound();
             }
 
-            _repostory.Update(group);
+            await _repostory.UpdateAsync(group);
 
             return NoContent();
         }
@@ -88,14 +88,14 @@ namespace E_Journal.JournalApi.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            if (_repostory.IsExists(id))
+            if (await _repostory.IsExistsAsync(id))
             {
                 return NotFound();
             }
 
-            _repostory.Delete(id);
+            _repostory.DeleteAsync(id);
 
             return NoContent();
         }

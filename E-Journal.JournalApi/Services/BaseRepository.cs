@@ -1,4 +1,6 @@
 ﻿using E_Journal.JournalApi.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace E_Journal.JournalApi.Services;
 
@@ -13,63 +15,63 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel, new()
 
     public IQueryable<T> Items => _context.Set<T>().AsQueryable<T>();
 
-    public bool IsExists(int id)
+    public async ValueTask<bool> IsExistsAsync(int id)
     {
-        return _context.Set<T>().Any(item => item.Id == id);
+        return await _context.Set<T>().AnyAsync(item => item.Id == id);
     }
-    public bool IsExists(string name)
+    public async ValueTask<bool> IsExistsAsync(string name)
     {
-        return _context.Set<T>().Any(item => item.Name == name);
-    }
-
-    public T? Get(int id)
-    {
-        return _context.Set<T>().FirstOrDefault(item => item.Id == id);
-    }
-    public T? Get(string name)
-    {
-        return _context.Set<T>().FirstOrDefault(item => item.Name == name);
+        return await _context.Set<T>().AnyAsync(item => item.Name == name);
     }
 
-    public T GetOrCreate(string name)
+    public async ValueTask<T?> GetAsync(int id)
     {
-        var item = this.Get(name);
+        return await _context.Set<T>().FirstOrDefaultAsync(item => item.Id == id);
+    }
+    public async ValueTask<T?> GetAsync(string name)
+    {
+        return await _context.Set<T>().FirstOrDefaultAsync(item => item.Name == name);
+    }
+
+    public async ValueTask<T> GetOrCreateAsync(string name)
+    {
+        var item = await this.GetAsync(name);
 
         if (item == null)
         {
-            item = _context.Set<T>().Add(new T() { Name = name }).Entity;
-            _context.SaveChanges();
+            item = (await _context.Set<T>().AddAsync(new T() { Name = name })).Entity;
+            await _context.SaveChangesAsync();
         }
 
         return item;
     }
 
-    public T? Create(string name)
+    public async ValueTask<T?> CreateAsync(string name)
     {
-        if (this.IsExists(name))
+        if (await this.IsExistsAsync(name))
         {
             return null;
         }
 
-        var item = _context.Set<T>().Add(new T() { Name = name }).Entity;
-        _context.SaveChanges();
+        var item = (await _context.Set<T>().AddAsync(new T() { Name = name })).Entity;
+        await _context.SaveChangesAsync();
         return item;
     }
-    public T? Update(T item)
+    public async ValueTask<T?> UpdateAsync(T item)
     {
-        if (!this.IsExists(item.Id))
+        if (!await this.IsExistsAsync(item.Id))
         {
             return null;
         }
 
         _context.Set<T>().Attach(item);
         item = _context.Set<T>().Update(item).Entity;
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return item;
     }
-    public T? Delete(int id)
+    public async ValueTask<T?> DeleteAsync(int id)
     {
-        var item = this.Get(id);
+        var item = await this.GetAsync(id);
 
         if (item == null)
         {
@@ -77,7 +79,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel, new()
         }
 
         _context.Set<T>().Remove(item);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return item;
     }
 }
