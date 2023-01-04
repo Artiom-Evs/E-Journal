@@ -22,6 +22,7 @@ public static class Program
                 });
         });
 
+        services.AddHealthChecks();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
@@ -46,6 +47,7 @@ public static class Program
             app.UseSwaggerUI();
         }
 
+        app.MapHealthChecks("/_hc");
         app.MapControllers();
     }
 

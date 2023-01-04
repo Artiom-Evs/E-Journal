@@ -23,6 +23,7 @@ public static class Program
                 });
         });
 
+        services.AddHealthChecks();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
@@ -46,12 +47,14 @@ public static class Program
         
         if (app.Environment.IsDevelopment())
         {
+            app.UseDeveloperExceptionPage();
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-        
+
         app.UseAuthorization();
 
+        app.MapHealthChecks("/_hc");
         app.MapControllers();
     }
 
