@@ -93,7 +93,7 @@ public class UpdateService : IUpdateService
         var group = _groups.GetOrCreate(parsedLesson.GroupName);
         var subject = _subjects.GetOrCreate(parsedLesson.Title);
         var type = _types.GetOrCreate(parsedLesson.Type);
-        var teacher = _teachers.GetOrCreate(parsedLesson.TeatherName);
+        var teacher = _teachers.GetOrCreate(parsedLesson.TeacherName);
         var room = _rooms.GetOrCreate(parsedLesson.Room);
 
         return new Lesson(subject, type, teacher, group, room, parsedLesson.Number, parsedLesson.Subgroup, parsedLesson.Date)

@@ -11,7 +11,7 @@ public class Lesson
     public DateTime Date { get; set; }
     public string Title { get; init; }
     public string Type { get; init; }
-    public string TeatherName { get; init; }
+    public string TeacherName { get; init; }
     public string GroupName { get; init; }
     public string Room { get; init; }
     public int Number { get; init; }
@@ -24,7 +24,7 @@ public class Lesson
             return GroupName.Equals(lesson.GroupName) &&
                 Title.Equals(lesson.Title) &&
                 Type.Equals(lesson.Type) &&
-                TeatherName.Equals(lesson.TeatherName) &&
+                TeacherName.Equals(lesson.TeacherName) &&
                 Room.Equals(lesson.Room) &&
                 Number.Equals(lesson.Number) &&
                 Subgroup.Equals(lesson.Subgroup);
@@ -38,7 +38,7 @@ public class Lesson
         string str = GroupName +
             Title +
             Type +
-            TeatherName +
+            TeacherName +
             Room +
             Number.ToString() +
             Subgroup;

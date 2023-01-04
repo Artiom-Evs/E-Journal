@@ -2,8 +2,6 @@
 using E_Journal.SchedulesApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace E_Journal.SchedulesApi.Controllers;
 
 [ApiController]
@@ -21,8 +19,8 @@ public class SchedulesController : ControllerBase
     }
 
     [HttpGet("api/[controller]/groups/{name}/", Name = nameof(GetGroup))]
-    [Consumes("application/json")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OutputLessonModel[]))]
     public IActionResult GetGroup(string name, [FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
     {
         var group = _groups.Get(name);
@@ -34,11 +32,6 @@ public class SchedulesController : ControllerBase
 
         var query = _repository.Lessons
             .Where(l => l.GroupId == group.Id);
-
-        if (!query.Any())
-        {
-            return NotFound();
-        }
 
         if (startDate != default)
         {
@@ -56,8 +49,7 @@ public class SchedulesController : ControllerBase
         return new JsonResult(result);
     }
 
-    [HttpGet("api/[controller]/groups/all/", Name = nameof(GetAllGroups))]
-    [Consumes("application/json")]
+    [HttpGet("api/[controller]/groups/", Name = nameof(GetAllGroups))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetAllGroups([FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
     {
@@ -81,10 +73,10 @@ public class SchedulesController : ControllerBase
         return new JsonResult(result);
     }
 
-    [HttpGet("api/[controller]/teathers/{name}/", Name = nameof(GetTeather))]
-    [Consumes("application/json")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult GetTeather(string name, [FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
+    [HttpGet("api/[controller]/teachers/{name}/", Name = nameof(GetTeacher))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OutputLessonModel[]))]
+    public IActionResult GetTeacher(string name, [FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
     {
         var teacher = _teachers.Get(name);
 
@@ -95,11 +87,6 @@ public class SchedulesController : ControllerBase
 
         var query = _repository.Lessons
             .Where(l => l.TeacherId == teacher.Id);
-
-        if (!query.Any())
-        {
-            return NotFound();
-        }
 
         if (startDate != default)
         {
@@ -117,10 +104,9 @@ public class SchedulesController : ControllerBase
         return new JsonResult(result);
     }
 
-    [HttpGet("api/[controller]/teathers/all/", Name = nameof(GetAllTeathers))]
-    [Consumes("application/json")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult GetAllTeathers([FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
+    [HttpGet("api/[controller]/teachers/", Name = nameof(GetAllTeachers))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OutputLessonModel[]))]
+    public IActionResult GetAllTeachers([FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
     {
         var query = _repository.Lessons;
 
@@ -142,9 +128,8 @@ public class SchedulesController : ControllerBase
         return new JsonResult(result);
     }
 
-    [HttpGet("api/[controller]/all/", Name = nameof(GetAll))]
-    [Consumes("application/json")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [HttpGet("api/[controller]/", Name = nameof(GetAll))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OutputLessonModel[]))]
     public IActionResult GetAll([FromQuery] DateTime startDate = default, [FromQuery] DateTime endDate = default)
     {
         var query = _repository.Lessons;

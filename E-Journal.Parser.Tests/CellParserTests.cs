@@ -69,7 +69,7 @@ public  class CellParserTests
                     Number = 1,
                     Room = "Кн 1-109(к)",
                     Subgroup = 0,
-                    TeatherName = "Северин А. В.",
+                    TeacherName = "Северин А. В.",
                     Title = "Уч прак проф",
                     Type = "Практика"
                 }
@@ -93,7 +93,7 @@ public  class CellParserTests
                     Number = 2,
                     Room = "Кн.1-204 маст",
                     Subgroup = 0,
-                    TeatherName = "Харевская Е. Т.",
+                    TeacherName = "Харевская Е. Т.",
                     Title = "ЭлИз",
                     Type = "Лек"
                 }
@@ -120,7 +120,7 @@ public  class CellParserTests
                         Number = 1,
                         Room = "Кн.1-319",
                         Subgroup = 1,
-                        TeatherName = "Самарская Н. В.",
+                        TeacherName = "Самарская Н. В.",
                         Title = "Автомат электр",
                         Type = "ЛР"
                 },
@@ -131,7 +131,7 @@ public  class CellParserTests
                     Number = 1,
                     Room = "Кн.1-006",
                     Subgroup = 2,
-                    TeatherName ="Шеметов И. В.",
+                    TeacherName ="Шеметов И. В.",
                     Title = "Электрооб.ПиГЗ",
                     Type = "КП"
                 }
@@ -155,7 +155,7 @@ public  class CellParserTests
                     Number = 2,
                     Room = "Кн.1-317",
                     Subgroup = 1,
-                    TeatherName = "Зайковская М. И.",
+                    TeacherName = "Зайковская М. И.",
                     Title = "Стил рус. яз.",
                     Type = "ЛР"
                 },
@@ -166,7 +166,7 @@ public  class CellParserTests
                     Number = 2,
                     Room = "Кн.1-325(к)",
                     Subgroup = 2,
-                    TeatherName = "Шавейко А. А.",
+                    TeacherName = "Шавейко А. А.",
                     Title = "ТСУ",
                     Type = "ЛР"
                 }
@@ -190,7 +190,7 @@ public  class CellParserTests
                     Number = 4,
                     Room = "Кн.1-317",
                     Subgroup = 1,
-                    TeatherName = "Зайковская М. И.",
+                    TeacherName = "Зайковская М. И.",
                     Title = "Рус Язык (проф)",
                     Type = "ЛР",
                 },
@@ -201,7 +201,7 @@ public  class CellParserTests
                     Number = 4,
                     Room = "Кн.1-206",
                     Subgroup = 2,
-                    TeatherName = "Колышкина Л. Н.",
+                    TeacherName = "Колышкина Л. Н.",
                     Title = "Нем. яз.",
                     Type = "ЛР"
                 }
@@ -228,7 +228,7 @@ public  class CellParserTests
                     Number = 1,
                     Room = "Кн 1-109(к)",
                     Subgroup = 0,
-                    TeatherName = "Северин А. В.",
+                    TeacherName = "Северин А. В.",
                     Title = "Уч прак проф",
                     Type = "unknown"
                 }
@@ -252,7 +252,7 @@ public  class CellParserTests
                     Number = 2,
                     Room = "Кн.1-204 маст",
                     Subgroup = 2,
-                    TeatherName = "Харевская Е. Т.",
+                    TeacherName = "Харевская Е. Т.",
                     Title = "ЭлИз",
                     Type = "unknown"
                 }
@@ -276,7 +276,7 @@ public  class CellParserTests
                         Number = 1,
                         Room = "Кн.1-319",
                         Subgroup = 0,
-                        TeatherName = "Самарская Н. В.",
+                        TeacherName = "Самарская Н. В.",
                         Title = "Автомат электр",
                         Type = "unknown"
                 },
@@ -304,7 +304,7 @@ public  class CellParserTests
                     Number = 1,
                     Room = "Кн 1-109(к)",
                     Subgroup = 0,
-                    TeatherName = "Северин А. В.",
+                    TeacherName = "Северин А. В.",
                     Title = "Уч прак проф",
                     Type = "Практика"
                 }
@@ -328,7 +328,7 @@ public  class CellParserTests
                     Number = 2,
                     Room = "Кн.1-204 маст",
                     Subgroup = 2,
-                    TeatherName = "Харевская Е. Т.",
+                    TeacherName = "Харевская Е. Т.",
                     Title = "ЭлИз",
                     Type = "Лек"
                 }
@@ -352,7 +352,7 @@ public  class CellParserTests
                         Number = 1,
                         Room = "Кн.1-319",
                         Subgroup = 0,
-                        TeatherName = "Самарская Н. В.",
+                        TeacherName = "Самарская Н. В.",
                         Title = "Автомат электр",
                         Type = "ЛР"
                 }
