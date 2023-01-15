@@ -30,5 +30,12 @@ services:
     volumes:
       - sql_data:/var/lib/mysql
 
+  e-journal.identity:
+    image: ${DOCKER_REGISTRY-}ejournalidentity
+    container_name: identity
+    build:
+      context: .
+      dockerfile: E-Journal.Identity/Dockerfile
+
 volumes:
   sql_data: 

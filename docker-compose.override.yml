@@ -13,11 +13,11 @@ services:
       - BUILDING_1_GROUP_WEEKLY_SCHEDULE_URL=http://mgke.minsk.edu.by/ru/main.aspx?guid=3781
       - BUILDING_2_GROUP_WEEKLY_SCHEDULE_URL=http://mgke.minsk.edu.by/ru/main.aspx?guid=3791
     expose:
-      - "5010"
       - "5011"
+      - "5010"
     ports:
-      - "5010:5010"
       - "5011:5011"
+      - "5010:5010"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
@@ -29,11 +29,11 @@ services:
       - ASPNETCORE_HTTPS_PORT=5021
       - JOURNAL_DB_CONNECTION_STRING=Server=sqldb;Port=3306;Database=JournalDB;User=root;Password=12345;
     expose:
-      - "5020"
       - "5021"
+      - "5020"
     ports:
-      - "5020:5020"
       - "5021:5021"
+      - "5020:5020"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
@@ -44,3 +44,18 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=12345
       
+  e-journal.identity:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:5031;http://+:5030
+      - ASPNETCORE_HTTPS_PORT=5031
+      - IDENTITY_DB_CONNECTION_STRING=Server=sqldb;Port=3306;Database=IdentityDB;User=root;Password=12345;
+    expose:
+      - 5031
+      - 5030
+    ports:
+      - "5031:5031"
+      - "5030:5030"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro

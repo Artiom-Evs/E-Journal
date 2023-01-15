@@ -9,7 +9,8 @@
       "serviceActions": {
         "e-journal.sqldb": "StartWithoutDebugging",
         "e-journal.schedulesapi": "StartDebugging",
-        "e-journal.journalapi": "StartDebugging"
+        "e-journal.journalapi": "StartDebugging",
+        "e-journal.identity": "StartDebugging"
       }
     }
   }
