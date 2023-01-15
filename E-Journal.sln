@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E-Journal.JournalApi", "E-J
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "e-journal.webspa", "E-Journal.WebSPA\e-journal.webspa.esproj", "{72352A41-423E-417C-9AD2-249374CF4BDE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E-Journal.Identity", "E-Journal.Identity\E-Journal.Identity.csproj", "{47A34614-F563-4C93-9561-EE5E2EE7C176}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{72352A41-423E-417C-9AD2-249374CF4BDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72352A41-423E-417C-9AD2-249374CF4BDE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{72352A41-423E-417C-9AD2-249374CF4BDE}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{47A34614-F563-4C93-9561-EE5E2EE7C176}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47A34614-F563-4C93-9561-EE5E2EE7C176}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47A34614-F563-4C93-9561-EE5E2EE7C176}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47A34614-F563-4C93-9561-EE5E2EE7C176}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
