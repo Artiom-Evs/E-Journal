@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E-Journal.WebUI", "E-Journa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E-Journal.SchedulesApi", "E-Journal.SchedulesApi\E-Journal.SchedulesApi.csproj", "{7C15107B-AF7B-41DD-8A92-743F8B4B6DF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E-Journal.JournalApi", "E-Journal.JournalApi\E-Journal.JournalApi.csproj", "{77FDA57D-AAAF-4A76-B7C9-6F4D8AA05AFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E-Journal.JournalApi", "E-Journal.JournalApi\E-Journal.JournalApi.csproj", "{77FDA57D-AAAF-4A76-B7C9-6F4D8AA05AFB}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "e-journal.webspa", "E-Journal.WebSPA\e-journal.webspa.esproj", "{72352A41-423E-417C-9AD2-249374CF4BDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,12 @@ Global
 		{77FDA57D-AAAF-4A76-B7C9-6F4D8AA05AFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77FDA57D-AAAF-4A76-B7C9-6F4D8AA05AFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77FDA57D-AAAF-4A76-B7C9-6F4D8AA05AFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72352A41-423E-417C-9AD2-249374CF4BDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72352A41-423E-417C-9AD2-249374CF4BDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72352A41-423E-417C-9AD2-249374CF4BDE}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{72352A41-423E-417C-9AD2-249374CF4BDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72352A41-423E-417C-9AD2-249374CF4BDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72352A41-423E-417C-9AD2-249374CF4BDE}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
