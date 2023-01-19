@@ -63,7 +63,7 @@ public static class PageParser
     /// </summary>
     private static HtmlNode GetPageContentNode(HtmlNode document)
     {
-        return document.SelectSingleNode("//div[@class='col-sm-9 content']//div");
+        return document.SelectSingleNode("//div[@id='main-p']//div").Element("div");
     }
 
     /// <summary>
@@ -293,7 +293,7 @@ public static class PageParser
             .ToArray();
 
         var rowsCells = tableRows.Skip(2)
-            .Select(tr => tr.Elements("td").ToArray())
+            .Select(tr => tr.SelectNodes("th | td").ToArray())
             .ToArray();
 
         return new PreparsedTable()
@@ -312,7 +312,7 @@ public static class PageParser
     {
         List<DateTime> days = new();
 
-        foreach (HtmlNode node in daysRow.Elements("td").Skip(1))
+        foreach (HtmlNode node in daysRow.Elements("th").Skip(1))
         {
             if (DateTime.TryParse(node.InnerText, new CultureInfo("ru-Ru"), DateTimeStyles.None, out DateTime buffer))
             {

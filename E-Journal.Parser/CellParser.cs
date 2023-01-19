@@ -108,8 +108,7 @@ public static class CellParser
         else
         {
             // split strings from lesson cell
-            var result = cell.Element("p")
-                .Elements("#text")
+            var result = cell.Elements("#text")
                 .Select(t => t.InnerText.Trim())
                 .Where(t => !t.Equals("&nbsp;"));
 
