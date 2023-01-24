@@ -9,7 +9,7 @@ const context =  [
   "/connect",
   "/ApplyDatabaseMigrations",
   "/_framework",
-  "/weatherforecast"
+  "/schedules"
 ];
 
 module.exports = function(app) {
@@ -20,7 +20,8 @@ module.exports = function(app) {
       Connection: 'Keep-Alive'
     },
     router: {
-      '/weatherforecast': 'https://localhost:5011'
+        '/schedules': 'https://localhost:5011/api',
+        '/journal': 'https://localhost:5021/api'
     }
   });
 
