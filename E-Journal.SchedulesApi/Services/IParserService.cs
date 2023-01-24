@@ -5,4 +5,5 @@ namespace E_Journal.SchedulesApi.Services;
 public interface IParserService
 {
     IEnumerable<Lesson> ParseDaylySchedulesPage(string pageText);
+    IEnumerable<Lesson> ParseWeeklySchedulesPage(string pageText);
 }

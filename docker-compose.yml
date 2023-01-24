@@ -23,19 +23,21 @@ services:
     depends_on:
       - e-journal.sqldb
 
-  e-journal.sqldb:
-    image: mariadb
-    container_name: sqldb
-    command: --innodb_use_native_aio=0
-    volumes:
-      - sql_data:/var/lib/mysql
-
   e-journal.identity:
     image: ${DOCKER_REGISTRY-}ejournalidentity
     container_name: identity
     build:
       context: .
       dockerfile: E-Journal.Identity/Dockerfile
+    depends_on:
+      - e-journal.sqldb
+
+  e-journal.sqldb:
+    image: mariadb
+    container_name: sqldb
+    command: --innodb_use_native_aio=0
+    volumes:
+      - sql_data:/var/lib/mysql
 
 volumes:
   sql_data: 

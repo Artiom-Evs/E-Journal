@@ -28,6 +28,34 @@ public class ParserService : IParserService
             yield break;
         }
 
+        foreach (var lesson in ParseTables(preparsedTables))
+        {
+            yield return lesson;
+        }
+    }
+
+    public IEnumerable<Lesson> ParseWeeklySchedulesPage(string pageText)
+    {
+        IEnumerable<PreparsedTable> preparsedTables;
+
+        try
+        {
+            preparsedTables = PageParser.ParseWeeklySchedules(pageText);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ">> Exception occurred while schedule page parsing\r\n");
+            yield break;
+        }
+
+        foreach (var lesson in ParseTables(preparsedTables))
+        {
+            yield return lesson;
+        }
+    }
+
+    private IEnumerable<Lesson> ParseTables(IEnumerable<PreparsedTable> preparsedTables)
+    {
         foreach (var preparsedTable in preparsedTables)
         {
             IEnumerable<IEnumerable<PreparsedCell>> preparsedCells;
