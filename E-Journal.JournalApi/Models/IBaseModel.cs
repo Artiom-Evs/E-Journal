@@ -3,5 +3,4 @@
 public interface IBaseModel
 {
     public int Id { get; }
-    public string Name { get; }
 }

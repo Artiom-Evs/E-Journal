@@ -52,7 +52,7 @@ public class TeachersController : ControllerBase
             return BadRequest();
         }
 
-        var storedTeacher = await _repostory.CreateAsync(teacher.Name);
+        var storedTeacher = await _repostory.CreateAsync(teacher);
 
         return Created($"/api/teachers/{storedTeacher.Id}", storedTeacher);
     }

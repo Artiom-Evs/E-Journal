@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace E_Journal.JournalApi.Services;
 
-public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel, new()
+public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseModel, new()
 {
     protected readonly ApplicationDbContext _context;
     
@@ -13,46 +13,30 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel, new()
         _context = context;
     }
 
-    public IQueryable<T> Items => _context.Set<T>().AsQueryable<T>();
+    public virtual IQueryable<T> Items => _context.Set<T>().AsQueryable<T>();
 
-    public async ValueTask<bool> IsExistsAsync(int id)
+    public virtual async ValueTask<bool> IsExistsAsync(int id)
     {
         return await _context.Set<T>().AnyAsync(item => item.Id == id);
     }
-    public async ValueTask<bool> IsExistsAsync(string name)
-    {
-        return await _context.Set<T>().AnyAsync(item => item.Name == name);
-    }
-
-    public async ValueTask<T?> GetAsync(int id)
+    
+    public virtual async ValueTask<T?> GetAsync(int id)
     {
         return await _context.Set<T>().FirstOrDefaultAsync(item => item.Id == id);
     }
-    public async ValueTask<T?> GetAsync(string name)
-    {
-        return await _context.Set<T>().FirstOrDefaultAsync(item => item.Name == name);
-    }
 
-    public async ValueTask<T> GetOrCreateAsync(string name)
+    public virtual async ValueTask<T?> CreateAsync(T item)
     {
-        var item = await this.GetAsync(name);
-
-        if (item == null)
+        if (await this.IsExistsAsync(item.Id))
         {
-            item = (await _context.Set<T>().AddAsync(new T() { Name = name })).Entity;
-            await _context.SaveChangesAsync();
+            return null;
         }
 
-        return item;
-    }
-
-    public async ValueTask<T?> CreateAsync(string name)
-    {
-        var item = (await _context.Set<T>().AddAsync(new T() { Name = name })).Entity;
+        await _context.Set<T>().AddAsync(item);
         await _context.SaveChangesAsync();
         return item;
     }
-    public async ValueTask<T?> UpdateAsync(T item)
+    public virtual async ValueTask<T?> UpdateAsync(T item)
     {
         if (!await this.IsExistsAsync(item.Id))
         {
@@ -64,7 +48,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel, new()
         await _context.SaveChangesAsync();
         return item;
     }
-    public async ValueTask<T?> DeleteAsync(int id)
+    public virtual async ValueTask<T?> DeleteAsync(int id)
     {
         var item = await this.GetAsync(id);
 

@@ -52,7 +52,7 @@ public class TrainingTypesController : ControllerBase
             return BadRequest();
         }
 
-        var storedTrainingType = await _repostory.CreateAsync(trainingType.Name);
+        var storedTrainingType = await _repostory.CreateAsync(trainingType);
 
         return Created($"/api/trainingTypes/{storedTrainingType.Id}", storedTrainingType);
     }

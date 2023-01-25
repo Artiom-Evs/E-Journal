@@ -132,7 +132,7 @@ public class StudentsController : ControllerBase
             Name = iOModel.Name,
         };
 
-        student.Group = await _groups.GetOrCreateAsync(iOModel.Group);
+        student.Group = await _groups.GetAsync(iOModel.GroupId) ?? await _groups.CreateAsync(new() { Name = iOModel.Group });
         student.GroupId = student.Group.Id;
 
         return student;

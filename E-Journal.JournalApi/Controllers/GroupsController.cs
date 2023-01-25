@@ -51,7 +51,7 @@ public class GroupsController : ControllerBase
             return BadRequest();
         }
 
-        var storedGroup = await _repostory.CreateAsync(group.Name);
+        var storedGroup = await _repostory.CreateAsync(group);
 
         return Created($"/api/groups/{storedGroup.Id}", storedGroup);
     }

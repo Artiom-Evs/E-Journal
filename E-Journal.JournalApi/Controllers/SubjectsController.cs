@@ -51,7 +51,7 @@ public class SubjectsController : ControllerBase
             return BadRequest();
         }
 
-        var storedSubject = await _repostory.CreateAsync(subject.Name);
+        var storedSubject = await _repostory.CreateAsync(subject);
 
         return Created($"/api/subjects/{storedSubject.Id}", storedSubject);
     }
