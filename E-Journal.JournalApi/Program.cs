@@ -29,12 +29,9 @@ public static class Program
 
         services.AddScoped<IBaseRepository<Group>, BaseRepository<Group>>();
         services.AddScoped<IBaseRepository<Subject>, BaseRepository<Subject>>();
-        services.AddScoped<IBaseRepository<Models.Type>, BaseRepository<Models.Type>>();
         services.AddScoped<IBaseRepository<Teacher>, BaseRepository<Teacher>>();
-        services.AddScoped<IBaseRepository<ScoreValue>, BaseRepository<ScoreValue>>();
         services.AddScoped<IBaseRepository<TrainingType>, BaseRepository<TrainingType>>();
         services.AddScoped<IStudentsRepository, StudentsRepository>();
-        services.AddScoped<IScoresRepository, ScoresRepository>();
     }
 
     public static void Configure(this WebApplication app)
