@@ -21,9 +21,9 @@ public class ScoresController : ControllerBase
     private readonly IBaseRepository<Subject> _subjects;
     private readonly IBaseRepository<Models.Type> _types;
     private readonly IBaseRepository<Teacher> _teachers;
-    private readonly IBaseRepository<ScoreValue> _scoreValues;
+    private readonly IBaseRepository<MarkValue> _scoreValues;
 
-    public ScoresController(IScoresRepository repository, IStudentsRepository students, IBaseRepository<Subject> subjects, IBaseRepository<Models.Type> types, IBaseRepository<Teacher> teachers, IBaseRepository<ScoreValue> scoreValues)
+    public ScoresController(IScoresRepository repository, IStudentsRepository students, IBaseRepository<Subject> subjects, IBaseRepository<Models.Type> types, IBaseRepository<Teacher> teachers, IBaseRepository<MarkValue> scoreValues)
     {
         _repository = repository;
         _students = students;
