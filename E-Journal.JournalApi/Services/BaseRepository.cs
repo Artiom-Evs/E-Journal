@@ -48,11 +48,6 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel, new()
 
     public async ValueTask<T?> CreateAsync(string name)
     {
-        if (await this.IsExistsAsync(name))
-        {
-            return null;
-        }
-
         var item = (await _context.Set<T>().AddAsync(new T() { Name = name })).Entity;
         await _context.SaveChangesAsync();
         return item;
