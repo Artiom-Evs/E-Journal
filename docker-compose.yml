@@ -29,6 +29,7 @@ services:
     build:
       context: .
       dockerfile: E-Journal.Identity/Dockerfile
+    restart: always
     depends_on:
       - e-journal.sqldb
 

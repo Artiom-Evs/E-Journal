@@ -61,7 +61,7 @@ public class GroupsController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status201Create, Type = typeof(Group))]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Group))]
     public async Task<IActionResult> PutAsync(int id, [FromBody] Group group)
     {
         if (id != group.Id)

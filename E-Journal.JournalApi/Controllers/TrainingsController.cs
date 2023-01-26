@@ -123,7 +123,7 @@ public class TrainingsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        if (await _repository.IsExistsAsync(id))
+        if (!await _repository.IsExistsAsync(id))
         {
             return NotFound();
         }
