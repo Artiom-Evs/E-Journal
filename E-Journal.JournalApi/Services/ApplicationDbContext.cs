@@ -15,5 +15,6 @@ public class ApplicationDbContext : DbContext
     public DbSet<Group> Groups { get; set; }
     public DbSet<Subject> Subjects { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
-    public DbSet<ScoreValue> ScoreValues { get; set; }
+    public DbSet<TrainingType> TrainingTypes { get; set; }
+    public DbSet<Training> Trainings { get; set; }
 }
