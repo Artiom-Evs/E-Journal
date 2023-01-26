@@ -1,4 +1,4 @@
-export const ApplicationName = 'IdentityAPI';
+export const ApplicationName = 'E-Journal';
 
 export const QueryParameterNames = {
   ReturnUrl: 'returnUrl',
