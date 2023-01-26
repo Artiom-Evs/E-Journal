@@ -3,76 +3,55 @@ using Microsoft.EntityFrameworkCore;
 
 namespace E_Journal.JournalApi.Services;
 
-public class StudentsRepository : IStudentsRepository
+public class StudentsRepository : BaseRepository<Student>
 {
-    private readonly ApplicationDbContext _context;
-
-    public StudentsRepository(ApplicationDbContext context)
+    public StudentsRepository(ApplicationDbContext context) : base(context)
     {
-        _context = context;
     }
 
-    public IQueryable<Student> Students => _context.Students
-        .Include(s => s.Group);
-    
-    public async ValueTask<bool> IsExistsAsync(int id)
-    {
-        return await _context.Students.AnyAsync(s => s.Id == id);
-    }
-    public async ValueTask<bool> IsExistsAsync(string name)
-    {
-        return await _context.Students.AnyAsync(s => s.Name == name);
-    }
+    public override IQueryable<Student> Items => _context.Students
+        .Include(t => t.Group)
+        .AsQueryable();
 
-    public async ValueTask<bool> CreateAsync(Student student)
+    public override async ValueTask<Student?> CreateAsync(Student item)
     {
-        if (await this.IsExistsAsync(student.Id))
+        if (item.Id != 0)
         {
-            return false;
+            return null;
         }
 
-        var group = await _context.Groups.FirstOrDefaultAsync(g => g.Name == student.Group.Name);
-
-        if (group != null)
+        try
         {
-            student.Group = group;
+            item.Group = await _context.Groups.FirstAsync(g => g.Id == item.GroupId);
+        }
+        catch
+        {
+            return null;
         }
 
-        await _context.Students.AddAsync(student);
+        await _context.Students.AddAsync(item);
         await _context.SaveChangesAsync();
-        return true;
+        return item;
     }
 
-    public async ValueTask<Student?> GetAsync(int id)
+    public override async ValueTask<Student?> UpdateAsync(Student item)
     {
-        return await this.Students.FirstOrDefaultAsync(s => s.Id == id);
-    }
-
-    public async ValueTask<bool> UpdateAsync(Student student)
-    {
-        if (!await this.IsExistsAsync(student.Id))
+        if (!await this.IsExistsAsync(item.Id))
         {
-            return false;
+            return null;
         }
 
-        _context.Students.Attach(student);
-        _context.Entry(student).State = EntityState.Modified;
-
-        await _context.SaveChangesAsync();
-        return true;
-    }
-
-    public async ValueTask<bool> DeleteAsync(int id)
-    {
-        var student = await this.GetAsync(id);
-
-        if (student == null)
+        if (!await _context.Groups.AnyAsync(g => g.Id == item.GroupId))
         {
-            return false;
+            return null;
         }
 
-        _context.Students.Remove(student);
-        await _context.SaveChangesAsync();
-        return true;
+        item.Group = await _context.Groups.FirstAsync(g => g.Id == item.GroupId);
+
+        _context.Attach(item);
+        _context.Entry(item).State = EntityState.Modified;
+        _context.SaveChanges();
+
+        return item;
     }
 }
