@@ -34,6 +34,7 @@ public static class Program
         services.AddScoped<IBaseRepository<Training>, TrainingRepository>();
         services.AddScoped<IBaseRepository<MarkValue>, BaseRepository<MarkValue>>();
         services.AddScoped<IBaseRepository<Student>, StudentsRepository>();
+        services.AddScoped<IBaseRepository<Mark>, MarksRepository>();
     }
 
     public static void Configure(this WebApplication app)

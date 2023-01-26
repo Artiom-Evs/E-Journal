@@ -18,4 +18,5 @@ public class ApplicationDbContext : DbContext
     public DbSet<TrainingType> TrainingTypes { get; set; }
     public DbSet<Training> Trainings { get; set; }
     public DbSet<MarkValue> MarkValues { get; set; }
+    public DbSet<Mark> Marks { get; set; }
 }
