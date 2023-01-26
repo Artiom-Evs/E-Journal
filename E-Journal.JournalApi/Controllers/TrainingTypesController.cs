@@ -25,6 +25,7 @@ public class TrainingTypesController : ControllerBase
     }
 
     // GET api/TrainingTypes/5
+    [ActionName(nameof(GetAsync))]
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TrainingType))]
@@ -52,16 +53,16 @@ public class TrainingTypesController : ControllerBase
             return BadRequest();
         }
 
-        var storedTrainingType = await _repostory.CreateAsync(trainingType);
+        var createdTrainingType = await _repostory.CreateAsync(trainingType);
 
-        return Created($"/api/trainingTypes/{storedTrainingType.Id}", storedTrainingType);
+        return CreatedAtAction(nameof(GetAsync), new { createdTrainingType.Id }, createdTrainingType);
     }
 
     // PUT api/TrainingTypes/5
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(TrainingType))]
     public async Task<IActionResult> PutAsync(int id, [FromBody] TrainingType trainingType)
     {
         if (id != trainingType.Id)
@@ -76,7 +77,7 @@ public class TrainingTypesController : ControllerBase
             return NotFound();
         }
 
-        return Created($"/api/trainingTypes/{updatedTrainingType.Id}", updatedTrainingType);
+        return CreatedAtAction(nameof(GetAsync), new { updatedTrainingType.Id }, updatedTrainingType);
     }
 
     // DELETE api/TrainingTypes/5

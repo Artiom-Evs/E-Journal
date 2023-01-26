@@ -25,6 +25,7 @@ public class GroupsController : ControllerBase
     }
 
     // GET api/Groups/5
+    [ActionName(nameof(GetAsync))]
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Group))]
@@ -51,16 +52,16 @@ public class GroupsController : ControllerBase
             return BadRequest();
         }
 
-        var storedGroup = await _repostory.CreateAsync(group);
+        var createdGroup = await _repostory.CreateAsync(group);
 
-        return Created($"/api/groups/{storedGroup.Id}", storedGroup);
+        return CreatedAtAction(nameof(GetAsync), new { createdGroup.Id }, createdGroup);
     }
 
     // PUT api/Groups/5
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Create, Type = typeof(Group))]
     public async Task<IActionResult> PutAsync(int id, [FromBody] Group group)
     {
         if (id != group.Id)
@@ -75,7 +76,7 @@ public class GroupsController : ControllerBase
             return NotFound();
         }
 
-        return Ok();
+        return CreatedAtAction(nameof(GetAsync), new { updatedGroup.Id }, updatedGroup);
     }
 
     // DELETE api/Groups/5

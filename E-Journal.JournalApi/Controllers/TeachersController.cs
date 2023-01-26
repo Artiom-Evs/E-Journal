@@ -25,6 +25,7 @@ public class TeachersController : ControllerBase
     }
 
     // GET api/Teachers/5
+    [ActionName(nameof(GetAsync))]
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Teacher))]
@@ -52,16 +53,16 @@ public class TeachersController : ControllerBase
             return BadRequest();
         }
 
-        var storedTeacher = await _repostory.CreateAsync(teacher);
+        var createdTeacher = await _repostory.CreateAsync(teacher);
 
-        return Created($"/api/teachers/{storedTeacher.Id}", storedTeacher);
+        return CreatedAtAction(nameof(GetAsync), new { createdTeacher.Id }, createdTeacher);
     }
 
     // PUT api/Teachers/5
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Teacher))]
     public async Task<IActionResult> PutAsync(int id, [FromBody] Teacher teacher)
     {
         if (id != teacher.Id)
@@ -76,7 +77,7 @@ public class TeachersController : ControllerBase
             return NotFound();
         }
 
-        return Created($"/api/teachers/{updatedTeacher.Id}", updatedTeacher);
+        return CreatedAtAction(nameof(GetAsync), new { updatedTeacher.Id }, updatedTeacher);
     }
 
     // DELETE api/Teachers/5

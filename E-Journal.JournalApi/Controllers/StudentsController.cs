@@ -24,7 +24,7 @@ public class StudentsController : ControllerBase
 
     // GET: api/Students
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Student[]))]
     public async Task<IEnumerable<Student>> GetAsync([FromQuery] int groupId, [FromQuery] string? name)
     {
         var query = _repository.Items;
@@ -46,7 +46,7 @@ public class StudentsController : ControllerBase
     [ActionName(nameof(GetAsync))]
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Student))]
     public async Task<IActionResult> GetAsync(int id)
     {
         var student = await _repository.GetAsync(id);
@@ -62,7 +62,7 @@ public class StudentsController : ControllerBase
     // PUT: api/Students/5
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Student))]
     public async Task<IActionResult> PutAsync(int id, Student student)
     {
         if (id != student.Id)
@@ -83,7 +83,7 @@ public class StudentsController : ControllerBase
     // POST: api/Students
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Student))]
     public async Task<IActionResult> PostAsync(Student student)
     {
         if (student.Id != 0)

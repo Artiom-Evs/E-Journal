@@ -20,6 +20,7 @@ public class TrainingsController : ControllerBase
 
     // GET: api/Trainings
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Training[]))]
     public async Task<IEnumerable<Training>> GetAsync(
         int groupId, 
         int teacherId,
@@ -60,6 +61,8 @@ public class TrainingsController : ControllerBase
     // GET api/Trainings/5
     [ActionName(nameof(GetAsync))]
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Training))]
     public async Task<IActionResult> GetAsync(int id)
     {
         var training = await _repository.GetAsync(id);
@@ -74,6 +77,8 @@ public class TrainingsController : ControllerBase
 
     // POST api/Trainings
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Training))]
     public async Task<IActionResult> PostAsync([FromBody] Training training)
     {
         if (training.Id != 0)
@@ -93,6 +98,8 @@ public class TrainingsController : ControllerBase
 
     // PUT api/<TrainingsController>/5
     [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Training))]
     public async Task<IActionResult> PutAsync(int id, [FromBody] Training training)
     {
         if (id != training.Id)
@@ -112,6 +119,8 @@ public class TrainingsController : ControllerBase
 
     // DELETE api/Trainings/5
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteAsync(int id)
     {
         if (await _repository.IsExistsAsync(id))

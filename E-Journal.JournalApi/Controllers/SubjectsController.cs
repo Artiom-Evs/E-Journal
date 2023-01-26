@@ -25,6 +25,7 @@ public class SubjectsController : ControllerBase
     }
 
     // GET api/Subjects/5
+    [ActionName(nameof(GetAsync))]
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Subject))]
@@ -51,16 +52,16 @@ public class SubjectsController : ControllerBase
             return BadRequest();
         }
 
-        var storedSubject = await _repostory.CreateAsync(subject);
+        var createdSubject = await _repostory.CreateAsync(subject);
 
-        return Created($"/api/subjects/{storedSubject.Id}", storedSubject);
+        return CreatedAtAction(nameof(GetAsync), new { createdSubject.Id }, createdSubject);
     }
 
     // PUT api/Subjects/5
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Subject))]
     public async Task<IActionResult> PutAsync(int id, [FromBody] Subject subject)
     {
         if (id != subject.Id)
@@ -75,7 +76,7 @@ public class SubjectsController : ControllerBase
             return NotFound();
         }
 
-        return Created($"/api/subjects/{updatedSubject.Id}", updatedSubject);
+        return CreatedAtAction(nameof(GetAsync), new { updatedSubject.Id }, updatedSubject);
     }
 
     // DELETE api/Subjects/5
