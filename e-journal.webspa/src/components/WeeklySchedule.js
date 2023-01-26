@@ -34,10 +34,10 @@ export class WeeklySchedule extends Component {
         let { isGroup } = this.props;
 
         if (loading) {
-            return (<div><em>Loading...</em></div>);
+            return (<div><em>Загрузка...</em></div>);
         }
 
-        let h1 = isGroup ? 'Расписание групп на неделю' : 'Расписание преподавателей на неделю';
+        let h1 = isGroup ? 'Расписание групп' : 'Расписание преподавателей';
         let keys = Object.keys(schedules);
         
         return (
