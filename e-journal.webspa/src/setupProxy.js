@@ -1,5 +1,4 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
-const { env } = require('process');
 
 const context =  [
   "/weatherforecast",
@@ -9,7 +8,8 @@ const context =  [
   "/connect",
   "/ApplyDatabaseMigrations",
   "/_framework",
-  "/schedules"
+  "/schedules",
+  "/journal"
 ];
 
 module.exports = function(app) {
@@ -20,8 +20,11 @@ module.exports = function(app) {
       Connection: 'Keep-Alive'
     },
     router: {
-        '/schedules': 'https://localhost:5011/api',
-        '/journal': 'https://localhost:5021/api'
+      '/schedules': 'https://localhost:5011/api',
+      '/journal': 'https://localhost:5021/api'
+    },
+    pathRewrite: {
+      '/journal': ''
     }
   });
 
