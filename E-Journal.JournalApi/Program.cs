@@ -32,6 +32,7 @@ public static class Program
         services.AddScoped<IBaseRepository<Teacher>, BaseRepository<Teacher>>();
         services.AddScoped<IBaseRepository<TrainingType>, BaseRepository<TrainingType>>();
         services.AddScoped<IBaseRepository<Training>, TrainingRepository>();
+        services.AddScoped<IBaseRepository<MarkValue>, BaseRepository<MarkValue>>();
         services.AddScoped<IBaseRepository<Student>, StudentsRepository>();
     }
 
