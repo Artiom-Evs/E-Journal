@@ -1,4 +1,4 @@
-import { SubjectsClient, TeachersClient } from './api-clients/JournalApiClient';
+import { SubjectsClient } from './api-clients/JournalApiClient';
 import { States, BaseManage } from './BaseManage'
 
 const properties = [
