@@ -135,3 +135,26 @@ export class TrainingTypesClient extends BaseClient {
             });
     }
 }
+
+export class MarkValuesClient extends BaseClient {
+    constructor() {
+        super('/journal/markvalues');
+    }
+
+    async Get(markValueId) {
+        let url = this._baseUrl;
+
+        if (markValueId) {
+            url += `/${markValueId}`;
+        }
+
+        return fetch(url)
+            .then(r => {
+                console.log(`===> URL: ${r.url}.`);
+                return r.json();
+            })
+            .catch(e => {
+                console.error(`===> Error occored while loading groups from Journal API:\n${e}`);
+            });
+    }
+}
