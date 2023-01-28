@@ -66,3 +66,26 @@ export class GroupsClient extends BaseClient {
             });
     }
 }
+
+export class SubjectsClient extends BaseClient {
+    constructor() {
+        super('/journal/subjects');
+    }
+
+    async Get(subjectId) {
+        let url = this._baseUrl;
+
+        if (subjectId) {
+            url += `/${subjectId}`;
+        }
+
+        return fetch(url)
+            .then(r => {
+                console.log(`===> URL: ${r.url}.`);
+                return r.json();
+            })
+            .catch(e => {
+                console.error(`===> Error occored while loading groups from Journal API:\n${e}`);
+            });
+    }
+}

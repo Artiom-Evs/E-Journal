@@ -2,6 +2,7 @@ import ApiAuthorzationRoutes from './components/api-authorization/ApiAuthorizati
 import { WeeklySchedule } from './components/WeeklySchedule';
 import { Home } from "./components/Home";
 import { ManageGroups } from './components/ManageGroups';
+import { ManageSubjects } from './components/ManageSubjects';
 
 const AppRoutes = [
   {
@@ -20,6 +21,11 @@ const AppRoutes = [
     path: '/manage-groups',
     requireAuth: true,
     element: <ManageGroups />
+  },
+  {
+    path: '/manage-subjects',
+    requireAuth: true,
+    element: <ManageSubjects />
   },
   ...ApiAuthorzationRoutes
 ];
