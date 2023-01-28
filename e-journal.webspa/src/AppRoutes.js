@@ -4,6 +4,7 @@ import { Home } from "./components/Home";
 import { ManageGroups } from './components/ManageGroups';
 import { ManageSubjects } from './components/ManageSubjects';
 import { ManageTeachers } from './components/ManageTeachers';
+import { ManageTrainingTypes } from './components/ManageTrainingTypes';
 
 const AppRoutes = [
   {
@@ -32,6 +33,11 @@ const AppRoutes = [
     path: '/manage-teachers',
     requireAuth: true,
     element: <ManageTeachers />
+  },
+  {
+    path: '/manage-training-types',
+    requireAuth: true,
+    element: <ManageTrainingTypes />
   },
   ...ApiAuthorzationRoutes
 ];

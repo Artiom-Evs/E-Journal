@@ -112,3 +112,26 @@ export class TeachersClient extends BaseClient {
             });
     }
 }
+
+export class TrainingTypesClient extends BaseClient {
+    constructor() {
+        super('/journal/trainingtypes');
+    }
+
+    async Get(trainingTypeId) {
+        let url = this._baseUrl;
+
+        if (trainingTypeId) {
+            url += `/${trainingTypeId}`;
+        }
+
+        return fetch(url)
+            .then(r => {
+                console.log(`===> URL: ${r.url}.`);
+                return r.json();
+            })
+            .catch(e => {
+                console.error(`===> Error occored while loading groups from Journal API:\n${e}`);
+            });
+    }
+}
