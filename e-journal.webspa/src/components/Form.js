@@ -21,7 +21,8 @@ export class Form extends Component {
                     build[p.id] = item ? item[p.id] : '';
                     break;
                 case 'select':
-                    build[p.id] = item ? item[p.id] : '0';
+                    let defaultValue = p.default ? p.default : '';
+                    build[p.id] = item ? item[p.id] : defaultValue;
                     break;
                 case 'hidden':
                     build[p.id] = item ? item[p.id] : '0';;
@@ -60,7 +61,7 @@ export class Form extends Component {
         let isRequired = prop.required === undefined ? true : prop.required;
         let defaultValue = prop.default === undefined ? '' : prop.default;
         value = value === undefined ? this.state[prop.id] : value;
-
+        
         if (!isRequired) return true;
         if (value === defaultValue) return false;
         return !!value;
