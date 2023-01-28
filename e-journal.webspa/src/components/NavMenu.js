@@ -43,6 +43,10 @@ export class NavMenu extends Component {
               </NavItem>
 
               <NavItem>
+                <NavLink tag={Link} className="text-dark" to="/manage-teachers">Преподаватели</NavLink>
+              </NavItem>
+
+              <NavItem>
                 <NavLink tag={Link} className="text-dark" to="/groups-schedule">Расписание групп</NavLink>
               </NavItem>
 

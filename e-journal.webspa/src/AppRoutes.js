@@ -3,6 +3,7 @@ import { WeeklySchedule } from './components/WeeklySchedule';
 import { Home } from "./components/Home";
 import { ManageGroups } from './components/ManageGroups';
 import { ManageSubjects } from './components/ManageSubjects';
+import { ManageTeachers } from './components/ManageTeachers';
 
 const AppRoutes = [
   {
@@ -26,6 +27,11 @@ const AppRoutes = [
     path: '/manage-subjects',
     requireAuth: true,
     element: <ManageSubjects />
+  },
+  {
+    path: '/manage-teachers',
+    requireAuth: true,
+    element: <ManageTeachers />
   },
   ...ApiAuthorzationRoutes
 ];
