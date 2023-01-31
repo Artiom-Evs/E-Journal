@@ -39,6 +39,10 @@ export class NavMenu extends Component {
                 <DropdownMenu right>
 
                   <DropdownItem>
+                    <NavLink tag={Link} className="text-dark" to="/manage-marks">Отметки</NavLink>
+                  </DropdownItem>
+
+                  <DropdownItem>
                     <NavLink tag={Link} className="text-dark" to="/manage-trainings">Занятия</NavLink>
                   </DropdownItem>
 

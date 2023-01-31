@@ -232,3 +232,38 @@ export class TrainingsClient extends BaseClient {
             });
     }
 }
+
+export class MarksClient extends BaseClient {
+    constructor() {
+        super('/journal/marks');
+    }
+
+    async Get(markId, studentId, trainingId, valueId) {
+        let url = this._baseUrl;
+
+        if (markId) {
+            url += `/${markId}`;
+        }
+
+        if (studentId) {
+            url += `?studentId=${studentId}`;
+        }
+
+        if (trainingId) {
+            url += `?trainingId=${trainingId}`;
+        }
+
+        if (valueId) {
+            url += `&valueId=${valueId}`;
+        }
+
+        return fetch(url)
+            .then(r => {
+                console.log(`===> URL: ${r.url}.`);
+                return r.json();
+            })
+            .catch(e => {
+                console.error(`===> Error occored while loading groups from Journal API:\n${e}`);
+            });
+    }
+}
