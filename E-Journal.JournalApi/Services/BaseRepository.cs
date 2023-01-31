@@ -22,7 +22,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseModel,
     
     public virtual async ValueTask<T?> GetAsync(int id)
     {
-        return await _context.Set<T>().FirstOrDefaultAsync(item => item.Id == id);
+        return await this.Items.FirstOrDefaultAsync(item => item.Id == id);
     }
 
     public virtual async ValueTask<T?> CreateAsync(T item)
