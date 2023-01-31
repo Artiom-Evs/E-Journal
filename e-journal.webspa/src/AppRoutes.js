@@ -6,6 +6,7 @@ import { ManageSubjects } from './components/ManageSubjects';
 import { ManageTeachers } from './components/ManageTeachers';
 import { ManageTrainingTypes } from './components/ManageTrainingTypes';
 import { ManageMarkValues } from './components/ManageMarkValues';
+import { ManageStudents } from './components/ManageStudents';
 
 const AppRoutes = [
   {
@@ -44,6 +45,11 @@ const AppRoutes = [
     path: '/manage-mark-values',
     requireAuth: true,
     element: <ManageMarkValues />
+  },
+  {
+    path: '/manage-students',
+    requireAuth: true,
+    element: <ManageStudents />
   },
   ...ApiAuthorzationRoutes
 ];

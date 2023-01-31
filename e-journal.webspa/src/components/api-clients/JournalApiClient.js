@@ -158,3 +158,30 @@ export class MarkValuesClient extends BaseClient {
             });
     }
 }
+
+export class StudentsClient extends BaseClient {
+    constructor() {
+        super('/journal/students');
+    }
+
+    async Get(studentId, groupId) {
+        let url = this._baseUrl;
+
+        if (studentId) {
+            url += `/${studentId}`;
+        }
+
+        if (groupId) {
+            url += `?groupId=${studentId}`;
+        }
+
+        return fetch(url)
+            .then(r => {
+                console.log(`===> URL: ${r.url}.`);
+                return r.json();
+            })
+            .catch(e => {
+                console.error(`===> Error occored while loading groups from Journal API:\n${e}`);
+            });
+    }
+}

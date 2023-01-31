@@ -22,6 +22,10 @@ export class Table extends Component {
         this.props.onDelete(item);
     }
 
+    viewProperty(prop, value) {
+        return prop.viewer ? prop.viewer(prop, value) : value;
+    }
+
     render() {
         return (
             <div>
@@ -38,7 +42,7 @@ export class Table extends Component {
                     {this.props.items.map((item, i) =>
                         <tr key={i}>
                             {this.props.properties.map((p, i) =>
-                                <td key={i}>{item[p.id]}</td>
+                                <td key={i}>{this.viewProperty(p, item[p.id])}</td>
                             )}
                             <td>
                                 <button className="btn btn-secondary" onClick={() => this.handleEdit(item)}>Изменить</button>
