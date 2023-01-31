@@ -185,3 +185,50 @@ export class StudentsClient extends BaseClient {
             });
     }
 }
+
+export class TrainingsClient extends BaseClient {
+    constructor() {
+        super('/journal/trainings');
+    }
+
+    async Get(trainingId, groupId, subjectId, teacherId, typeId, startDate, endDate) {
+        let url = this._baseUrl;
+
+        if (trainingId) {
+            url += `/${trainingId}`;
+        }
+
+        if (groupId) {
+            url += `?groupId=${groupId}`;
+        }
+
+        if (subjectId) {
+            url += `?subjectId=${subjectId}`;
+        }
+
+        if (teacherId) {
+            url += `&teacherId=${teacherId}`;
+        }
+
+        if (typeId) {
+            url += `&typeId=${typeId}`;
+        }
+
+        if (startDate) {
+            url += `&startDate=${startDate}`;
+        }
+
+        if (endDate) {
+            url += `&endDate=${endDate}`;
+        }
+
+        return fetch(url)
+            .then(r => {
+                console.log(`===> URL: ${r.url}.`);
+                return r.json();
+            })
+            .catch(e => {
+                console.error(`===> Error occored while loading groups from Journal API:\n${e}`);
+            });
+    }
+}

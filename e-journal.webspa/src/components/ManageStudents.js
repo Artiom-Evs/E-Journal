@@ -11,7 +11,7 @@ const properties = [
         id: 'name',
         name: 'Инициалы',
         type: 'text',
-        placeholder: 'Введите наименование значения оценки'
+        placeholder: 'Введите инициалы учащегося'
     },
     {
         id: 'groupId',
@@ -56,7 +56,7 @@ export class ManageStudents extends BaseManage {
         groups = groups.map(g => {
             return {key:g.id,value:g.name};
         });
-        properties[2].options = groups;
+        properties.find(o => o.id === 'groupId').options = groups;
 
         this.setState({
             items: data,

@@ -20,6 +20,9 @@ export class Form extends Component {
                 case 'text':
                     build[p.id] = item ? item[p.id] : '';
                     break;
+                case 'number':
+                    build[p.id] = item ? item[p.id] : 0;
+                    break;
                 case 'select':
                     let defaultValue = p.default ? p.default : '';
                     build[p.id] = item ? item[p.id] : defaultValue;
@@ -98,6 +101,8 @@ export class Form extends Component {
         switch (prop.type) {
             case 'text':
                 return this.renderTextInput(prop);
+            case 'number':
+                return this.renderNumberInput(prop);
             case 'select':
                 return this.renderSelectInput(prop);
             case 'hidden':
@@ -112,6 +117,16 @@ export class Form extends Component {
             <div className='form-group'>
                 <label htmlFor={`${prop.id}Input`}>{prop.name}</label>
                 <input className="form-control" type='text' id={`${prop.id}Input`} name={prop.id} value={this.state[prop.id]} placeholder={prop.placeholder ? prop.placeholder : ''} onChange={this.handleChange} />
+                <small id={`${prop.id}Message`} className="form-text text-muted"></small>
+            </div>
+        )
+    }
+
+    renderNumberInput(prop) {
+        return (
+            <div className='form-group'>
+                <label htmlFor={`${prop.id}Input`}>{prop.name}</label>
+                <input className="form-control" type='number' min='0' max='7' id={`${prop.id}Input`} name={prop.id} value={this.state[prop.id]} placeholder={prop.placeholder ? prop.placeholder : ''} onChange={this.handleChange} />
                 <small id={`${prop.id}Message`} className="form-text text-muted"></small>
             </div>
         )
