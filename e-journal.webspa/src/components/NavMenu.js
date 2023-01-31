@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Collapse, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
+import { Collapse, DropdownItem, DropdownMenu, DropdownToggle, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, UncontrolledDropdown } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { LoginMenu } from './api-authorization/LoginMenu';
 import './NavMenu.css';
@@ -33,42 +33,58 @@ export class NavMenu extends Component {
               <NavItem>
                 <NavLink tag={Link} className="text-dark" to="/">Главная</NavLink>
               </NavItem>
-              
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/manage-groups">Группы</NavLink>
-              </NavItem>
 
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/manage-subjects">Дисциплины</NavLink>
-              </NavItem>
+              <UncontrolledDropdown inNavbar nav>
+                <DropdownToggle caret nav>Администрирование</DropdownToggle>
+                <DropdownMenu right>
 
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/manage-teachers">Преподаватели</NavLink>
-              </NavItem>
+                  <DropdownItem>
+                    <NavLink tag={Link} className="text-dark" to="/manage-trainings">Занятия</NavLink>
+                  </DropdownItem>
 
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/manage-training-types">Типы занятий</NavLink>
-              </NavItem>
+                  <DropdownItem>
+                    <NavLink tag={Link} className="text-dark" to="/manage-students">Учащиеся</NavLink>
+                  </DropdownItem>
 
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/manage-mark-values">Значения оценок</NavLink>
-              </NavItem>
+                  <DropdownItem divider />
 
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/manage-students">Учащиеся</NavLink>
-              </NavItem>
+                  <DropdownItem>
+                    <NavLink tag={Link} className="text-dark" to="/manage-groups">Группы</NavLink>
+                  </DropdownItem>
 
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/manage-trainings">Занятия</NavLink>
-              </NavItem>
+                  <DropdownItem>
+                    <NavLink tag={Link} className="text-dark" to="/manage-subjects">Дисциплины</NavLink>
+                  </DropdownItem>
 
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/groups-schedule">Расписание групп</NavLink>
-              </NavItem>
+                  <DropdownItem>
+                    <NavLink tag={Link} className="text-dark" to="/manage-teachers">Преподаватели</NavLink>
+                  </DropdownItem>
 
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/teachers-schedule">Расписание преподавателей</NavLink>
-              </NavItem>
+                  <DropdownItem>
+                    <NavLink tag={Link} className="text-dark" to="/manage-training-types">Типы занятий</NavLink>
+                  </DropdownItem>
+
+                  <DropdownItem>
+                    <NavLink tag={Link} className="text-dark" to="/manage-mark-values">Значения оценок</NavLink>
+                  </DropdownItem>
+
+                </DropdownMenu>
+              </UncontrolledDropdown>
+
+              <UncontrolledDropdown inNavbar nav>
+                <DropdownToggle caret nav>Расписания</DropdownToggle>
+                <DropdownMenu>
+
+                  <DropdownItem>
+                    <NavLink tag={Link} className="text-dark" to="/groups-schedule">Расписание групп</NavLink>
+                  </DropdownItem>
+
+                  <DropdownItem>
+                    <NavLink tag={Link} className="text-dark" to="/teachers-schedule">Расписание преподавателей</NavLink>
+                  </DropdownItem>
+
+                </DropdownMenu>
+              </UncontrolledDropdown>
 
               <LoginMenu>
               </LoginMenu>
