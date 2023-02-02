@@ -36,7 +36,7 @@ export class NavMenu extends Component {
 
               <UncontrolledDropdown inNavbar nav>
                 <DropdownToggle caret nav>Администрирование</DropdownToggle>
-                <DropdownMenu right>
+                <DropdownMenu>
 
                   <DropdownItem>
                     <NavLink tag={Link} className="text-dark" to="/manage-marks">Отметки</NavLink>
