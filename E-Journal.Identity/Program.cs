@@ -1,26 +1,26 @@
 using E_Journal.Identity.Data;
 using E_Journal.Identity.Models;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+/*
 string connectionString = Environment.GetEnvironmentVariable("IDENTITY_DB_CONNECTION_STRING")
-            ?? throw new InvalidOperationException("Environment has not contain the IDENTITY_DB_CONNECTION_STRING variable that contains database connection string.");
+    ?? throw new InvalidOperationException("Environment has not contain the IDENTITY_DB_CONNECTION_STRING variable that contains database connection string.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
     options.UseMySql(
         connectionString,
         ServerVersion.AutoDetect(connectionString),
         mySqlOptionsAction: options =>
         {
             options.EnableRetryOnFailure();
-        });
-});
+        }));
+*/
+
+builder.Services.AddDbContext<ApplicationDbContext>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -38,14 +38,12 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
 }
 else
 {
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
