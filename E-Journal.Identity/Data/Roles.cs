@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.VisualBasic;
+using System.Reflection;
 
 namespace E_Journal.Identity.Data;
 
@@ -6,19 +8,22 @@ public sealed class Roles
 {
     private Roles() { }
 
-    public static string Admin => "Администратор";
-    public static string Teacher => "Преподаватель";
-    public static string UnconfirmedTeacher => "Неподтверждённый преподаватель";
-    public static string Student => "Учащийся";
-    public static string UnconfirmedStudent => "Неподтверждённый учащийся";
+    public const string Admin = "Администратор";
+    public const string Teacher = "Преподаватель";
+    public const string UnconfirmedTeacher = "Неподтверждённый преподаватель";
+    public const string Student = "Учащийся";
+    public const string UnconfirmedStudent = "Неподтверждённый учащийся";
 
     public static string[] GetAll()
     {
         Roles rolesObj = new();
-        string[] roles = rolesObj.GetType().GetProperties()
-            .Select(p => (string)(p.GetValue(rolesObj) ?? throw new InvalidOperationException("All properties of the Roles class should only return string.")))
-            .ToArray();
+        List<string> constants = new();
+        FieldInfo[] fieldInfos = typeof(Roles).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 
-        return roles;
+        foreach (FieldInfo fi in fieldInfos)
+            if (fi.IsLiteral && !fi.IsInitOnly)
+                constants.Add((string?)fi.GetValue(rolesObj) ?? throw new InvalidOperationException());
+
+        return constants.ToArray();
     }
 }

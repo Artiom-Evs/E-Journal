@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using E_Journal.Identity.Data;
 
 namespace E_Journal.Identity.Areas.Identity.Pages.Account
 {
@@ -30,13 +31,15 @@ namespace E_Journal.Identity.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,6 +47,7 @@ namespace E_Journal.Identity.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         /// <summary>
@@ -79,6 +83,9 @@ namespace E_Journal.Identity.Areas.Identity.Pages.Account
             [EmailAddress(ErrorMessage = "Некорректный Email.")]
             public string Email { get; set; }
 
+            [Required(ErrorMessage = "'{0}' является обязательным полем.")]
+            public string Role { get; set; }
+            
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -108,6 +115,7 @@ namespace E_Journal.Identity.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -115,23 +123,28 @@ namespace E_Journal.Identity.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
+                IdentityResult roleResult = null;
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
+                    switch (Input.Role)
+                    {
+                        case Roles.Admin:
+                            roleResult = await _userManager.AddToRoleAsync(user, Roles.Admin);
+                            break;
+                        case Roles.Teacher:
+                            roleResult = await _userManager.AddToRoleAsync(user, Roles.UnconfirmedTeacher);
+                            break;
+                        case Roles.Student:
+                            roleResult = await _userManager.AddToRoleAsync(user, Roles.UnconfirmedStudent);
+                            break;
+                    }
+                }
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
+                if (result.Succeeded && roleResult.Succeeded)
+                {
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
@@ -142,7 +155,13 @@ namespace E_Journal.Identity.Areas.Identity.Pages.Account
                         return LocalRedirect(returnUrl);
                     }
                 }
+
                 foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                foreach (var error in roleResult?.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
@@ -156,7 +175,9 @@ namespace E_Journal.Identity.Areas.Identity.Pages.Account
         {
             try
             {
-                return Activator.CreateInstance<ApplicationUser>();
+                var user = Activator.CreateInstance<ApplicationUser>();
+                return user;
+                
             }
             catch
             {
