@@ -133,18 +133,13 @@ namespace E_Journal.Identity.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    switch (Input.Role)
+                    roleResult = Input.Role switch
                     {
-                        case Roles.Admin:
-                            roleResult = await _userManager.AddToRoleAsync(user, Roles.Admin);
-                            break;
-                        case Roles.Teacher:
-                            roleResult = await _userManager.AddToRoleAsync(user, Roles.UnconfirmedTeacher);
-                            break;
-                        case Roles.Student:
-                            roleResult = await _userManager.AddToRoleAsync(user, Roles.UnconfirmedStudent);
-                            break;
-                    }
+                        Roles.Admin => await _userManager.AddToRoleAsync(user, Roles.Admin),
+                        Roles.Teacher => await _userManager.AddToRoleAsync(user, Roles.UnconfirmedTeacher),
+                        Roles.Student => await _userManager.AddToRoleAsync(user, Roles.UnconfirmedStudent),
+                        _ => throw new ArgumentException(nameof(Input.Role)),
+                    };
                 }
 
                 if (result.Succeeded && roleResult.Succeeded)
@@ -165,7 +160,7 @@ namespace E_Journal.Identity.Areas.Identity.Pages.Account
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
 
-                foreach (var error in roleResult?.Errors)
+                foreach (var error in roleResult?.Errors ?? Array.Empty<IdentityError>())
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
