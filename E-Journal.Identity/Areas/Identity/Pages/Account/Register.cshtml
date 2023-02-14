@@ -32,6 +32,12 @@
             </div>
 
             <div class="form-floating mb-3">
+                <input asp-for="Input.Initials" class="form-control" aria-required="true" placeholder="Введите ваши инициалы" />
+                <label asp-for="Input.Initials">Инициалы</label>
+                <span asp-validation-for="Input.Initials" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
                 <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Введите пароль" />
                 <label asp-for="Input.Password">Пароль</label>
                 <span asp-validation-for="Input.Password" class="text-danger"></span>

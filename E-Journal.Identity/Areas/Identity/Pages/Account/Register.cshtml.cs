@@ -85,7 +85,11 @@ namespace E_Journal.Identity.Areas.Identity.Pages.Account
 
             [Required(ErrorMessage = "'{0}' €вл€етс€ об€зательным полем.")]
             public string Role { get; set; }
-            
+
+            [Required(ErrorMessage = "'{0}' €вл€етс€ об€зательным полем.")]
+            [StringLength(50, ErrorMessage = "»нициалы должны содержать от {2} до {1} символов.", MinimumLength = 8)]
+            public string Initials { get; set; }
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -176,6 +180,7 @@ namespace E_Journal.Identity.Areas.Identity.Pages.Account
             try
             {
                 var user = Activator.CreateInstance<ApplicationUser>();
+                user.Initials = Input.Initials;
                 return user;
                 
             }
